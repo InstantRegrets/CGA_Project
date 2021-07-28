@@ -1,6 +1,8 @@
 # Cayuga
 
-![duck](https://commons.wikimedia.org/wiki/File:Cayuga_drake_2012-05-02_001.jpg#/media/File:Cayuga_drake_2012-05-02_001.jpg)
+![duck](https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Cayuga_drake_2012-05-02_001.jpg/1920px-Cayuga_drake_2012-05-02_001.jpg)
+
+our spirit animal!
 
 # Teammitglieder
 - Simon Wöhler
