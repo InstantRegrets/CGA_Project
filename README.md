@@ -1,21 +1,13 @@
-# CGAProject
-Dies ist das Template Projekt für die Abschlussprojekte im Modul "Computergrafik und Animation" an der TH Köln.
-
-Bitte forken Sie dieses Projekt und entwickeln Sie Ihr Abschlussprojekt in diesem Fork weiter. Denken Sie daran fabianfriederichs, jm-th-koeln und umuesse als Collaborators hinzuzufügen, damit wir darauf zugreifen können.
-
-Löschen Sie als erstes den Abschnitt CGAProjekt in dieser Datei und füllen Sie den Rest entsprechend aus für die Abgabe.
-
-# Projektname
-Cayuga
+# Cayuga
 
 # Teammitglieder
-Listen Sie hier noch einmal alle Teammitglieder auf.
 - Simon Wöhler
 - Bastian Abt
 - Jannik Alexander
 
 # Featureliste
-Listen Sie hier alle relevanten Features als Liste mit sinnvoller Reihenfolge auf mit Angabe wer das Feature implementiert hat.
-Bei starker Ungleicheit der Features behalten wir uns eine individuelle Notenvergabe vor.
 
-WIP
+- [x] soundausgabe (B)
+- [x] einfaches rythmusspiel (B)
+- todo
+
