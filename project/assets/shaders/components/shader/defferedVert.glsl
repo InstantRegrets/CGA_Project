@@ -4,8 +4,11 @@ layout (location = 1) in vec2 aTexCoords;
 
 out vec2 textureCoordinates;
 
+out vec4 testPos;
+
 void main()
 {
     textureCoordinates = aTexCoords;
     gl_Position = vec4(aPos, 1.0);
+    testPos = vec4(aPos,1.0);
 }
