@@ -41,16 +41,9 @@ class GeometryBuffer(window: GameWindow){
         gNormal = glGenTextures()
         glBindTexture(GL_TEXTURE_2D, gNormal)
         val gNormalFrameBuffer: ByteBuffer? = null
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RGBA16F,
-            window.windowWidth,
-            window.windowHeight,
-            0,
-            GL_RGBA,
-            GL_FLOAT,
-            gNormalFrameBuffer
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F,
+            window.windowWidth, window.windowHeight,
+            0, GL_RGBA, GL_FLOAT, gNormalFrameBuffer
         )
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -61,15 +54,9 @@ class GeometryBuffer(window: GameWindow){
         glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
         val gAlbedoBuffer: ByteBuffer? = null
         glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RGBA,
-            window.windowWidth,
-            window.windowHeight,
-            0,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            gAlbedoBuffer
+            GL_TEXTURE_2D, 0, GL_RGBA,
+            window.windowWidth, window.windowHeight,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, gAlbedoBuffer
         );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -80,15 +67,9 @@ class GeometryBuffer(window: GameWindow){
         glBindTexture(GL_TEXTURE_2D, gEmissive);
         val gEmissiveBuff: ByteBuffer? = null
         glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RGBA,
-            window.windowWidth,
-            window.windowHeight,
-            0,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            gEmissiveBuff
+            GL_TEXTURE_2D, 0, GL_RGBA,
+            window.windowWidth, window.windowHeight,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, gEmissiveBuff
         );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

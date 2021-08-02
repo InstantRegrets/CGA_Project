@@ -7,6 +7,7 @@ uniform sampler2D gPosition, gNormal, gAlbedoSpec, gEmissive;
 in vec4 testPos;
 in vec2 textureCoordinates;
 
+
 uniform int lightMode;
 
 struct PointLightData{
@@ -122,9 +123,9 @@ void spotLight(in vec3 fragPos, in vec3 N, in SpotLightData lightData, inout vec
     }
 }
 
-void spotLights(in vec3 N, inout vec3 o){
+void spotLights(in vec3 fragPos, in vec3 N, inout vec3 o){
     for (int i = 0; i < NR_SPOT_LIGHTS; i++){
-        spotLight(slStaticData[i], slDynamicData[i], N, o);
+        spotLight(fragPos, N, slData[i], o);
     }
 }
 
@@ -138,8 +139,8 @@ void ambient(inout vec3 o){
 
 void main(){
     loadMaterial();
+    vec3 fragPos = texture(gPosition, textureCoordinates).xyz;
     vec3 N = normalize(texture(gNormal, textureCoordinates).xyz);
-    vec3 fragPosition = normalize(texture(gPosition, textureCoordinates).xyz);
 
     vec3 o = vec3(0, 0, 0);// output color that get's passed through all the functions
 
@@ -148,5 +149,6 @@ void main(){
     spotLights(fragPos, N, o);
     emit(o);
 
-    color = vec4(o, 1);// output as vec4
+    //color = vec4(o, 1);// output as vec4
+    color = vec4(fragPos,1.0);
 }
