@@ -15,8 +15,8 @@ import java.nio.file.Paths
  * @param fragmentShaderPath    fragment shader path
  * @throws Exception if shader compilation failed, an exception is thrown
  */
-class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
-    private var programID: Int = 0
+open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
+    var programID: Int = 0
     //Matrix buffers for setting matrix uniforms. Prevents allocation for each uniform
     private val m4x4buf: FloatBuffer = BufferUtils.createFloatBuffer(16)
     private val v2fBuf: FloatBuffer = BufferUtils.createFloatBuffer(2)
