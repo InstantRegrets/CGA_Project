@@ -17,7 +17,7 @@ in struct VertexData
 uniform sampler2D emitMat;
 uniform sampler2D specularMat;
 uniform sampler2D diffMat;
-
+uniform vec3 emitColor; // todo remove, once renderable is changed
 
 void main() {
     // store the fragment position vector in the first gbuffer texture

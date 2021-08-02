@@ -10,9 +10,12 @@ class Player {
     val model = PlayerModel(player)
     val lighting = PlayerLighting(player)
 
-    fun update(shaderProgram: ShaderProgram, camera: TronCamera){
+    fun draw(shaderProgram: ShaderProgram){
         model.update(shaderProgram)
+    }
+    fun light(shaderProgram: ShaderProgram, camera: TronCamera){
         lighting.update(shaderProgram, camera.viewMatrix)
+
     }
 }
 

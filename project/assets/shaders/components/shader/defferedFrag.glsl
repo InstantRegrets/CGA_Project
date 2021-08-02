@@ -38,14 +38,16 @@ in LightData slDynamicData[NR_SPOT_LIGHTS];
 uniform vec3 ambLight;
 uniform float ambientStrength;
 
-// Material
 vec4 diffMaterial, specularMaterial, emitMaterial;
+// Material todo do those 2 need to be here?
+uniform float shininess;
+uniform vec3 emitColor;
 
 // todo don't do this vec4 hackery
 void loadMaterial(){
     emitMaterial = texture(gEmissive, textureCoordinates);
-    diffMaterial = vec4(texture(gAlbedoSpec, vertexData.textureCoordinates).rgb,0);
-    specularMaterial = vec4(texture(gAlbedoSpec, vertexData.textureCoordinates).a);
+    diffMaterial = vec4(texture(gAlbedoSpec, textureCoordinates).rgb,0);
+    specularMaterial = vec4(texture(gAlbedoSpec, textureCoordinates).a);
 }
 
 // Lightning functions
@@ -140,7 +142,9 @@ void ambient(inout vec3 o){
 
 void main(){
     loadMaterial();
-    vec3 N = normalize(vertexData.normal);
+    vec3 N = normalize(texture(gNormal, textureCoordinates).xyz);
+    vec3 fragPosition = normalize(texture(gPosition, textureCoordinates).xyz);
+
     vec3 o = vec3(0, 0, 0);// output color that get's passed through all the functions
 
     ambient(o);
