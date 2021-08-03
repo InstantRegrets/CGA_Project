@@ -17,6 +17,8 @@ import java.nio.file.Paths
  */
 open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
     var programID: Int = 0
+    var vShaderId: Int = 0
+    var fShaderId: Int = 0
     //Matrix buffers for setting matrix uniforms. Prevents allocation for each uniform
     private val m4x4buf: FloatBuffer = BufferUtils.createFloatBuffer(16)
     private val v2fBuf: FloatBuffer = BufferUtils.createFloatBuffer(2)
@@ -53,7 +55,9 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
             GLError.checkThrow("Error setting Uniform: $name at location $loc")
             return true
         }
-        return false
+
+        throw Exception("Error setting uniform $name. Error:${(glGetError())
+        }")
     }
 
     fun setUniform(name: String, value: Float): Boolean =
@@ -78,8 +82,10 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
         val vSource = String(Files.readAllBytes(vPath))
         val fSource = String(Files.readAllBytes(fPath))
         val vShader = glCreateShader(GL_VERTEX_SHADER)
+        vShaderId = vShader
         if (vShader == 0) throw Exception("Vertex shader object couldn't be created.")
         val fShader = glCreateShader(GL_FRAGMENT_SHADER)
+        fShaderId = fShader
         if (fShader == 0) {
             glDeleteShader(vShader)
             throw Exception("Fragment shader object couldn't be created.")

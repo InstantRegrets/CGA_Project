@@ -31,7 +31,7 @@ class PlayerLighting(parent: Transformable): Lighting {
     }
 
     override fun update(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
-        pointLight.bind(shaderProgram)
-        spotLight.bind(shaderProgram, "bikeSpotLight", viewMatrix)
+        pointLight.bindCamSpace(shaderProgram, viewMatrix)
+        spotLight.bindCamSpace(shaderProgram, viewMatrix)
     }
 }

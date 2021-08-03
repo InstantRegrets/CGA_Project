@@ -2,9 +2,11 @@
 out vec4 color;
 
 
-uniform sampler2D gPosition, gNormal, gAlbedoSpec, gEmissive;
+uniform sampler2D inPosition;
+uniform sampler2D inNormal;
+uniform sampler2D inAlbedoSpec;
+uniform sampler2D inEmissive;
 
-in vec4 testPos;
 in vec2 textureCoordinates;
 
 
@@ -42,9 +44,9 @@ uniform vec3 emitColor;
 
 // todo don't do this vec4 it's horrendous
 void loadMaterial(){
-    emitMaterial = texture(gEmissive, textureCoordinates);
-    diffMaterial = vec4(texture(gAlbedoSpec, textureCoordinates).rgb,0);
-    specularMaterial = vec4(texture(gAlbedoSpec, textureCoordinates).a);
+    emitMaterial = texture(inEmissive, textureCoordinates);
+    diffMaterial = vec4(texture(inAlbedoSpec, textureCoordinates).rgb,0);
+    specularMaterial = vec4(texture(inAlbedoSpec, textureCoordinates).a);
 }
 
 // Lightning functions
@@ -139,8 +141,8 @@ void ambient(inout vec3 o){
 
 void main(){
     loadMaterial();
-    vec3 fragPos = texture(gPosition, textureCoordinates).xyz;
-    vec3 N = normalize(texture(gNormal, textureCoordinates).xyz);
+    vec3 fragPos = texture(inPosition, textureCoordinates).xyz;
+    vec3 N = normalize(texture(inNormal, textureCoordinates).xyz);
 
     vec3 o = vec3(0, 0, 0);// output color that get's passed through all the functions
 
@@ -149,6 +151,6 @@ void main(){
     spotLights(fragPos, N, o);
     emit(o);
 
-    //color = vec4(o, 1);// output as vec4
-    color = vec4(fragPos,1.0);
+    color = vec4(o,1);
+    color = vec4(texture(inAlbedoSpec, textureCoordinates).xyz,1);
 }

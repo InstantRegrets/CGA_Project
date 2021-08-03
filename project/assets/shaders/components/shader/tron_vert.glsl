@@ -12,14 +12,6 @@ uniform mat4 projection_matrix;
 // textures
 uniform vec2 tcMultiplier;
 
-// lightning
-uniform vec3 bikePointLightPos;
-uniform vec3 bikePointLightColor;
-uniform vec3 bikeSpotLightPos;
-uniform vec3 bikeSpotLightColor;
-uniform vec3 bikeSpotLightDirection;
-
-
 out struct VertexData
 {
     vec3 position;

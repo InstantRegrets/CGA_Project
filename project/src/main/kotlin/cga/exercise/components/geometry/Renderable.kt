@@ -41,7 +41,7 @@ class Renderable(
         }
 
         shaderProgram.setUniform("model_matrix",mm)
-        shaderProgram.setUniform("emitColor",color)
+        //shaderProgram.setUniform("emitColor",color) TODO
         meshes.forEach{
             it.render(shaderProgram)
         }

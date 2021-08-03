@@ -3,7 +3,6 @@ package cga.exercise.game.player
 import cga.exercise.components.camera.TronCamera
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.shader.ShaderProgram
-import cga.exercise.game.staticShader
 
 class Player {
     val player = Transformable()

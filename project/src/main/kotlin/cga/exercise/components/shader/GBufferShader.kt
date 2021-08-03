@@ -7,14 +7,8 @@ class GBufferShader(): ShaderProgram(
     fragmentShaderPath = "assets/shaders/components/shader/gFrag.glsl"
 ) {
     init {
-        //layout (location = 0) out vec3 gPosition;
-        //layout (location = 1) out vec3 gNormal;
-        //layout (location = 2) out vec4 gAlbedoSpec;
-        //layout (location = 3) out vec3 gEmissive;
-        GL30.glBindFragDataLocation(this.programID, 0,"gPosition")
-        GL30.glBindFragDataLocation(this.programID, 1,"gNormal")
-        GL30.glBindFragDataLocation(this.programID, 2,"gAlbedoSpec")
-        GL30.glBindFragDataLocation(this.programID, 3,"gEmissive")
+        //We actually dont need glBindFragDataLocation,
+        //as this is done in the Fragment shader
     }
 
 }
