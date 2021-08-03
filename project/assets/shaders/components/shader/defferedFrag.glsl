@@ -151,6 +151,6 @@ void main(){
     spotLights(fragPos, N, o);
     emit(o);
 
+    // todo emit texture pos?
     color = vec4(o,1);
-    color = vec4(texture(inAlbedoSpec, textureCoordinates).xyz,1);
 }

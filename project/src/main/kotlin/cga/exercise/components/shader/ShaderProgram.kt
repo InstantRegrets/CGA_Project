@@ -55,9 +55,8 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
             GLError.checkThrow("Error setting Uniform: $name at location $loc")
             return true
         }
-
-        throw Exception("Error setting uniform $name. Error:${(glGetError())
-        }")
+        println("Error setting uniform $name. Error:${(glGetError())}")
+        return false
     }
 
     fun setUniform(name: String, value: Float): Boolean =

@@ -1,6 +1,5 @@
 package cga.exercise.game
 
-import GBuffer
 import cga.exercise.components.camera.TronCamera
 import cga.exercise.components.light.LightMode
 import cga.exercise.components.light.PointLight
@@ -8,14 +7,11 @@ import cga.exercise.components.shader.GBufferShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
 import cga.exercise.game.environment.ground.Ground
-import cga.exercise.game.level.Level
-import cga.exercise.game.note.NoteKey
 import cga.exercise.game.player.Player
 import cga.framework.GLError
 import cga.framework.GameWindow
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30.*
 import java.util.*
 import kotlin.math.PI
@@ -36,7 +32,6 @@ class Scene(private val window: GameWindow) {
     // private val level: Level
     private val gBufferShader = GBufferShader()
     private val gBuffer = GeometryBuffer(window)
-    private val test = GBuffer(window)
     private val deferredShader = DefferedShader()
 
     //scene setup
@@ -67,41 +62,37 @@ class Scene(private val window: GameWindow) {
     }
 
     fun render(dt: Float, t: Float) {
-        try {
-            // geometry pass into gbuffer
-            gBuffer.bind()
-            gBufferShader.use()
-            player.draw(gBufferShader)
-            ground.update(gBufferShader)
-            camera.bind(gBufferShader)
-            glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
+        // geometry pass into gbuffer
+        gBuffer.bind()
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        gBufferShader.use()
+        player.draw(gBufferShader)
+        ground.update(gBufferShader)
+        camera.bind(gBufferShader)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
 
-            //Lighting Pass
-            initLightRendering()
-            deferredShader.use()
-            println(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS)
-            gBuffer.bindTextures()
-            GLError.checkThrow()
-            deferredShader.setUniform("inPosition", 0)
-            deferredShader.setUniform("inNormal", 1)
-            deferredShader.setUniform("inAlbedoSpec", 2)
-            deferredShader.setUniform("inEmissive", 3)
-            deferredShader.setUniform("lightMode", lightMode.ordinal)
-            deferredShader.setUniform("shininess", 64f)
-            player.light(deferredShader, camera)
-            sceneLights.forEach { it.bindCamSpace(deferredShader, camera.getCalculateViewMatrix()) }
-            //level.update(dt, t)
-            quad.draw(deferredShader)
-            endLightRendering()
+        //Lighting Pass
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        initLightRendering()
+        deferredShader.use()
+        gBuffer.bindTextures()
+        GLError.checkThrow()
+        deferredShader.setUniform("inPosition", 0)
+        deferredShader.setUniform("inNormal", 1)
+        deferredShader.setUniform("inAlbedoSpec", 2)
+        deferredShader.setUniform("inEmissive", 3)
+        deferredShader.setUniform("lightMode", lightMode.ordinal)
+        deferredShader.setUniform("shininess", 64f)
+        player.light(deferredShader, camera)
+        sceneLights.forEach { it.bindCamSpace(deferredShader, camera.getCalculateViewMatrix()) }
+        //level.update(dt, t)
+        quad.draw(deferredShader)
+        endLightRendering()
 
-            glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
+        glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
 
-            SoundListener.setPosition(camera)
-            GLError.checkThrow()
-            println(glGetFragDataLocation(deferredShader.programID, "gNormal"))
-        }catch (e: Exception){
-
-        }
+        SoundListener.setPosition(camera)
+        GLError.checkThrow()
     }
 
     private fun initLightRendering(){
