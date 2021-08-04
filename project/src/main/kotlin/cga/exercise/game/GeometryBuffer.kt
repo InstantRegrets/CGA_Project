@@ -2,9 +2,12 @@ package cga.exercise.game
 
 import cga.framework.GLError
 import cga.framework.GameWindow
+import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.ARBInternalformatQuery2.GL_TEXTURE_2D
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL33.*
+import org.lwjgl.stb.STBImage
+import org.lwjgl.stb.STBImageWrite
 import java.nio.ByteBuffer
 
 @Suppress("JoinDeclarationAndAssignment")
@@ -14,7 +17,7 @@ class GeometryBuffer(window: GameWindow){
     val width: Int = window.windowWidth
     val height: Int = window.windowHeight
     companion object{
-        const val totalTextures: Int = 4
+        const val totalTextures: Int = 5
     }
     init {
         gBufferID = glGenFramebuffers()
@@ -22,8 +25,8 @@ class GeometryBuffer(window: GameWindow){
         GLError.checkThrow()
         glGenTextures(textureIDs)
         for (i in 0 until totalTextures){
-            GL11.glBindTexture(GL_TEXTURE_2D, textureIDs[i])
-            GL11.glTexImage2D(GL_TEXTURE_2D,0, GL_RGB32F,
+            glBindTexture(GL_TEXTURE_2D, textureIDs[i])
+            glTexImage2D(GL_TEXTURE_2D,0, GL_RGB32F,
                 width,height,0,
                 GL_RG, GL_FLOAT, null as ByteBuffer?)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
@@ -37,7 +40,8 @@ class GeometryBuffer(window: GameWindow){
             GL_COLOR_ATTACHMENT0,
             GL_COLOR_ATTACHMENT1,
             GL_COLOR_ATTACHMENT2,
-            GL_COLOR_ATTACHMENT3
+            GL_COLOR_ATTACHMENT3,
+            GL_COLOR_ATTACHMENT4,
         )
         glDrawBuffers(buffers)
         GLError.checkThrow()

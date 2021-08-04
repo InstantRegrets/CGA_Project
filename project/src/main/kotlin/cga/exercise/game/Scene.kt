@@ -66,8 +66,8 @@ class Scene(private val window: GameWindow) {
         gBuffer.bind()
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gBufferShader.use()
-        player.draw(gBufferShader)
         ground.update(gBufferShader)
+        player.draw(gBufferShader)
         camera.bind(gBufferShader)
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
 
@@ -79,12 +79,13 @@ class Scene(private val window: GameWindow) {
         GLError.checkThrow()
         deferredShader.setUniform("inPosition", 0)
         deferredShader.setUniform("inNormal", 1)
-        deferredShader.setUniform("inAlbedoSpec", 2)
-        deferredShader.setUniform("inEmissive", 3)
+        deferredShader.setUniform("inDiffuse", 2)
+        deferredShader.setUniform("inSpecular", 3)
+        deferredShader.setUniform("inEmissive", 4)
         deferredShader.setUniform("lightMode", lightMode.ordinal)
         deferredShader.setUniform("shininess", 64f)
         player.light(deferredShader, camera)
-        sceneLights.forEach { it.bindCamSpace(deferredShader, camera.getCalculateViewMatrix()) }
+        sceneLights.forEach { it.bind(deferredShader, camera.viewMatrix) }
         //level.update(dt, t)
         quad.draw(deferredShader)
         endLightRendering()

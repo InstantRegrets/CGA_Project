@@ -4,7 +4,8 @@ out vec4 color;
 
 uniform sampler2D inPosition;
 uniform sampler2D inNormal;
-uniform sampler2D inAlbedoSpec;
+uniform sampler2D inDiffuse;
+uniform sampler2D inSpecular;
 uniform sampler2D inEmissive;
 
 in vec2 textureCoordinates;
@@ -37,16 +38,15 @@ uniform PointLightData plData[NR_POINT_LIGHTS];
 uniform SpotLightData slData[NR_SPOT_LIGHTS];
 
 
-vec4 diffMaterial, specularMaterial, emitMaterial;
+vec3 diffMaterial, specularMaterial, emitMaterial;
 // Material todo do those 2 need to be here?
 uniform float shininess;
-uniform vec3 emitColor;
 
 // todo don't do this vec4 it's horrendous
 void loadMaterial(){
-    emitMaterial = texture(inEmissive, textureCoordinates);
-    diffMaterial = vec4(texture(inAlbedoSpec, textureCoordinates).rgb,0);
-    specularMaterial = vec4(texture(inAlbedoSpec, textureCoordinates).a);
+    emitMaterial = texture(inEmissive, textureCoordinates).rgb;
+    diffMaterial = texture(inDiffuse, textureCoordinates).rgb;
+    specularMaterial = texture(inSpecular, textureCoordinates).rgb;
 }
 
 // Lightning functions
@@ -132,7 +132,7 @@ void spotLights(in vec3 fragPos, in vec3 N, inout vec3 o){
 }
 
 void emit(inout vec3 o){
-    o += emitMaterial.xyz*emitColor;
+    o += emitMaterial.xyz; // *emitColor;
 }
 
 void ambient(inout vec3 o){
@@ -153,4 +153,5 @@ void main(){
 
     // todo emit texture pos?
     color = vec4(o,1);
+    // color = vec4(slData[0].toLight, 1);
 }
