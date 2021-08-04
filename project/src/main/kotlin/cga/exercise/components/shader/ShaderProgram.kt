@@ -27,8 +27,8 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
      * if this isn't already the currently active shader
      */
     fun use() {
-        val curprog = glGetInteger(GL_CURRENT_PROGRAM)
-        if (curprog != programID) glUseProgram(programID)
+        val curProg = glGetInteger(GL_CURRENT_PROGRAM)
+        if (curProg != programID) glUseProgram(programID)
 
     }
 
