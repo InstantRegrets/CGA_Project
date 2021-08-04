@@ -4,7 +4,6 @@ import cga.exercise.game.chart.IoChart
 import cga.exercise.game.note.Note
 import cga.exercise.game.note.NoteData
 import cga.exercise.game.note.NoteKey
-import cga.exercise.game.staticShader
 import chart.difficulty.Difficulty
 import chart.difficulty._notes
 import chart.info.Info
@@ -95,7 +94,9 @@ class Level(name: String) {
 
     private fun advanceNote(){
         if (notes.hasNext())
-            nextNote = Note(notes.next(), staticShader)
+
+
+            // nextNote = Note(notes.next(), staticShader)
         else
             nextNote = null
     }
