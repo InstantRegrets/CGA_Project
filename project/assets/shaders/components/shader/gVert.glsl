@@ -25,7 +25,7 @@ void main(){
     //also, we don't want to translate them, so the homogeneous coordinate has to be 0
     vec4 norm = transpose(inverse(view_matrix*model_matrix)) * vec4(normal, 0.0f);
 
-    FragPos = - cameraSpace.xyz;
+    FragPos = cameraSpace.xyz;
     Normal = norm.xyz;
     TexCoords = tcMultiplier * texture; //todo is this actually how this works?
 }

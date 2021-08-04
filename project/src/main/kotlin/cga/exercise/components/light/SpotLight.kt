@@ -26,7 +26,7 @@ class SpotLight(
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
         val dir = (Vector4f(super.getWorldZAxis(), 0f)).mul(viewMatrix).toVector3f()
         val pos = Vector4f(super.getWorldPosition(), 1f).mul(viewMatrix).toVector3f()
-        shaderProgram.setUniform("${structName}toLight",pos)
+        shaderProgram.setUniform("${structName}lightPos",pos)
         shaderProgram.setUniform("${structName}color",color)
         shaderProgram.setUniform("${structName}direction",dir)
         shaderProgram.setUniform("${structName}innerCone",cos(innerCone))

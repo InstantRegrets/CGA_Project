@@ -1,8 +1,8 @@
 package cga.exercise.game
 
 import cga.exercise.components.camera.TronCamera
-import cga.exercise.components.light.LightMode
 import cga.exercise.components.light.PointLight
+import cga.exercise.components.shader.DefferedShader
 import cga.exercise.components.shader.GBufferShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
@@ -11,7 +11,7 @@ import cga.exercise.game.player.Player
 import cga.framework.GLError
 import cga.framework.GameWindow
 import org.joml.Vector3f
-import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL30.*
 import java.util.*
 import kotlin.math.PI
@@ -25,7 +25,6 @@ class Scene(private val window: GameWindow) {
     private val NR_POINT_LIGHTS: Int = 8
     private val sceneLights = sceneLights()
     private val camera: TronCamera
-    private var lightMode = LightMode.BlinnPhong
     private var player = Player()
     private val ground = Ground()
     private val quad = Quad()
@@ -63,6 +62,13 @@ class Scene(private val window: GameWindow) {
 
     fun render(dt: Float, t: Float) {
         // geometry pass into gbuffer
+        deferredRender()
+        SoundListener.setPosition(camera)
+        GLError.checkThrow()
+    }
+
+
+    private fun deferredRender(){
         gBuffer.bind()
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gBufferShader.use()
@@ -82,7 +88,6 @@ class Scene(private val window: GameWindow) {
         deferredShader.setUniform("inDiffuse", 2)
         deferredShader.setUniform("inSpecular", 3)
         deferredShader.setUniform("inEmissive", 4)
-        deferredShader.setUniform("lightMode", lightMode.ordinal)
         deferredShader.setUniform("shininess", 64f)
         player.light(deferredShader, camera)
         sceneLights.forEach { it.bind(deferredShader, camera.viewMatrix) }
@@ -92,8 +97,6 @@ class Scene(private val window: GameWindow) {
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
 
-        SoundListener.setPosition(camera)
-        GLError.checkThrow()
     }
 
     private fun initLightRendering(){
@@ -117,17 +120,22 @@ class Scene(private val window: GameWindow) {
     }
 
     fun update(dt: Float, t: Float) {
-        if (window.getKeyState(GLFW.GLFW_KEY_L))
-            lightMode = LightMode.BlinnPhong
-        else
-            lightMode = LightMode.Phong
+        if (window.getKeyState(GLFW_KEY_W))
+            player.player.translateLocal(Vector3f(0f,0f,-10f*dt))
+        if (window.getKeyState(GLFW_KEY_S))
+            player.player.translateLocal(Vector3f(0f,0f,+10f*dt))
+        if (window.getKeyState(GLFW_KEY_A))
+            player.player.rotateLocal(0f,5f*dt,0f)
+        if (window.getKeyState(GLFW_KEY_D))
+            player.player.rotateLocal(0f,-5f*dt,0f)
+
     }
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
-        if (key == GLFW.GLFW_KEY_W && action == 1) {
+        if (key == GLFW_KEY_W && action == 1) {
             // level.onKey(NoteKey.Left)
         }
-        if (key == GLFW.GLFW_KEY_E && action == 1) {
+        if (key == GLFW_KEY_E && action == 1) {
             // level.onKey(NoteKey.Right)
         }
     }

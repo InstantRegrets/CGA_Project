@@ -16,7 +16,7 @@ open class CustomModel(
     specPath: String,
     override val emitColor: Vector3f,
 ): Model {
-    override val renderable: Renderable
+    final override val renderable: Renderable
     init {
         val groundOBJ = OBJLoader.loadOBJ(objPath)
         val groundOBJMesh = groundOBJ.objects.first().meshes.first()
@@ -24,12 +24,12 @@ open class CustomModel(
         val emit = Texture2D.invoke(emitPath, true)
         emit.setTexParams(
             GL_REPEAT, GL_REPEAT,
-            GL_LINEAR, GL_LINEAR,
+            GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR,
         )
         val diff = Texture2D.invoke(diffPath, true)
-        diff.setTexParams(GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR)
+        diff.setTexParams(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR)
         val spec = Texture2D.invoke(specPath, true)
-        spec.setTexParams(GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR)
+        spec.setTexParams(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR)
         val material = Material(diff, emit, spec, tcMultiplier = Vector2f(64f))
 
         val groundMesh = Mesh(groundOBJMesh.vertexData, groundOBJMesh.indexData, defaultOBJAttributes, material)

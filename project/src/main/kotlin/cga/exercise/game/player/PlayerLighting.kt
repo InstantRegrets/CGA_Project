@@ -14,7 +14,7 @@ class PlayerLighting(parent: Transformable): Lighting {
         0,
         Vector3f(0f, 1f, 0f),
         Vector3f(1f, 0f, 0f),
-        Vector3f(1f, 0.5f, 0.1f)
+        Vector3f(1f, 0.15f, 0.12f)
     )
 
     val spotLight = SpotLight(
