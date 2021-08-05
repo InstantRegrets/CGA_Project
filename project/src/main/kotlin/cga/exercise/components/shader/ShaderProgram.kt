@@ -3,10 +3,9 @@ package cga.exercise.components.shader
 import cga.framework.GLError
 import org.joml.*
 import org.lwjgl.BufferUtils
-import org.lwjgl.opengl.GL30.*
+import org.lwjgl.opengl.GL40.*
+import java.io.File
 import java.nio.FloatBuffer
-import java.nio.file.Files
-import java.nio.file.Paths
 
 /**
  * Created by Fabian on 16.09.2017.
@@ -15,10 +14,11 @@ import java.nio.file.Paths
  * @param fragmentShaderPath    fragment shader path
  * @throws Exception if shader compilation failed, an exception is thrown
  */
-open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
+open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String, geometryShaderPath: String? = null) {
     var programID: Int = 0
     var vShaderId: Int = 0
     var fShaderId: Int = 0
+    var gShaderId: Int = 0
     //Matrix buffers for setting matrix uniforms. Prevents allocation for each uniform
     private val m4x4buf: FloatBuffer = BufferUtils.createFloatBuffer(16)
     private val v2fBuf: FloatBuffer = BufferUtils.createFloatBuffer(2)
@@ -74,37 +74,26 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
     fun setUniform(name: String, value: Vector3f) =
         setUniform(name){ glUniform3f(it, value.x, value.y, value.z) }
 
+    private fun createShader(shaderType: Int, shaderPath: String): Int {
+        val source = File(shaderPath).readText()
+        val shader = glCreateShader(shaderType)
+        if (shader == 0) throw Exception ("${glGetString(shaderType)} couldn't be created")
+        glShaderSource(shader, source)
+        glCompileShader(shader)
+        if (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_FALSE) {
+            val log = glGetShaderInfoLog(shader)
+            glDeleteShader(shader)
+            throw Exception("${glGetString(shaderType)} shader compilation failed:\n$log")
+        }
+        return shader
+    }
 
     init {
-        val vPath = Paths.get(vertexShaderPath)
-        val fPath = Paths.get(fragmentShaderPath)
-        val vSource = String(Files.readAllBytes(vPath))
-        val fSource = String(Files.readAllBytes(fPath))
-        val vShader = glCreateShader(GL_VERTEX_SHADER)
-        vShaderId = vShader
-        if (vShader == 0) throw Exception("Vertex shader object couldn't be created.")
-        val fShader = glCreateShader(GL_FRAGMENT_SHADER)
-        fShaderId = fShader
-        if (fShader == 0) {
-            glDeleteShader(vShader)
-            throw Exception("Fragment shader object couldn't be created.")
-        }
-        glShaderSource(vShader, vSource)
-        glShaderSource(fShader, fSource)
-        glCompileShader(vShader)
-        if (glGetShaderi(vShader, GL_COMPILE_STATUS) == GL_FALSE) {
-            val log = glGetShaderInfoLog(vShader)
-            glDeleteShader(fShader)
-            glDeleteShader(vShader)
-            throw Exception("Vertex shader compilation failed:\n$log")
-        }
-        glCompileShader(fShader)
-        if (glGetShaderi(fShader, GL_COMPILE_STATUS) == GL_FALSE) {
-            val log = glGetShaderInfoLog(fShader)
-            glDeleteShader(fShader)
-            glDeleteShader(vShader)
-            throw Exception("Fragment shader compilation failed:\n$log")
-        }
+        // to ensure we allow both normal and shader with a geometry option, the geomPath can be null
+        // this makes this init a little cumbersome to work with, but we solve it by using kotlin's let binding
+        val vShader = createShader(GL_VERTEX_SHADER, vertexShaderPath)
+        val gShader = geometryShaderPath?.let { createShader(GL_GEOMETRY_SHADER, geometryShaderPath) }
+        val fShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderPath)
         programID = glCreateProgram()
         if (programID == 0) {
             glDeleteShader(vShader)
@@ -112,19 +101,23 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String) {
             throw Exception("Program object creation failed.")
         }
         glAttachShader(programID, vShader)
+        gShader?.let { glAttachShader(programID, gShader) }
         glAttachShader(programID, fShader)
         glLinkProgram(programID)
         if (glGetProgrami(programID, GL_LINK_STATUS) == GL_FALSE) {
             val log = glGetProgramInfoLog(programID)
             glDetachShader(programID, vShader)
+            gShader?.let{ glDetachShader(programID, gShader) }
             glDetachShader(programID, fShader)
             glDeleteShader(vShader)
             glDeleteShader(fShader)
             throw Exception("Program linking failed:\n$log")
         }
         glDetachShader(programID, vShader)
+        gShader?.let{ glDetachShader(programID, gShader) }
         glDetachShader(programID, fShader)
         glDeleteShader(vShader)
         glDeleteShader(fShader)
+        gShader?.let { glDeleteShader(gShader) }
     }
 }
