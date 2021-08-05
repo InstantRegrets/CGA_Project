@@ -7,8 +7,10 @@ import cga.exercise.components.shader.DefferedShader
 import cga.exercise.components.shader.GBufferShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
-import cga.exercise.game.environment.ground.Ground
-import cga.exercise.game.player.Player
+import cga.exercise.game.gameObjects.GameObject
+import cga.exercise.game.gameObjects.player.Player
+import cga.exercise.game.gameObjects.street.Street
+import cga.exercise.game.gameObjects.trees.CherryTree
 import cga.framework.GLError
 import cga.framework.GameWindow
 import org.joml.Vector3f
@@ -26,10 +28,9 @@ class Scene(private val window: GameWindow) {
     private val NR_POINT_LIGHTS: Int = 64
     private val sceneLights = sceneLights()
     private val camera: TronCamera
-    private var player = Player()
-    private val ground = Ground()
     private val quad = Quad()
     // private val level: Level
+    private val gameObjects: MutableList<GameObject> = mutableListOf()
     private val gBufferShader = GBufferShader()
     private val gBuffer = GeometryBuffer(window)
     private val deferredShader = DefferedShader()
@@ -44,6 +45,14 @@ class Scene(private val window: GameWindow) {
         glCullFace(GL_BACK); GLError.checkThrow()
         glDisable(GL_DEPTH_TEST); GLError.checkThrow()
         glDepthFunc(GL_LESS); GLError.checkThrow()
+
+        gameObjects.addAll(
+            listOf(
+                Player(),
+                Street(),
+                CherryTree()
+            )
+        )
 
         // CAMERA
         camera = TronCamera()
@@ -73,8 +82,7 @@ class Scene(private val window: GameWindow) {
         gBuffer.bind()
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gBufferShader.use()
-        ground.update(gBufferShader)
-        player.draw(gBufferShader)
+        gameObjects.forEach{it.draw(gBufferShader)}
         camera.bind(gBufferShader)
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
 
@@ -90,8 +98,8 @@ class Scene(private val window: GameWindow) {
         deferredShader.setUniform("inSpecular", 3)
         deferredShader.setUniform("inEmissive", 4)
         deferredShader.setUniform("shininess", 64f)
+        gameObjects.forEach { it.processLighting(deferredShader, camera.viewMatrix) }
         Light.bindAmount(deferredShader)
-        player.light(deferredShader, camera)
         sceneLights.forEach { it.bind(deferredShader, camera.viewMatrix) }
         //level.update(dt, t)
         quad.draw(deferredShader)
@@ -122,21 +130,16 @@ class Scene(private val window: GameWindow) {
     }
 
     fun update(dt: Float, t: Float) {
-        if (window.getKeyState(GLFW_KEY_W))
-            player.player.translateLocal(Vector3f(0f,0f,-10f*dt))
-        if (window.getKeyState(GLFW_KEY_S))
-            player.player.translateLocal(Vector3f(0f,0f,+10f*dt))
-        if (window.getKeyState(GLFW_KEY_A))
-            player.player.rotateLocal(0f,5f*dt,0f)
-        if (window.getKeyState(GLFW_KEY_D))
-            player.player.rotateLocal(0f,-5f*dt,0f)
+        gameObjects.forEach{
+            it.processInput(window, dt)
+            it.update(dt, t)
+        }
         if (window.getKeyState(GLFW_KEY_L)){
             val l = sceneLights.last()
             l.cleanup()
             sceneLights.remove(l)
 
         }
-
     }
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
@@ -149,6 +152,7 @@ class Scene(private val window: GameWindow) {
     }
 
     var x: Double = 0.0
+    var y: Double = 0.0
     fun onMouseMove(xPos: Double, yPos: Double) {
         if (x == 0.0) {
             x = xPos
@@ -158,6 +162,15 @@ class Scene(private val window: GameWindow) {
             // Bike parent von Camera
             // bike <- rotateAround <- local <- v
             camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f))
+        }
+        if (y == 0.0) {
+            y = yPos
+        } else {
+            val diff = (y - yPos) * 0.002
+            y = yPos
+            // Bike parent von Camera
+            // bike <- rotateAround <- local <- v
+            camera.rotateAroundPoint(diff.toFloat(), 0f, 0f, Vector3f(0f))
         }
     }
 

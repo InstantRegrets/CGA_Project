@@ -5,6 +5,6 @@ import cga.exercise.game.Game
 
 
 fun main() {
-    val game = Game(1280, 720)
+    val game = Game(1920, 1080)
     game.run()
 }
