@@ -11,20 +11,18 @@ import org.joml.Vector4f
  * vec3(constant,linear,quadratic)
  */
 class PointLight(
-    val index: Int,
-    position: Vector3f,
     val color: Vector3f,
     val attenuation: Vector3f
 ): Light() {
-    init {
-        translateLocal(position)
-    }
-    private val structName = "plData[$index]."
+    private var structName: String = "plData[-1]."
+    init { register(this) }
+
+    public override fun setIndex(index: Int) { structName = "plData[$index]." }
 
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
         val pos = Vector4f(super.getWorldPosition(), 1f).mul(viewMatrix).toVector3f()
-        shaderProgram.setUniform("${structName}lightPos",pos)
-        shaderProgram.setUniform("${structName}color",color)
+        shaderProgram.setUniform("${structName}lightPos", pos)
+        shaderProgram.setUniform("${structName}color", color)
         shaderProgram.setUniform("${structName}attenuation", attenuation)
     }
 }
