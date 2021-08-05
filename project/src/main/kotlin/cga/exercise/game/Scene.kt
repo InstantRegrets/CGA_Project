@@ -1,6 +1,7 @@
 package cga.exercise.game
 
 import cga.exercise.components.camera.TronCamera
+import cga.exercise.components.light.Light
 import cga.exercise.components.light.PointLight
 import cga.exercise.components.shader.DefferedShader
 import cga.exercise.components.shader.GBufferShader
@@ -22,7 +23,7 @@ import kotlin.math.sin
  * Created by Fabian on 16.09.2017.
  */
 class Scene(private val window: GameWindow) {
-    private val NR_POINT_LIGHTS: Int = 8
+    private val NR_POINT_LIGHTS: Int = 64
     private val sceneLights = sceneLights()
     private val camera: TronCamera
     private var player = Player()
@@ -89,6 +90,7 @@ class Scene(private val window: GameWindow) {
         deferredShader.setUniform("inSpecular", 3)
         deferredShader.setUniform("inEmissive", 4)
         deferredShader.setUniform("shininess", 64f)
+        Light.bindAmount(deferredShader)
         player.light(deferredShader, camera)
         sceneLights.forEach { it.bind(deferredShader, camera.viewMatrix) }
         //level.update(dt, t)
@@ -128,6 +130,12 @@ class Scene(private val window: GameWindow) {
             player.player.rotateLocal(0f,5f*dt,0f)
         if (window.getKeyState(GLFW_KEY_D))
             player.player.rotateLocal(0f,-5f*dt,0f)
+        if (window.getKeyState(GLFW_KEY_L)){
+            val l = sceneLights.last()
+            l.cleanup()
+            sceneLights.remove(l)
+
+        }
 
     }
 
@@ -163,21 +171,20 @@ class Scene(private val window: GameWindow) {
     }
 
 
-    fun sceneLights(): List<PointLight> {
+    fun sceneLights(): MutableList<PointLight> {
         val l = arrayListOf<PointLight>()
         val r = Random(10)
         val rf = { r.nextFloat() * 20f - 10f }
         val ra = { r.nextFloat() * 0.5f }
         for (i in 1 until NR_POINT_LIGHTS) {
-            l.add(
-                PointLight(
-                    i, Vector3f(rf(), ra(), rf()),
+            val pl = PointLight(
                     Vector3f(r.nextFloat(), r.nextFloat(), r.nextFloat()),
                     Vector3f(1f, 0.15f, 0.12f),
                 )
-            )
+            pl.translateLocal(Vector3f(rf(), ra(), rf()))
+            l.add(pl)
         }
-        return l.toList()
+        return l // .toList()
     }
 }
 
