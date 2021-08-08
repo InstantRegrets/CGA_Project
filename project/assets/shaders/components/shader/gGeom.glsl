@@ -6,6 +6,7 @@ layout (max_vertices = 9) out;
 
 uniform mat4 projection_matrix;
 uniform float beat;
+uniform float pulseStrength;
 
 in vec3 vFragPos[];
 in vec2 vTexCoords[];
@@ -40,7 +41,7 @@ float pulse(float x){
     return pow(a,2);
 }
 void makeMiddle(){
-    vec3 pos = middlePos + middleNorm * (0.5 * pulse(mod(beat, 1)));
+    vec3 pos = middlePos + middleNorm * (pulseStrength * pulse(mod(beat, 1)));
     FragPos = pos;
     Normal = middleNorm;
     TexCoords = middleTex;

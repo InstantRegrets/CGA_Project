@@ -55,7 +55,8 @@ class Scene(private val window: GameWindow) {
         )
         gBufferShader = ShaderProgram(
             vertexShaderPath = "assets/shaders/components/shader/gVert.glsl",
-            fragmentShaderPath = "assets/shaders/components/shader/gFrag.glsl"
+            geometryShaderPath = "assets/shaders/components/shader/gGeom.glsl",
+            fragmentShaderPath = "assets/shaders/components/shader/gFrag.glsl",
         )
         skyboxShader = ShaderProgram(
             vertexShaderPath = "assets/shaders/components/shader/skyboxVert.glsl",
@@ -94,8 +95,7 @@ class Scene(private val window: GameWindow) {
     }
 
     fun render(dt: Float, t: Float) {
-        //renderSkybox()
-        deferredRender()
+        deferredRender(dt, t)
         renderSkybox()
         SoundListener.setPosition(camera)
         GLError.checkThrow()
@@ -113,11 +113,12 @@ class Scene(private val window: GameWindow) {
     }
 
 
-    private fun deferredRender(){
+    private fun deferredRender(dt: Float, t: Float){
         //Geometry pass into gBuffer
         gBuffer.bind()
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gBufferShader.use()
+        gBufferShader.setUniform("beat",t)
         camera.bind(gBufferShader)
         gameObjects.forEach{it.draw(gBufferShader)}
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default

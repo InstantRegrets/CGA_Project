@@ -17,7 +17,7 @@ abstract class Model(
      init {
         renderable = ModelLoader.loadModel(objPath,pitch, yaw, roll)?: throw Exception("could not load model $objPath")
     }
-    fun draw(shaderProgram: ShaderProgram, addMatrix4f: Matrix4f? = null){
-        renderable.render(shaderProgram, addMatrix4f)
+    fun draw(shaderProgram: ShaderProgram){
+        renderable.render(shaderProgram)
     }
 }
