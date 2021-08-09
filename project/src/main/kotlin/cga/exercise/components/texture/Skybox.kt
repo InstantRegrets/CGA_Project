@@ -2,10 +2,7 @@ package cga.exercise.components.texture
 
 import cga.framework.GLError
 import org.lwjgl.BufferUtils
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL15
-import org.lwjgl.opengl.GL20
-import org.lwjgl.opengl.GL30.*
+import org.lwjgl.opengl.GL33.*
 import org.lwjgl.stb.STBImage
 
 @Suppress("DuplicatedCode")
@@ -37,7 +34,7 @@ class Skybox(private var id: Int = -1) {
                 STBImage.stbi_set_flip_vertically_on_load(false)
                 val imageData = STBImage.stbi_load(path, widthRead, heightRead, readChannels, 0)
                     ?: throw Exception("Image file \"" + path + "\" couldn't be read:\n" + STBImage.stbi_failure_reason())
-                GL11.glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                     0, GL_RGB,widthRead.get(),heightRead.get(),0, GL_RGB, GL_UNSIGNED_BYTE, imageData)
                 GLError.checkThrow()
                 STBImage.stbi_image_free(imageData)
@@ -104,9 +101,9 @@ class Skybox(private var id: Int = -1) {
     fun setup(){
         glBindVertexArray(skyboxVAO)
         glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO)
-        GL15.glBufferData(GL_ARRAY_BUFFER,vertices, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER,vertices, GL_STATIC_DRAW)
         glEnableVertexAttribArray(0)
-        GL20.glVertexAttribPointer(0,3, GL_FLOAT, false, 3*4,0)
+        glVertexAttribPointer(0,3, GL_FLOAT, false, 3*4,0)
         glBindVertexArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
     }
@@ -132,7 +129,7 @@ class Skybox(private var id: Int = -1) {
     fun cleanup() {
         unbind()
         if (id != 0) {
-            GL11.glDeleteTextures(id)
+            glDeleteTextures(id)
             id = 0
         }
     }
