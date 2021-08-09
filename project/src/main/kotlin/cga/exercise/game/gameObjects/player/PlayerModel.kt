@@ -6,7 +6,7 @@ class PlayerModel: Model(
     "assets/Light Cycle/Light Cycle/HQ_Movie cycle.obj",
     pitch = Math.toRadians(-90.0).toFloat(),
     yaw = Math.toRadians(90.0).toFloat()
-    )
+    ){
     init {
         renderable.pulseStrength = 0.5f
         renderable.emitColor = Vector3f(0.5f)
