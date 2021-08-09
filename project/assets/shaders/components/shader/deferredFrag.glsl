@@ -34,7 +34,7 @@ uniform int plAmount;
 uniform PointLightData plData[128]; // max 128 lights
 
 uniform int slAmount;
-uniform SpotLightData slData[128];  // max 128 lights
+uniform SpotLightData slData[20];  // max 128 lights
 
 
 vec3 diffMaterial, specularMaterial, emitMaterial;
