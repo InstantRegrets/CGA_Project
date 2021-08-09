@@ -30,11 +30,13 @@ struct SpotLightData{
 #define ambientStrength 0.1
 #define ambientColor vec3(0.5, 1, 1)
 
+#define plMaxAmount 128
 uniform int plAmount;
-uniform PointLightData plData[128]; // max 128 lights
+uniform PointLightData plData[plMaxAmount]; // max 128 lights
 
+#define slMaxAmount 20
 uniform int slAmount;
-uniform SpotLightData slData[20];  // max 128 lights
+uniform SpotLightData slData[slMaxAmount];  // max 128 lights
 
 
 vec3 diffMaterial, specularMaterial, emitMaterial;
@@ -82,7 +84,8 @@ void pointLight(in vec3 pToCamera, in vec3 N, in PointLightData ld,in vec3 fragP
 }
 
 void pointLights(in vec3 toCamera, in vec3 N, in vec3 fragPos, inout vec3 o){
-    for (int i = 0; i < plAmount; i++){
+    int amount = min(plAmount, plMaxAmount);
+    for (int i = 0; i < amount; i++){
         pointLight(toCamera, N, plData[i],fragPos, o);
     }
 }
@@ -103,7 +106,8 @@ void spotLight(in vec3 pToCamera, in vec3 N, in SpotLightData ld,in vec3 fragPos
 }
 
 void spotLights(in vec3 toCamera, in vec3 N,in vec3 fragPos, inout vec3 o){
-    for (int i = 0; i < slAmount; i++){
+    int amount = min(slAmount, plMaxAmount);
+    for (int i = 0; i < amount; i++){
         spotLight(toCamera, N, slData[i],fragPos , o);
     }
 }

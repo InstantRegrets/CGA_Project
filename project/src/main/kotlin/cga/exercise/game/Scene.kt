@@ -3,12 +3,12 @@ package cga.exercise.game
 import cga.exercise.components.camera.TronCamera
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.light.Light
-import cga.exercise.components.light.PointLight
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
 import cga.exercise.components.texture.Skybox
 import cga.exercise.game.gameObjects.GameObject
+import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
 import cga.exercise.game.gameObjects.street.Street
 import cga.exercise.game.gameObjects.trees.CherryTree
@@ -28,8 +28,6 @@ import kotlin.math.sin
  * Created by Fabian on 16.09.2017.
  */
 class Scene(private val window: GameWindow) {
-    private val NR_POINT_LIGHTS: Int = 64
-    private val sceneLights = sceneLights()
     private val camera: TronCamera
     private val quad = Quad()
     // private val level: Level
@@ -55,6 +53,7 @@ class Scene(private val window: GameWindow) {
         )
         gBufferShader = ShaderProgram(
             vertexShaderPath = "assets/shaders/components/shader/gVert.glsl",
+            geometryShaderPath = "assets/shaders/components/shader/gGeom.glsl",
             fragmentShaderPath = "assets/shaders/components/shader/gFrag.glsl"
         )
         skyboxShader = ShaderProgram(
@@ -65,7 +64,8 @@ class Scene(private val window: GameWindow) {
             listOf(
                 Player(),
                 Street(),
-                CherryTree()
+                CherryTree(),
+                Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(),
             )
         )
 
@@ -95,7 +95,7 @@ class Scene(private val window: GameWindow) {
 
     fun render(dt: Float, t: Float) {
         //renderSkybox()
-        deferredRender()
+        deferredRender(dt, t)
         renderSkybox()
         SoundListener.setPosition(camera)
         GLError.checkThrow()
@@ -112,12 +112,11 @@ class Scene(private val window: GameWindow) {
         glDepthFunc(GL_LESS)
     }
 
-
-    private fun deferredRender(){
-        //Geometry pass into gBuffer
+    private fun deferredRender(dt: Float, t: Float){
         gBuffer.bind()
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gBufferShader.use()
+        gBufferShader.setUniform("beat",t)
         camera.bind(gBufferShader)
         gameObjects.forEach{it.draw(gBufferShader)}
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
@@ -132,7 +131,6 @@ class Scene(private val window: GameWindow) {
 
         gameObjects.forEach { it.processLighting(deferredShader, camera.viewMatrix) }
         Light.bindAmount(deferredShader)
-        sceneLights.forEach { it.bind(deferredShader, camera.viewMatrix) }
         //level.update(dt, t)
         endLightRendering()
         quad.draw(deferredShader)
@@ -173,12 +171,6 @@ class Scene(private val window: GameWindow) {
             it.processInput(window, dt)
             it.update(dt, t)
         }
-        if (window.getKeyState(GLFW_KEY_L)){
-            val l = sceneLights.last()
-            l.cleanup()
-            sceneLights.remove(l)
-
-        }
     }
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
@@ -216,22 +208,6 @@ class Scene(private val window: GameWindow) {
     fun cleanup() {
         //level.cleanup()
         SoundContext.cleanup()
-    }
-
-    fun sceneLights(): MutableList<PointLight> {
-        val l = arrayListOf<PointLight>()
-        val r = Random(10)
-        val rf = { r.nextFloat() * 20f - 10f }
-        val ra = { r.nextFloat() * 0.5f }
-        for (i in 1 until NR_POINT_LIGHTS) {
-            val pl = PointLight(
-                    Vector3f(r.nextFloat(), r.nextFloat(), r.nextFloat()),
-                    Vector3f(1f, 0.15f, 0.12f),
-                )
-            pl.translateLocal(Vector3f(rf(), ra(), rf()))
-            l.add(pl)
-        }
-        return l // .toList()
     }
 }
 

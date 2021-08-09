@@ -17,6 +17,6 @@ class Note(
         val x = pulse(data.beat - beat)
         val pulseMat = Matrix4f().scale(x)
         // todo lighting.update(shader)
-        model.draw(shader, pulseMat)
+        model.draw(shader)
     }
 }
