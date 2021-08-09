@@ -5,6 +5,7 @@ import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Model
 import cga.framework.GameWindow
 import org.joml.Matrix4f
+import org.joml.Vector3f
 
 class CherryTree : GameObject {
     val model: Model = CherryTreeModel("assets/models/cherryTree/cherryTree.obj")
@@ -22,6 +23,10 @@ class CherryTree : GameObject {
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
 
+    }
+
+    override fun getPosition(): Vector3f {
+        return model.renderable.getWorldPosition()
     }
 
 }

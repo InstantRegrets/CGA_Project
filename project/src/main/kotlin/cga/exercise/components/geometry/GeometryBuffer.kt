@@ -1,21 +1,18 @@
-package cga.exercise.game
+package cga.exercise.components.geometry
 
 import cga.framework.GLError
 import cga.framework.GameWindow
-import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.ARBInternalformatQuery2.GL_TEXTURE_2D
-import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL33.*
-import org.lwjgl.stb.STBImage
-import org.lwjgl.stb.STBImageWrite
 import java.nio.ByteBuffer
 
 @Suppress("JoinDeclarationAndAssignment")
 class GeometryBuffer(window: GameWindow){
-    val gBufferID: Int
-    val textureIDs: IntArray = IntArray(totalTextures)
-    val width: Int = window.windowWidth
-    val height: Int = window.windowHeight
+    var gBufferID: Int
+    private val textureIDs: IntArray = IntArray(totalTextures)
+    private val width: Int = window.windowWidth
+    private val height: Int = window.windowHeight
     companion object{
         const val totalTextures: Int = 5
     }
@@ -80,5 +77,10 @@ class GeometryBuffer(window: GameWindow){
         }
     }
 
+    fun cleanup(){
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
+        GL30.glDeleteFramebuffers(gBufferID)
+        gBufferID = -1
+    }
 
 }

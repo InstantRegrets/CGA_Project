@@ -6,6 +6,7 @@ import cga.exercise.game.gameObjects.Model
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import org.joml.Matrix4f
+import org.joml.Vector3f
 
 class Street: GameObject {
     val model = StreetModel()
@@ -23,6 +24,10 @@ class Street: GameObject {
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
 
+    }
+
+    override fun getPosition(): Vector3f {
+        return model.renderable.getWorldPosition()
     }
 
 }

@@ -157,7 +157,7 @@ open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Tra
      * Returns object model matrix
      * @return modelMatrix
      */
-    fun getLocalModelMatrix(): Matrix4f {
+        fun getLocalModelMatrix(): Matrix4f {
         return Matrix4f(modelMatrix)
     }
 }

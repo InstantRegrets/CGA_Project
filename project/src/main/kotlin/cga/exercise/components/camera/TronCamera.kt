@@ -4,13 +4,12 @@ import cga.exercise.components.shader.ShaderProgram
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import kotlin.math.PI
-import kotlin.random.Random
 
 class TronCamera(
-    val fieldOfView: Float = 0.5f * PI.toFloat(),
-    val aspectRatio: Float = 16f / 9f,
-    val nearPlane: Float = 0.1f,
-    val farPlane: Float = 100f,
+    private val fieldOfView: Float = 0.5f * PI.toFloat(),
+    private val aspectRatio: Float = 16f / 9f,
+    private val nearPlane: Float = 0.1f,
+    private val farPlane: Float = 100f,
     parent: Transformable = Transformable()
 ): Transformable(parent = parent), ICamera {
     var viewMatrix: Matrix4f = Matrix4f()

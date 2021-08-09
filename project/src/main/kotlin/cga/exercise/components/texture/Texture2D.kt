@@ -1,11 +1,8 @@
 package cga.exercise.components.texture
 
-import cga.framework.GLError.checkEx
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL30
 import org.lwjgl.stb.STBImage
