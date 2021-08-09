@@ -18,12 +18,11 @@ class SpotLight(
     private val outerCone: Float = (0.4* PI).toFloat(), // Outer Cone in radians
     private val innerCone: Float = (0.2* PI).toFloat(), // Inner Cone in radians
 ) : Light() {
-    private var structName = "slData[-1]." //how the struct for Spotlights is called in the FragmentShader
-
-    init { register(this) }
-    public override fun setIndex(index: Int) { structName = "slData[$index]." }
 
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
+        val structName = "slData[$slAmount]."
+        slAmount++;
+
         val dir = (Vector4f(super.getWorldZAxis(), 0f)).mul(viewMatrix).toVector3f()
         val pos = Vector4f(super.getWorldPosition(), 1f).mul(viewMatrix).toVector3f()
         shaderProgram.setUniform("${structName}lightPos",pos)

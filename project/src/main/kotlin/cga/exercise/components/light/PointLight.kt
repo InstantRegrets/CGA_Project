@@ -13,12 +13,10 @@ class PointLight(
     val color: Vector3f,
     val attenuation: Vector3f
 ): Light() {
-    private var structName: String = "plData[-1]."
-    init { register(this) }
-
-    public override fun setIndex(index: Int) { structName = "plData[$index]." }
-
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
+        val structName = "plData[$plAmount]."
+        plAmount++;
+
         val pos = Vector4f(super.getWorldPosition(), 1f).mul(viewMatrix).toVector3f()
         shaderProgram.setUniform("${structName}lightPos", pos)
         shaderProgram.setUniform("${structName}color", color)
