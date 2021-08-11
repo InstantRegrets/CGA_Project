@@ -9,11 +9,9 @@ interface GameObject {
     //draw call to actually render the object
     fun draw(shaderProgram: ShaderProgram)
     //Update every frame
-    fun update(dt: Float,t :Float)
+    fun update(dt: Float, beat :Float)
     //handle input from game window if necessary
     fun processInput(window: GameWindow, dt: Float)
     //Call light binding methods
     fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) //TODO: Remove view matrix and upload in scene
-
-    fun getPosition(): Vector3f
 }

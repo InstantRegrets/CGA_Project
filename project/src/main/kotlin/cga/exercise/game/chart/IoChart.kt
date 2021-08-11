@@ -5,14 +5,28 @@ import chart.difficulty.Difficulty
 import chart.info.Info
 import com.google.gson.Gson
 import java.io.File
+import java.io.FileNotFoundException
 
-class IoChart(val chartPath: File){
+class IoChart{
     private val gson = Gson()
+    val chartPath: File
+    val info: Info
+    val difficulty: Difficulty
 
-    fun loadInfo(): Info {
+    init {
+        val selectFile = File("assets/levels/select.txt")
+        if(!selectFile.isFile){ throw FileNotFoundException(selectFile.path) }
+        val song = selectFile.readText()
+        chartPath = File("assets/levels/$song")
+
         if (!chartPath.isDirectory)
             throw Exception("Invalid Path, song $chartPath does not exist")
 
+        info = loadInfo()
+        difficulty = loadLowestDiff()
+    }
+
+    fun loadInfo(): Info {
         var infoPath = chartPath.resolve("info.dat")
         if (!infoPath.isFile)
             infoPath = chartPath.resolve("Info.dat")
@@ -27,7 +41,6 @@ class IoChart(val chartPath: File){
     }
 
     fun loadLowestDiff(): Difficulty {
-        val info = loadInfo()
         val bms = info._difficultyBeatmapSets.find { it._beatmapCharacteristicName == "Standard" }
         if (bms != null && bms._difficultyBeatmaps.isNotEmpty())
             return loadDifficulty(bms._difficultyBeatmaps.first()._difficultyRank)
@@ -42,8 +55,6 @@ class IoChart(val chartPath: File){
     }
 
     fun loadDifficulty(difficultyRank: Int, characteristic: String = "Standard"): Difficulty {
-        val info = loadInfo()
-
         var diffFile: File? = null
         var offset = 0.0
 

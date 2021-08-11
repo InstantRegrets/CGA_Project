@@ -74,6 +74,12 @@ open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Tra
         return Vector3f(modelMatrix.m30(), modelMatrix.m31(), modelMatrix.m32())
     }
 
+    fun setPosition(position: Vector3f) {
+        modelMatrix.m30(position.x)
+        modelMatrix.m31(position.y)
+        modelMatrix.m32(position.z)
+    }
+
     /**
      * Returns position based on aggregated translations incl. parents.
      * Hint: last column of world model matrix

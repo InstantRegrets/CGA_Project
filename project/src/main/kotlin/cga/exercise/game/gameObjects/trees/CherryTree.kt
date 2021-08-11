@@ -13,7 +13,7 @@ class CherryTree : GameObject {
         model.draw(shaderProgram)
     }
 
-    override fun update(dt: Float, t: Float) {
+    override fun update(dt: Float, beat: Float) {
 
     }
 
@@ -24,9 +24,4 @@ class CherryTree : GameObject {
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
 
     }
-
-    override fun getPosition(): Vector3f {
-        return model.renderable.getWorldPosition()
-    }
-
 }

@@ -1,29 +1,33 @@
 package cga.exercise.game.level
 
+import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.chart.IoChart
+import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.note.Note
 import cga.exercise.game.note.NoteData
 import cga.exercise.game.note.NoteKey
+import cga.framework.GameWindow
 import chart.difficulty.Difficulty
 import chart.difficulty._notes
 import chart.info.Info
+import org.joml.Matrix4f
 import java.io.File
 import kotlin.math.abs
 
-class Level(name: String) {
-    val path = File("assets/levels/$name")
+class Level: GameObject {
+    lateinit var path: File
 
     lateinit var info: Info
     lateinit var difficulty: Difficulty
     lateinit var notes: Iterator<NoteData>
     // this could probably be done much more efficiently
-    var nextNote: Note? = null
+    var visibleNotes: ArrayList<Note> = arrayListOf()
 
     lateinit var song: Song
     val scoring = Scoring()
 
-    private var beat: Float = 0f
-    private var beatsPerSeconds: Float = 0f
+    var beat: Float = 0f
+    var beatsPerSeconds: Float = 0f
 
 
     fun setup(){
@@ -31,33 +35,51 @@ class Level(name: String) {
         loadSounds()
     }
 
-
-    fun update(dt: Float, t: Float) {
-        beat = t * beatsPerSeconds
-        val noteBeat = nextNote?.data?.beat ?: - 1000f // todo make decent
-        if(nextNote != null && noteBeat < beat) {
-            println(beat)
-            println("missed Note ${nextNote?.data?.key}, ${nextNote?.data?.beat}")
-            scoring.fail()
-            advanceNote()
-        } else if (noteBeat > beat && noteBeat < (beat + 1.0)){
-            nextNote?.update(beat)
+    override fun draw(shaderProgram: ShaderProgram) {
+        for (n in visibleNotes){
+            n.draw(shaderProgram)
         }
     }
 
-    fun onKey(key: NoteKey) {
-        if( beat - 0.2f < nextNote!!.data.beat  && nextNote!!.data.beat < beat + 0.52){
-            if (key == nextNote?.data?.key){
-                val score = 1 - abs(beat - nextNote!!.data.beat)
-                scoring.score(score)
-                advanceNote()
-            }else {
-                println("wrong note")
+
+    override fun update(dt: Float, beat: Float) {
+        this.beat = beat
+        for (n in visibleNotes){
+            if(n.data.beat < beat) {
+                println(beat)
+                println("missed Note ${n.data.key} on beat ${n.data.beat}")
                 scoring.fail()
                 advanceNote()
+            } else if (n.data.beat > beat && n.data.beat < (beat + 1.0)){
+                n.update(dt,beat)
             }
-        } else {
-            scoring.fail()
+        }
+    }
+
+    override fun processInput(window: GameWindow, dt: Float) {
+
+    }
+
+    override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
+        visibleNotes.forEach { it.processLighting(shaderProgram, viewMatrix4f) }
+    }
+
+    fun onKey(key: NoteKey) {
+        for (n in visibleNotes){
+            if( beat - 0.4f < n.data.beat  && n.data.beat < beat + 0.52){
+                if (key == n.data.key){
+                    val score = 1 - abs(beat - n.data.beat)
+                    scoring.score(score)
+                    advanceNote()
+                }else {
+                    println("wrong note")
+                    scoring.fail()
+                    advanceNote()
+                }
+            }
+         else {
+                 scoring.fail()
+             }
         }
     }
 
@@ -66,9 +88,10 @@ class Level(name: String) {
     }
 
     private fun loadChart(){
-        val cio = IoChart(path)
-        info = cio.loadInfo()
+        val cio = IoChart()
+        info = cio.info
         difficulty = cio.loadLowestDiff()
+        path = cio.chartPath
         notes = difficulty._notes
                 .sortedBy { it._time }
                 .map { noteDataFromBsNote(it) }
@@ -93,11 +116,9 @@ class Level(name: String) {
     }
 
     private fun advanceNote(){
+        if (visibleNotes.isNotEmpty())
+            visibleNotes.removeAt(0)
         if (notes.hasNext())
-
-
-            // nextNote = Note(notes.next(), staticShader)
-        else
-            nextNote = null
+            visibleNotes.add(Note(notes.next()))
     }
 }

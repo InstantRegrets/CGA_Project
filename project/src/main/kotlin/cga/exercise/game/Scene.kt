@@ -12,6 +12,8 @@ import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
 import cga.exercise.game.gameObjects.street.Street
 import cga.exercise.game.gameObjects.trees.CherryTree
+import cga.exercise.game.level.Level
+import cga.exercise.game.note.NoteKey
 import cga.framework.GLError
 import cga.framework.GameWindow
 import org.joml.Matrix3f
@@ -30,7 +32,8 @@ import kotlin.math.sin
 class Scene(private val window: GameWindow) {
     private val camera: TronCamera
     private val quad = Quad()
-    // private val level: Level
+    private val level: Level
+    private val player = Player()
     private val gameObjects: MutableList<GameObject> = mutableListOf()
     private val gBufferShader: ShaderProgram
     private val gBuffer = GeometryBuffer(window)
@@ -60,25 +63,19 @@ class Scene(private val window: GameWindow) {
             vertexShaderPath = "assets/shaders/components/shader/skyboxVert.glsl",
             fragmentShaderPath = "assets/shaders/components/shader/skyboxFrag.glsl"
         )
-        gameObjects.addAll(
-            listOf(
-                Player(),
-                Street(),
-                CherryTree(),
-                Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(),
-            )
-        )
+
+        SoundContext.setup()
+
 
         // CAMERA
         camera = TronCamera()
         camera.rotateLocal(-0.65f, 0.0f, 0f)
         camera.translateLocal(Vector3f(0f, 0f, 4f))
-        camera.parent = (gameObjects.first() as Player).model.renderable
+        camera.parent = player.model.renderable
 
         //Sound and level
-        SoundContext.setup()
-        // level = Level("caramelldansen")
-        // level.setup()        GLError.checkThrow("Failed init")
+        level = Level()
+        level.setup()
         skybox.setup()
         skyboxShader.use()
         skyboxShader.setUniform("skybox",0)
@@ -90,6 +87,16 @@ class Scene(private val window: GameWindow) {
         deferredShader.setUniform("inSpecular", 3)
         deferredShader.setUniform("inEmissive", 4)
         deferredShader.setUniform("shininess", 64f)
+
+
+        gameObjects.addAll(
+            listOf(
+                Street(),
+                CherryTree(),
+                Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(),
+                level, player
+            )
+        )
 
     }
 
@@ -116,7 +123,9 @@ class Scene(private val window: GameWindow) {
         gBuffer.bind()
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gBufferShader.use()
-        gBufferShader.setUniform("beat",t)
+
+        val beat = level.beatsPerSeconds * t
+        gBufferShader.setUniform("beat",beat)
         camera.bind(gBufferShader)
         gameObjects.forEach{it.draw(gBufferShader)}
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
@@ -167,18 +176,19 @@ class Scene(private val window: GameWindow) {
     }
 
     fun update(dt: Float, t: Float) {
+        val beat = level.beatsPerSeconds * t
         gameObjects.forEach{
-            it.processInput(window, dt)
-            it.update(dt, t)
+            it.processInput(window, beat)
+            it.update(dt, beat)
         }
     }
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
-        if (key == GLFW_KEY_W && action == 1) {
-            // level.onKey(NoteKey.Left)
+        if (key == GLFW_KEY_F && action == 1) {
+            level.onKey(NoteKey.Left)
         }
-        if (key == GLFW_KEY_E && action == 1) {
-            // level.onKey(NoteKey.Right)
+        if (key == GLFW_KEY_J && action == 1) {
+            level.onKey(NoteKey.Right)
         }
     }
 
@@ -192,7 +202,7 @@ class Scene(private val window: GameWindow) {
             x = xPos
             // Bike parent von Camera
             // bike <- rotateAround <- local <- v
-            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, gameObjects.first().getPosition())
+            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, player.model.renderable.getPosition())
         }
         //  if (y == 0.0) {
         //      y = yPos

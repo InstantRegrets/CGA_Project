@@ -23,7 +23,7 @@ class Player(parent: Transformable? = null): GameObject {
         model.draw(shaderProgram)
     }
 
-    override fun update(dt: Float, t: Float) {
+    override fun update(dt: Float, beat: Float) {
         //doesnt need anything rn
     }
 
@@ -42,10 +42,6 @@ class Player(parent: Transformable? = null): GameObject {
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
         lighting.update(shaderProgram, viewMatrix4f)
-    }
-
-    override fun getPosition(): Vector3f {
-        return model.renderable.getWorldPosition()
     }
 }
 
