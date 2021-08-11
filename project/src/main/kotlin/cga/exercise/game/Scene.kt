@@ -179,7 +179,7 @@ class Scene(private val window: GameWindow) {
     fun update(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
         gameObjects.forEach{
-            it.processInput(window, beat)
+            it.processInput(window, dt)
             it.update(dt, beat)
         }
     }

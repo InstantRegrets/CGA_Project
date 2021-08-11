@@ -16,7 +16,7 @@ class IoChart{
     init {
         val selectFile = File("assets/levels/select.txt")
         if(!selectFile.isFile){ throw FileNotFoundException(selectFile.path) }
-        val song = selectFile.readText()
+        val song = selectFile.readText().trim()
         chartPath = File("assets/levels/$song")
 
         if (!chartPath.isDirectory)
