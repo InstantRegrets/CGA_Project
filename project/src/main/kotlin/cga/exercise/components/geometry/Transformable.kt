@@ -29,9 +29,6 @@ open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Tra
             .translate(altMidpoint)
         val transMat = Matrix4f().translate(Vector3f(altMidpoint).negate())
 
-        // T * R * T^-1 * v
-        // todo names
-
         val test = Matrix4f()
         test.mul(transMat)
         test.mul(rotMat)

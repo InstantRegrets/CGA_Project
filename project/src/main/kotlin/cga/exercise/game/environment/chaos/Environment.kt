@@ -1,27 +1,29 @@
-package cga.exercise.game.gameObjects.trees
+package cga.exercise.game.environment.chaos
 
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
-import cga.exercise.game.gameObjects.Model
 import cga.framework.GameWindow
+import cga.framework.ModelLoader
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
-class CherryTree : GameObject {
-    val model: Model = CherryTreeModel("assets/models/cherryTree2/cherryTree2.obj")
+class Environment : GameObject {
+    val model = EnvironmentModel()
     override fun draw(shaderProgram: ShaderProgram) {
         model.draw(shaderProgram)
     }
 
-    override fun update(dt: Float, beat: Float) {
-
+    override fun update(dt: Float, t: Float) {
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
-
     }
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
-
     }
+
+    fun getPosition(): Vector3f {
+        return Vector3f(0f)
+    }
+
 }

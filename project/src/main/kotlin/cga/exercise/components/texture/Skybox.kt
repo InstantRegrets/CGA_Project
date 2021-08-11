@@ -9,7 +9,7 @@ import org.lwjgl.stb.STBImage
 /**
  * This is used to create a skybox.
  * The images have to be in this format:
- * https://learnopengl.com/img/advanced/cubemaps_skybox.png
+ * https://learnopengl.com/img/advanced/cubemaps_skybox.jpg
  * also named right.jpg, left.jpg, top.jpg, bottom.jpg, front.jpg, back.jpg
  */
 class Skybox(private var id: Int = -1) {

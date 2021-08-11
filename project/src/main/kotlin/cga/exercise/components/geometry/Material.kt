@@ -10,7 +10,6 @@ import org.lwjgl.opengl.GL13.*
 class Material(var diff: Texture2D,
                var emit: Texture2D,
                var specular: Texture2D,
-               var shininess: Float = 50.0f,
                var tcMultiplier : Vector2f = Vector2f(1.0f)){
 
     fun bind(shaderProgram: ShaderProgram) {
@@ -20,7 +19,6 @@ class Material(var diff: Texture2D,
         shaderProgram.setUniform("diffMat", 1)
         specular.bind(2)
         shaderProgram.setUniform("specularMat", 2)
-        //shaderProgram.setUniform("shininess", shininess)
         shaderProgram.setUniform("tcMultiplier", tcMultiplier)
     }
 }

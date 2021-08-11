@@ -77,7 +77,7 @@ void pointLight(in vec3 pToCamera, in vec3 N, in PointLightData ld,in vec3 fragP
     vec3 toLight = normalize(ld.lightPos - fragPos);
     vec3 toCamera = normalize(pToCamera);
 
-    float distance = length(toLight - fragPos);
+    float distance = length(ld.lightPos - fragPos);
     float attenuation = calcAttenuation(ld.attenuation, distance);
     o += diffuse(N, toLight, ld.color)*attenuation;
     o += specularBlinn(N, toLight, toCamera, ld.color)*attenuation;
@@ -95,7 +95,7 @@ void spotLight(in vec3 pToCamera, in vec3 N, in SpotLightData ld,in vec3 fragPos
     vec3 toCamera = normalize(pToCamera);
     vec3 dir = normalize(ld.direction);
     float theta = dot(toLight, - dir);
-    float distance = length(toLight - fragPos);
+    float distance = length(ld.lightPos - fragPos);
     float attenuation = calcAttenuation(ld.attenuation, distance);
 
     float epsilon = ld.innerCone- ld.outerCone;

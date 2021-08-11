@@ -7,6 +7,7 @@ import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
 import cga.exercise.components.texture.Skybox
+import cga.exercise.game.environment.chaos.Environment
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
@@ -38,7 +39,7 @@ class Scene(private val window: GameWindow) {
     private val gBufferShader: ShaderProgram
     private val gBuffer = GeometryBuffer(window)
     private val deferredShader: ShaderProgram
-    private val skybox = Skybox.invoke("assets/textures/skybox")
+    private val skybox = Skybox.invoke("assets/textures/skyboxNight")
     private val skyboxShader: ShaderProgram
 
     //scene setup
@@ -91,8 +92,8 @@ class Scene(private val window: GameWindow) {
 
         gameObjects.addAll(
             listOf(
-                Street(),
                 CherryTree(),
+                Environment(),
                 Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(),
                 level, player
             )
@@ -202,17 +203,17 @@ class Scene(private val window: GameWindow) {
             x = xPos
             // Bike parent von Camera
             // bike <- rotateAround <- local <- v
-            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, player.model.renderable.getPosition())
+            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
         }
-        //  if (y == 0.0) {
-        //      y = yPos
-        //  } else {
-        //      val diff = (y - yPos) * 0.002
-        //      y = yPos
-        //      // Bike parent von Camera
-        //      // bike <- rotateAround <- local <- v
-        //      camera.rotateAroundPoint(diff.toFloat(), 0f, 0f, gameObjects.first().getPosition())
-        //  }
+          if (y == 0.0) {
+              y = yPos
+          } else {
+              val diff = (y - yPos) * 0.002
+              y = yPos
+              // Bike parent von Camera
+              // bike <- rotateAround <- local <- v
+              camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f,  Vector3f(0f,0f,0f))
+          }
     }
 
     fun cleanup() {

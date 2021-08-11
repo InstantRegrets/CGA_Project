@@ -20,7 +20,7 @@ class Mesh(
     vertexData: FloatArray,
     indexData: IntArray,
     attributes: Array<VertexAttribute>,
-    private val material: Material,
+    val material: Material,
     private val drawMode: Int = GL_TRIANGLES //default to Triangles
 ) {
     //These are just IDs
