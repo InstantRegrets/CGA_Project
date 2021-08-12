@@ -1,6 +1,7 @@
 package cga.exercise.game
 
 import cga.exercise.components.camera.TronCamera
+import cga.exercise.components.geometry.DepthMap
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.light.Light
 import cga.exercise.components.shader.ShaderProgram
@@ -11,7 +12,6 @@ import cga.exercise.game.environment.chaos.Environment
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
-import cga.exercise.game.gameObjects.street.Street
 import cga.exercise.game.gameObjects.trees.CherryTree
 import cga.exercise.game.level.Level
 import cga.exercise.game.note.NoteKey
@@ -20,9 +20,9 @@ import cga.framework.GameWindow
 import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.opengl.GL30.*
-import java.util.*
+import org.lwjgl.glfw.GLFW.GLFW_KEY_F
+import org.lwjgl.glfw.GLFW.GLFW_KEY_J
+import org.lwjgl.opengl.GL33.*
 import kotlin.math.PI
 import kotlin.math.sin
 
@@ -35,9 +35,13 @@ class Scene(private val window: GameWindow) {
     private val quad = Quad()
     private val level: Level
     private val player = Player()
+    private val sun = Sun()
     private val gameObjects: MutableList<GameObject> = mutableListOf()
     private val gBufferShader: ShaderProgram
-    private val gBuffer = GeometryBuffer(window)
+    private val gBuffer: GeometryBuffer
+    private val depthMap: DepthMap
+    private val simpleDepthShader: ShaderProgram
+    private val debugDepthQuad: ShaderProgram
     private val deferredShader: ShaderProgram
     private val skybox = Skybox.invoke("assets/textures/skyboxNight")
     private val skyboxShader: ShaderProgram
@@ -51,19 +55,26 @@ class Scene(private val window: GameWindow) {
         glCullFace(GL_BACK); GLError.checkThrow()
         glEnable(GL_DEPTH_TEST); GLError.checkThrow()
         glDepthFunc(GL_LESS); GLError.checkThrow()
-        deferredShader = ShaderProgram(
-            "assets/shaders/components/shader/deferredVert.glsl",
-            "assets/shaders/components/shader/deferredFrag.glsl",
-        )
-        gBufferShader = ShaderProgram(
-            vertexShaderPath = "assets/shaders/components/shader/gVert.glsl",
-            geometryShaderPath = "assets/shaders/components/shader/gGeom.glsl",
-            fragmentShaderPath = "assets/shaders/components/shader/gFrag.glsl"
-        )
+
+        gBufferShader = GBufferShader()
         skyboxShader = ShaderProgram(
             vertexShaderPath = "assets/shaders/components/shader/skyboxVert.glsl",
             fragmentShaderPath = "assets/shaders/components/shader/skyboxFrag.glsl"
         )
+
+        debugDepthQuad = ShaderProgram(
+            vertexShaderPath = "assets/shaders/components/shader/debugVert.glsl",
+            fragmentShaderPath = "assets/shaders/components/shader/debugFrag.glsl"
+        )
+        debugDepthQuad.use()
+        debugDepthQuad.setUniform("depthMap",6)
+        depthMap = DepthMap()
+        simpleDepthShader = ShadowShader()
+        simpleDepthShader.use()
+
+
+        deferredShader = DeferredShader()
+        gBuffer = GeometryBuffer(window)
 
         SoundContext.setup()
 
@@ -81,46 +92,29 @@ class Scene(private val window: GameWindow) {
         skyboxShader.use()
         skyboxShader.setUniform("skybox",0)
         //Setup uniforms for deferredShader (Texture locations = output of gbuffer)
-        deferredShader.use()
-        deferredShader.setUniform("inPosition", 0)
-        deferredShader.setUniform("inNormal", 1)
-        deferredShader.setUniform("inDiffuse", 2)
-        deferredShader.setUniform("inSpecular", 3)
-        deferredShader.setUniform("inEmissive", 4)
-        deferredShader.setUniform("shininess", 64f)
 
 
         gameObjects.addAll(
             listOf(
                 CherryTree(),
                 Environment(),
-                Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(),
-                level, player
+                // Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(), Orb(),
+                level, player, sun,
             )
         )
 
     }
 
     fun render(dt: Float, t: Float) {
-        //renderSkybox()
-        deferredRender(dt, t)
+        shadowPass(dt,t)
+        geometryPass(dt, t)
+        lightingPass(dt, t)
         renderSkybox()
         SoundListener.setPosition(camera)
         GLError.checkThrow()
     }
 
-    private fun renderSkybox() {
-        glDepthFunc(GL_LEQUAL)
-        skyboxShader.use()
-        //We eliminate the translation part of the matrix
-        val viewMatrix = Matrix4f(Matrix3f(camera.getCalculateViewMatrix()))
-        skyboxShader.setUniform("view_matrix", viewMatrix)
-        skyboxShader.setUniform("projection_matrix", camera.getCalculateProjectionMatrix())
-        skybox.render()
-        glDepthFunc(GL_LESS)
-    }
-
-    private fun deferredRender(dt: Float, t: Float){
+    private fun geometryPass(dt: Float, t: Float){
         gBuffer.bind()
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gBufferShader.use()
@@ -128,21 +122,50 @@ class Scene(private val window: GameWindow) {
         val beat = level.beatsPerSeconds * t
         gBufferShader.setUniform("beat",beat)
         camera.bind(gBufferShader)
-        gameObjects.forEach{it.draw(gBufferShader)}
+        sun.bindShadowViewMatrix(gBufferShader)
+        gameObjects.forEach{ it.draw(gBufferShader) }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
+    }
+
+    private fun shadowPass(dt: Float, t: Float) {
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+
+        simpleDepthShader.use()
+        glViewport(0,0,depthMap.width, depthMap.height)
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMap.fbo)
+        glClear(GL_DEPTH_BUFFER_BIT)
+
+        sun.bindShadowViewMatrix(simpleDepthShader)
+        gameObjects.forEach{it.draw(simpleDepthShader)}
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default
 
+        glViewport(0,0,window.windowWidth,window.windowHeight)
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+
+    }
+
+    private fun lightingPass(dt: Float, t: Float){
         //Lighting Pass
         //We can clear here, because we bound the default FBO again
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-        initLightRendering()
         deferredShader.use()
         gBuffer.bindTextures()
         GLError.checkThrow()
 
+        glActiveTexture(GL_TEXTURE6)
+        glBindTexture(GL_TEXTURE_2D, depthMap.texture)
+        deferredShader.setUniform("shadowMap", 6)
+        deferredShader.setUniform("near_plane", sun.near_plane)
+        deferredShader.setUniform("far_plane", sun.far_plane)
+
         gameObjects.forEach { it.processLighting(deferredShader, camera.viewMatrix) }
         Light.bindAmount(deferredShader)
-        //level.update(dt, t)
-        endLightRendering()
+        // Bind screen for writing
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
+        glEnable(GL_DEPTH_TEST)
+
         quad.draw(deferredShader)
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer.gBufferID)
@@ -156,15 +179,17 @@ class Scene(private val window: GameWindow) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //set both to default again
     }
 
-    private fun initLightRendering(){
-        glDisable(GL_DEPTH_TEST)
-    }
-    private fun endLightRendering() {
-        // Bind screen for writing
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)
-        glEnable(GL_DEPTH_TEST)
-    }
 
+    private fun renderSkybox() {
+        glDepthFunc(GL_LEQUAL)
+        skyboxShader.use()
+        //We eliminate the translation part of the matrix
+        val viewMatrix = Matrix4f(Matrix3f(camera.getCalculateViewMatrix()))
+        skyboxShader.setUniform("view_matrix", viewMatrix)
+        skyboxShader.setUniform("projection_matrix", camera.getCalculateProjectionMatrix())
+        skybox.render()
+        glDepthFunc(GL_LESS)
+    }
 
 
     fun rainbow(vect: Vector3f, p: Float) {

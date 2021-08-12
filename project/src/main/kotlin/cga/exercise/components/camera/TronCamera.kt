@@ -22,7 +22,7 @@ class TronCamera(
     override fun getCalculateViewMatrix(): Matrix4f {
         val up = getWorldYAxis()
         val cameraPosition = getWorldPosition()
-        val cameraTarget = camTarget.getWorldPosition().also { println(it) }
+        val cameraTarget = camTarget.getWorldPosition()
         cameraTarget.add(0f,0.5f,0f)
         viewMatrix = Matrix4f().lookAt(cameraPosition, cameraTarget, up)
 

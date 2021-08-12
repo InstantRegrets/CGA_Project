@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW.*
 
 class Player(parent: Transformable? = null): GameObject {
     val model: Model = PlayerModel()
-    //private val lighting = PlayerLighting(model.renderable)
+    private val lighting = PlayerLighting(model.renderable)
     var movementSpeed: Float = 8f
     var rotationSpeed: Float = 6f
 
@@ -41,7 +41,7 @@ class Player(parent: Transformable? = null): GameObject {
     }
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
-        //lighting.update(shaderProgram, viewMatrix4f)
+        // lighting.update(shaderProgram, viewMatrix4f)
     }
 }
 

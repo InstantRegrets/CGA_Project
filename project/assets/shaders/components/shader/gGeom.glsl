@@ -11,16 +11,19 @@ uniform float pulseStrength;
 in vec3 vFragPos[];
 in vec2 vTexCoords[];
 in vec3 vNormal[];
+in vec4 vFragPosLightSpace[];
 
 out vec3 FragPos;
 out vec2 TexCoords;
 out vec3 Normal;
+out vec4 FragPosLightSpace;
 
 void makeVertex(int index){
     vec3 pos = vFragPos[index];
     FragPos = pos;
     TexCoords = vTexCoords[index];
     Normal = vNormal[index];
+    FragPosLightSpace = vFragPosLightSpace[index];
     gl_Position = projection_matrix * vec4(pos,1);
 
     EmitVertex();
@@ -29,9 +32,11 @@ void makeVertex(int index){
 vec3 middlePos;
 vec3 middleNorm;
 vec2 middleTex;
+vec4 middleLightPos;
 
 void setupMiddle(){
     middlePos = mix(mix(vFragPos[0], vFragPos[1], 0.5), vFragPos[2], 0.5);
+    middleLightPos = mix(mix(vFragPosLightSpace[0], vFragPosLightSpace[1], 0.5), vFragPosLightSpace[2], 0.5);
     middleNorm = mix(mix(vNormal[0], vNormal[1], 0.5), vNormal[2], 0.5);
     middleTex = mix(mix(vTexCoords[0], vTexCoords[1], 0.5), vTexCoords[2], 0.5);
 }
@@ -45,6 +50,8 @@ void makeMiddle(){
     FragPos = pos;
     Normal = middleNorm;
     TexCoords = middleTex;
+    // todo spikes do currently not throw shadows
+    FragPosLightSpace = middleLightPos;
     gl_Position = projection_matrix * vec4(pos,1);
     EmitVertex();
 }
@@ -60,8 +67,13 @@ void makeTriangle(int index1, int index2){
 
 
 void main(){
-    setupMiddle();
-    makeTriangle(0,1);
-    makeTriangle(1,2);
-    makeTriangle(2,0);
+    // setupMiddle();
+    // makeTriangle(0,1);
+    // makeTriangle(1,2);
+    // makeTriangle(2,0);
+
+    makeVertex(0);
+    makeVertex(1);
+    makeVertex(2);
+    EndPrimitive();
 }

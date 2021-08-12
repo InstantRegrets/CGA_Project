@@ -10,7 +10,7 @@ class Song(path: File) {
 
     init {
         musicBuffer = SoundBuffer(path)
-        musicSource = SoundSource(loop = true, relative = false, buffer = musicBuffer)
+        musicSource = SoundSource(loop = false, relative = false, buffer = musicBuffer)
         musicSource.setGain(0.1f)
     }
 

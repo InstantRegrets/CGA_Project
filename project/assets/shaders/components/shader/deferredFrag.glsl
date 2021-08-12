@@ -7,6 +7,11 @@ uniform sampler2D inNormal;
 uniform sampler2D inDiffuse;
 uniform sampler2D inSpecular;
 uniform sampler2D inEmissive;
+uniform sampler2D inShadow;
+
+uniform float near_plane;
+uniform float far_plane;
+uniform sampler2D shadowMap;
 
 in vec2 textureCoordinates;
 
@@ -40,15 +45,31 @@ uniform SpotLightData slData[slMaxAmount];  // max 128 lights
 
 
 vec3 diffMaterial, specularMaterial, emitMaterial;
+vec4 fragPosLightSpace;
 uniform float shininess;
 
 void loadMaterial(){
     emitMaterial = texture(inEmissive, textureCoordinates).rgb;
     diffMaterial = texture(inDiffuse, textureCoordinates).rgb;
     specularMaterial = texture(inSpecular, textureCoordinates).rgb;
+    fragPosLightSpace = texture(inShadow, textureCoordinates);
 }
 
 
+float ShadowCalculation() {
+     // perform perspective divide
+     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+     // transform to [0,1] range
+     projCoords = projCoords * 0.5 + 0.5;
+     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+     float closestDepth = texture(shadowMap, projCoords.xy).r;
+     // get depth of current fragment from light's perspective
+     float currentDepth = projCoords.z;
+     // check whether current frag pos is in shadow
+     float shadow = currentDepth-0.005 > closestDepth  ? 1.0 : 0.0;
+
+     return shadow;
+}
 
 
 // Lightning functions
@@ -102,7 +123,7 @@ void spotLight(in vec3 pToCamera, in vec3 N, in SpotLightData ld,in vec3 fragPos
     float intensity = clamp((theta - ld.outerCone) / epsilon, 0.0, 1.0);
     vec3 diff = intensity * diffuse(N, toLight, ld.color)*attenuation;
     vec3 spec = intensity * specularBlinn(N, toLight, toCamera, ld.color)*attenuation;
-    o += diff + spec;
+    o += (diff + spec) * (1-ShadowCalculation());
 }
 
 void spotLights(in vec3 toCamera, in vec3 N,in vec3 fragPos, inout vec3 o){
@@ -120,6 +141,12 @@ void ambient(inout vec3 o){
     o += ambientStrength * ambientColor * diffMaterial.xyz;
 }
 
+// required when using a perspective projection matrix
+float LinearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0; // Back to NDC
+    return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));
+}
 
 void main(){
     loadMaterial();
@@ -134,5 +161,9 @@ void main(){
     spotLights(toCamera, N,fragPos, o);
     emit(o);
 
-    color = vec4(o, 1);
+    color = vec4(o,1);
+    // color = vec4(vec3(ShadowCalculation()),1);
+    // float depthValue = texture(shadowMap, textureCoordinates).r;
+    // color = vec4(vec3(LinearizeDepth(depthValue) / far_plane), 1.0); // perspective
 }
+
