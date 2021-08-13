@@ -61,7 +61,8 @@ class Mesh(
     fun render(shaderProgram: ShaderProgram) {
 
         //bind our attributes
-        material.bind(shaderProgram)
+        if (shaderProgram.targetMaterial)
+            material.bind(shaderProgram)
         glBindVertexArray(vao)
         //use in constructor specified draw mode, to draw a maximum of <indexCount> vertices, starting with index 0
         glDrawElements(drawMode, indexCount, GL_UNSIGNED_INT, 0)

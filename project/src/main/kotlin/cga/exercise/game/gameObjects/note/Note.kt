@@ -1,9 +1,9 @@
-package cga.exercise.game.note
+package cga.exercise.game.gameObjects.note
 
 import cga.exercise.components.geometry.Renderable
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.light.Light
-import cga.exercise.components.light.SpotLight
+import cga.exercise.components.light.PointLight
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.CustomModel
 import cga.exercise.game.gameObjects.GameObject
@@ -37,7 +37,7 @@ class Note(
         translateLocal(startPosition)
         scaleLocal(Vector3f(0.2f))
         renderable.emitColor = color
-        light = SpotLight(color, Vector3f(1f,0.15f,0.15f))
+        light = PointLight(color, Vector3f(1f,0.15f,0.15f))
 
         renderable.parent = this
         light.parent = this

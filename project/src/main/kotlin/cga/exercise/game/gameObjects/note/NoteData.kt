@@ -1,6 +1,4 @@
-package cga.exercise.game.note
-
-import cga.exercise.game.note.NoteKey
+package cga.exercise.game.gameObjects.note
 
 
 open class NoteData(

@@ -14,7 +14,7 @@ class GeometryBuffer(window: GameWindow){
     private val width: Int = window.windowWidth
     private val height: Int = window.windowHeight
     companion object{
-        const val totalTextures: Int = 5
+        const val totalTextures: Int = 6
     }
     init {
         gBufferID = glGenFramebuffers()
@@ -39,7 +39,11 @@ class GeometryBuffer(window: GameWindow){
             GL_COLOR_ATTACHMENT2,
             GL_COLOR_ATTACHMENT3,
             GL_COLOR_ATTACHMENT4,
+            GL_COLOR_ATTACHMENT5,
         )
+        if (buffers.size != totalTextures){
+            throw Exception("Total texture size doesn't match")
+        }
         glDrawBuffers(buffers)
         GLError.checkThrow()
 
@@ -79,7 +83,7 @@ class GeometryBuffer(window: GameWindow){
 
     fun cleanup(){
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
-        GL30.glDeleteFramebuffers(gBufferID)
+        glDeleteFramebuffers(gBufferID)
         gBufferID = -1
     }
 
