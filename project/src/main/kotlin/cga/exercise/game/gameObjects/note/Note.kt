@@ -1,10 +1,9 @@
-package cga.exercise.game.note
+package cga.exercise.game.gameObjects.note
 
 import cga.exercise.components.geometry.Renderable
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.light.Light
 import cga.exercise.components.light.PointLight
-import cga.exercise.components.light.SpotLight
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.CustomModel
 import cga.exercise.game.gameObjects.GameObject

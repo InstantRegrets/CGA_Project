@@ -16,6 +16,10 @@ import java.nio.FloatBuffer
  */
 open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String, geometryShaderPath: String? = null) {
     var programID: Int = 0
+    open val targetMaterial = true
+    open val targetPulseStrength = true
+    open val targetEmitColor = true
+
     var vShaderId: Int = 0
     var fShaderId: Int = 0
     var gShaderId: Int = 0

@@ -2,6 +2,7 @@ package cga.exercise.game
 
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.light.SpotLight
+import cga.exercise.components.shader.DepthShader
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.CustomModel
 import cga.exercise.game.gameObjects.GameObject
@@ -11,55 +12,53 @@ import org.joml.Vector3f
 import kotlin.math.PI
 
 class Sun(
-    val near_plane: Float = 10.0f,
-    val far_plane: Float = 180f
+    private val near_plane: Float = 350f,
+    private val far_plane: Float = 450f
 ): GameObject, Transformable() {
-    private val target = Transformable()
 
-    var lightView = Matrix4f()
-    var projectionMatrix = Matrix4f()
+    private val shadowQuadSize = 20f
+    private var phase = Phase.Sun
+
+    private var lightView = Matrix4f()
+    private var projectionMatrix = Matrix4f()
     val model = CustomModel("orb")
     val light = SpotLight(
         color = Vector3f(1f, 1f, 1f),
-        attenuation = Vector3f(1f, 0f, 0f),
+        attenuation = Vector3f(0.0000001f, 0f, 0f),
         outerCone = 0.6f * PI.toFloat(),
-        innerCone = 0.6f*PI.toFloat(),
+        innerCone = 0.4f *PI.toFloat(),
     )
 
     init {
-        target.translateLocal(getWorldZAxis().negate())
-        target.parent = this
         model.renderable.parent = this
         light.parent = this
-        translateLocal(Vector3f(0f,50f,0f))
+        model.renderable.pulseStrength = 10f
+        translateLocal(Vector3f(50f,400f,0f))
         scaleLocal(Vector3f(10f))
-        rotateLocal(-1* PI.toFloat(),0f,0f)
+        light.rotateLocal(-1.5f * PI.toFloat(),0f,0f)
+        // rotateAroundPoint((-0.5* PI).toFloat(),0f,0f, Vector3f())
     }
 
     fun bindShadowViewMatrix(shaderProgram: ShaderProgram){
         val up = getWorldYAxis()
         val position = getWorldPosition()
         lightView = Matrix4f().lookAt(position, Vector3f(0f), up)
-        // // todo debug only
-        // lightView = Matrix4f().lookAt(
-        //     Vector3f(0f,50f, -10f),
-        //     Vector3f(0f),
-        //     Vector3f(0f,1f,0f)
-        // )
-
-        // todo understand
-        // todo if this is n, the resolution may must be 2^n?
-        projectionMatrix =  Matrix4f().ortho(-10f,10f,-10f,10f, near_plane, far_plane)
+        projectionMatrix =  Matrix4f().ortho(-shadowQuadSize,shadowQuadSize,-shadowQuadSize,shadowQuadSize, near_plane, far_plane)
         shaderProgram.setUniform("lightProjection", projectionMatrix)
         shaderProgram.setUniform("lightView", lightView)
     }
 
     override fun draw(shaderProgram: ShaderProgram) {
-        model.renderable.render(shaderProgram)
+        if (shaderProgram !is DepthShader)
+            model.renderable.render(shaderProgram)
     }
 
     override fun update(dt: Float, beat: Float) {
-        // todo rotate around world
+        rotateAroundPoint(0.2f*dt, 0f,0f, Vector3f(0f))
+        if (getWorldPosition().y < -40){
+            switchPhase()
+            rotateAroundPoint(0.25f* PI.toFloat(), 0f,0f, Vector3f(0f))
+        }
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
@@ -68,5 +67,40 @@ class Sun(
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
         light.bind(shaderProgram, viewMatrix4f)
+    }
+
+    enum class Phase{
+        Sun,
+        Moon,
+        BloodMoon,
+    }
+
+    fun switchPhase(){
+        phase = when(phase){
+            Phase.Sun -> Phase.Moon
+            Phase.Moon -> Phase.BloodMoon
+            Phase.BloodMoon -> Phase.Sun
+        }
+
+        when(phase){
+            Phase.Sun -> {
+                model.renderable.scaleLocal(Vector3f(0.25f))
+                light.color.set(1f,1f,0f)
+                model.renderable.emitColor.set(1f,1f,0f)
+                model.renderable.pulseStrength = 40f
+            }
+            Phase.Moon -> {
+                model.renderable.scaleLocal(Vector3f(2f))
+                light.color.set(0.1f,0.1f,0.1f)
+                model.renderable.emitColor.set(0.1f,0.1f,0.1f)
+                model.renderable.pulseStrength = 0f
+            }
+            Phase.BloodMoon -> {
+                model.renderable.scaleLocal(Vector3f(2f))
+                light.color.set(0.8f,0f,0f)
+                model.renderable.emitColor.set(0.8f,0f,0f)
+                model.renderable.pulseStrength = 400f
+            }
+        }
     }
 }

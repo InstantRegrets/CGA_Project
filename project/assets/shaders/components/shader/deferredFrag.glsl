@@ -9,8 +9,6 @@ uniform sampler2D inSpecular;
 uniform sampler2D inEmissive;
 uniform sampler2D inShadow;
 
-uniform float near_plane;
-uniform float far_plane;
 uniform sampler2D shadowMap;
 
 in vec2 textureCoordinates;
@@ -56,19 +54,32 @@ void loadMaterial(){
 }
 
 
-float ShadowCalculation() {
-     // perform perspective divide
-     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-     // transform to [0,1] range
-     projCoords = projCoords * 0.5 + 0.5;
-     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-     float closestDepth = texture(shadowMap, projCoords.xy).r;
-     // get depth of current fragment from light's perspective
-     float currentDepth = projCoords.z;
-     // check whether current frag pos is in shadow
-     float shadow = currentDepth-0.005 > closestDepth  ? 1.0 : 0.0;
+float ShadowCalculation(vec3 normal, vec3 lightDir) {
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
 
-     return shadow;
+    float bias = min(0.05 * (1.0 - dot(normal, normalize(lightDir))), 0.005);
+
+    // output value
+    float shadow = 0.0;
+
+    // check whether current frag pos is in shadow
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+
+    shadow /= 9.0; // nine, since we loop through 9 pixels
+    return shadow;
 }
 
 
@@ -87,11 +98,9 @@ vec3 specularBlinn(in vec3 N, in vec3 toLight, in vec3 toCamera, in vec3 color){
     return specular;
 }
 
-//
-// POINT LIGHTS
-//
 float calcAttenuation(in vec3 inAtten,in float distance){
-    return 1.0/ (inAtten.x + inAtten.y*distance + inAtten.z *(distance * distance));
+    float att = 1/(inAtten.x + inAtten.y*distance + inAtten.z *(distance * distance));
+    return clamp(att,0,1); // make sure we don't go above 1
 }
 
 void pointLight(in vec3 pToCamera, in vec3 N, in PointLightData ld,in vec3 fragPos, inout vec3 o){
@@ -123,7 +132,7 @@ void spotLight(in vec3 pToCamera, in vec3 N, in SpotLightData ld,in vec3 fragPos
     float intensity = clamp((theta - ld.outerCone) / epsilon, 0.0, 1.0);
     vec3 diff = intensity * diffuse(N, toLight, ld.color)*attenuation;
     vec3 spec = intensity * specularBlinn(N, toLight, toCamera, ld.color)*attenuation;
-    o += (diff + spec) * (1-ShadowCalculation());
+    o += (diff + spec) * (1.0-ShadowCalculation(N, ld.direction));
 }
 
 void spotLights(in vec3 toCamera, in vec3 N,in vec3 fragPos, inout vec3 o){
@@ -141,13 +150,6 @@ void ambient(inout vec3 o){
     o += ambientStrength * ambientColor * diffMaterial.xyz;
 }
 
-// required when using a perspective projection matrix
-float LinearizeDepth(float depth)
-{
-    float z = depth * 2.0 - 1.0; // Back to NDC
-    return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));
-}
-
 void main(){
     loadMaterial();
     vec3 fragPos = texture(inPosition, textureCoordinates).xyz;
@@ -162,8 +164,5 @@ void main(){
     emit(o);
 
     color = vec4(o,1);
-    // color = vec4(vec3(ShadowCalculation()),1);
-    // float depthValue = texture(shadowMap, textureCoordinates).r;
-    // color = vec4(vec3(LinearizeDepth(depthValue) / far_plane), 1.0); // perspective
 }
 

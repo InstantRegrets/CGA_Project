@@ -13,10 +13,10 @@ import kotlin.math.cos
  * vec3(constant,linear,quadratic)
  */
 class SpotLight(
-    private val color: Vector3f,
-    private val attenuation: Vector3f,
-    private val outerCone: Float = (0.4* PI).toFloat(), // Outer Cone in radians
-    private val innerCone: Float = (0.2* PI).toFloat(), // Inner Cone in radians
+    val color: Vector3f,
+    val attenuation: Vector3f,
+    val outerCone: Float = (0.4* PI).toFloat(), // Outer Cone in radians
+    val innerCone: Float = (0.2* PI).toFloat(), // Inner Cone in radians
 ) : Light() {
 
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {

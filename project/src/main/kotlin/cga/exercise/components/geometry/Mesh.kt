@@ -58,10 +58,10 @@ class Mesh(
     /**
      * renders the mesh
      */
-    fun render(shaderProgram: ShaderProgram, bindMaterial: Boolean = true) {
+    fun render(shaderProgram: ShaderProgram) {
 
         //bind our attributes
-        if (bindMaterial)
+        if (shaderProgram.targetMaterial)
             material.bind(shaderProgram)
         glBindVertexArray(vao)
         //use in constructor specified draw mode, to draw a maximum of <indexCount> vertices, starting with index 0
