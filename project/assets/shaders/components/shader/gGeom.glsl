@@ -24,10 +24,7 @@ vec3 calcPos(int index){
     vec3 pos = vFragPos[index];
     float distance = length(pos);
 
-    // see https://www.desmos.com/calculator/8sij1ejwar
-    float s = 40;   // start distance
-    float m = 1;    // max strength
-    float strength = 2/((2/m) + exp(s-distance*0.5));
+    float strength = smoothstep(40,80,distance) * 0.95+ 0.05;
     pos.y += strength * sin(pos.x/2 + mod(beat,2)*2*pi);
     return pos;
 }
