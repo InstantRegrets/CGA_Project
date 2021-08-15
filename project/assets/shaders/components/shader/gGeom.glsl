@@ -18,8 +18,22 @@ out vec2 TexCoords;
 out vec3 Normal;
 out vec4 FragPosLightSpace;
 
-void makeVertex(int index){
+#define pi 3.14159265359
+
+vec3 calcPos(int index){
     vec3 pos = vFragPos[index];
+    float distance = length(pos);
+
+    // see https://www.desmos.com/calculator/8sij1ejwar
+    float s = 40;   // start distance
+    float m = 1;    // max strength
+    float strength = 2/((2/m) + exp(s-distance*0.5));
+    pos.y += strength * sin(pos.x/2 + mod(beat,2)*2*pi);
+    return pos;
+}
+
+void makeVertex(int index){
+    vec3 pos = calcPos(index);
     FragPos = pos;
     TexCoords = vTexCoords[index];
     Normal = vNormal[index];
@@ -35,7 +49,7 @@ vec2 middleTex;
 vec4 middleLightPos;
 
 void setupMiddle(){
-    middlePos = mix(mix(vFragPos[0], vFragPos[1], 0.5), vFragPos[2], 0.5);
+    middlePos = mix(mix(calcPos(0), calcPos(1), 0.5), calcPos(2), 0.5);
     middleLightPos = mix(mix(vFragPosLightSpace[0], vFragPosLightSpace[1], 0.5), vFragPosLightSpace[2], 0.5);
     middleNorm = mix(mix(vNormal[0], vNormal[1], 0.5), vNormal[2], 0.5);
     middleTex = mix(mix(vTexCoords[0], vTexCoords[1], 0.5), vTexCoords[2], 0.5);
