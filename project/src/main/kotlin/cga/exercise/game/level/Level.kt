@@ -96,6 +96,10 @@ class Level: GameObject {
                 .sortedBy { it._time }
                 .map { noteDataFromBsNote(it) }
                 .toSet().iterator()
+        val events = difficulty._events
+            .sortedBy { it._time }
+            .map { println(it) }
+            .iterator()
         advanceNote()
 
         beatsPerSeconds = (info._beatsPerMinute / 60f).toFloat()
