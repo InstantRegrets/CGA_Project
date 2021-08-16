@@ -1,7 +1,7 @@
 package cga.exercise.components.geometry
 
+import cga.exercise.components.material.Mat
 import cga.exercise.components.shader.ShaderProgram
-import cga.framework.GLError
 import org.lwjgl.opengl.GL30.*
 
 /**
@@ -20,7 +20,7 @@ class Mesh(
     vertexData: FloatArray,
     indexData: IntArray,
     attributes: Array<VertexAttribute>,
-    val material: Material?,
+    val material: Mat,
     private val drawMode: Int = GL_TRIANGLES //default to Triangles
 ) {
     //These are just IDs
@@ -61,7 +61,8 @@ class Mesh(
     fun render(shaderProgram: ShaderProgram) {
 
         //bind our attributes
-        material?.bind(shaderProgram)
+        if (shaderProgram.targetMaterial)
+            material.bind(shaderProgram)
         glBindVertexArray(vao)
         //use in constructor specified draw mode, to draw a maximum of <indexCount> vertices, starting with index 0
         glDrawElements(drawMode, indexCount, GL_UNSIGNED_INT, 0)

@@ -41,7 +41,7 @@ class Player(parent: Transformable? = null): GameObject {
     }
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
-        //lighting.update(shaderProgram, viewMatrix4f)
+        // lighting.update(shaderProgram, viewMatrix4f)
     }
 }
 

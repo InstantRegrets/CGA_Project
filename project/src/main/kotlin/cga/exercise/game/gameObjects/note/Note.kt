@@ -1,14 +1,16 @@
-package cga.exercise.game.note
+package cga.exercise.game.gameObjects.note
 
-import cga.exercise.components.geometry.Renderable
-import cga.exercise.components.geometry.Transformable
+import cga.exercise.components.geometry.*
 import cga.exercise.components.light.Light
-import cga.exercise.components.light.SpotLight
+import cga.exercise.components.light.PointLight
+import cga.exercise.components.material.AnimatedMaterial
 import cga.exercise.components.shader.ShaderProgram
-import cga.exercise.game.gameObjects.CustomModel
 import cga.exercise.game.gameObjects.GameObject
 import cga.framework.GameWindow
+import cga.framework.ModelLoader
+import cga.framework.OBJLoader
 import org.joml.Matrix4f
+import org.joml.Vector2f
 import org.joml.Vector3f
 import kotlin.random.Random
 
@@ -16,15 +18,14 @@ class Note(
     val data: NoteData,
 ): Transformable(), GameObject {
     private val color: Vector3f
-    private val renderable: Renderable = Renderable(model.meshes)
+    private val renderable: Renderable = noteRenderable()
     private val light: Light
     private val startPosition: Vector3f
+
     // todo move out of this class?
     private val targetPosition: Vector3f
     private val spawnBeat = 2f
-    companion object{
-        val model = CustomModel("orb").renderable
-    }
+
     init {
         if (data.key == NoteKey.Left) {
             color = Vector3f(1f ,0f,0f)
@@ -38,7 +39,7 @@ class Note(
         translateLocal(startPosition)
         scaleLocal(Vector3f(0.2f))
         renderable.emitColor = color
-        light = SpotLight(color, Vector3f(1f,0.15f,0.15f))
+        light = PointLight(color, Vector3f(1f,0.15f,0.15f))
 
         renderable.parent = this
         light.parent = this
@@ -50,6 +51,7 @@ class Note(
 
     // todo this could be done so much more efficient
     override fun update(dt: Float, beat: Float) {
+        renderable.meshes.forEach { (it.material as AnimatedMaterial).counter += dt*30 }
         // val f = (data.beat - beat) / spawnBeat
         // val newPos = Vector3f(targetPosition).sub(Vector3f(startPosition.mul(f)))
         // setPosition(newPos)
@@ -63,5 +65,19 @@ class Note(
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
         light.bind(shaderProgram, viewMatrix4f)
+    }
+
+    companion object {
+        private val obj = OBJLoader.loadOBJ("assets/models/note/mesh.obj")
+        private val meshes =  obj.objects.flatMap { it.meshes }
+        private val diff = ModelLoader.loadTexArray("note", "diff")
+        private val emit = ModelLoader.loadTexArray("note", "emit")
+        private val spec = ModelLoader.loadTexArray("note", "spec")
+        fun noteRenderable(): Renderable {
+            val mat = AnimatedMaterial(diff,emit,spec, Vector2f(3.0f))
+            val m =  meshes.map { Mesh(it.vertexData, it.indexData, ModelLoader.defaultOBJAttributes, mat) }.toMutableList()
+            val r = Renderable(m)
+            return r
+        }
     }
 }

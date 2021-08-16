@@ -3,14 +3,11 @@ package cga.exercise.game.gameObjects.orb
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.light.PointLight
 import cga.exercise.components.shader.ShaderProgram
-import cga.exercise.components.sound.SoundBuffer
-import cga.exercise.components.sound.SoundSource
 import cga.exercise.game.gameObjects.GameObject
 import cga.framework.GameWindow
 import cga.framework.Random
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import java.io.File
 import kotlin.math.PI
 import kotlin.math.max
 import kotlin.math.min

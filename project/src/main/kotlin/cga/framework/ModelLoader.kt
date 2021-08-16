@@ -1,9 +1,9 @@
 package cga.framework
 
-import cga.exercise.components.geometry.Material
-import cga.exercise.components.geometry.Mesh
-import cga.exercise.components.geometry.Renderable
-import cga.exercise.components.geometry.VertexAttribute
+import cga.exercise.components.geometry.*
+import cga.exercise.components.material.AnimatedMaterial
+import cga.exercise.components.material.Mat
+import cga.exercise.components.material.Material
 import cga.exercise.components.texture.Texture2D
 import org.joml.Matrix3f
 import org.joml.Vector2f
@@ -12,6 +12,8 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.PointerBuffer
 import org.lwjgl.assimp.*
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL33
+import java.io.File
 import java.nio.IntBuffer
 import java.util.*
 
@@ -137,7 +139,7 @@ object ModelLoader {
     fun loadModel(objpath: String, pitch: Float, yaw: Float, roll: Float): Renderable? {
         val model = load(objpath) ?: return null
         val textures = ArrayList<Texture2D>()
-        val materials = ArrayList<Material>()
+        val materials = ArrayList<Mat>()
         val meshes = ArrayList<Mesh>()
         val stride = 8 * 4
         val atr1 = VertexAttribute(3, GL11.GL_FLOAT, stride, 0)
@@ -160,10 +162,12 @@ object ModelLoader {
         }
         // materials
         for (i in model.materials.indices) {
-            materials.add(Material(textures[model.materials[i].diffTexIndex],
+            materials.add(
+                Material(textures[model.materials[i].diffTexIndex],
                     textures[model.materials[i].emitTexIndex],
                     textures[model.materials[i].specTexIndex],
-                    ))
+                    )
+            )
         }
         // meshes
         for (i in model.meshes.indices) {
@@ -174,5 +178,44 @@ object ModelLoader {
         }
         // assemble the renderable
         return Renderable(meshes)
+    }
+
+    val defaultOBJAttributes = arrayOf(
+        VertexAttribute(3, GL33.GL_FLOAT,  32, 0),  //Position
+        VertexAttribute(2, GL33.GL_FLOAT,  32, 12),  //Tex
+        VertexAttribute(3, GL33.GL_FLOAT,  32, 20),  //Normals
+    )
+
+    fun loadAnimatedMesh(name: String): MutableList<Mesh> {
+        val mat = loadAnimatedMaterial(name)
+        val objPath = "assets/models/$name/mesh.obj"
+        val obj = OBJLoader.loadOBJ(objPath)
+
+        val meshes =  obj.objects.flatMap { it.meshes }
+        return meshes.map { Mesh(it.vertexData, it.indexData, defaultOBJAttributes, mat) }.toMutableList()
+    }
+
+    fun loadAnimatedMaterial(basePath: String): AnimatedMaterial {
+        val diff = loadTexArray(basePath, "diff")
+        val emit = loadTexArray(basePath, "emit")
+        val spec = loadTexArray(basePath, "spec")
+        return AnimatedMaterial(diff,emit,spec)
+
+    }
+    fun loadTexArray(basePath: String, textureName: String): Array<Texture2D> {
+        var index = 0
+        val l = arrayListOf<Texture2D>()
+        while(true){
+            val path = "assets/models/$basePath/$textureName-$index.png"
+            if (!File(path).isFile) { break }
+            val t = Texture2D(path, true)
+            t.setTexParams(
+                GL33.GL_REPEAT, GL33.GL_REPEAT,
+                GL33.GL_LINEAR_MIPMAP_LINEAR, GL33.GL_LINEAR,
+            )
+            l.add(t)
+            index++
+        }
+        return l.toTypedArray()
     }
 }

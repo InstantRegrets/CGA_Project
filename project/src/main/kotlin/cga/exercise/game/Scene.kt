@@ -1,11 +1,14 @@
 package cga.exercise.game
 
 import cga.exercise.components.camera.TronCamera
+import cga.exercise.components.geometry.DepthMap
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.geometry.Mesh
 import cga.exercise.components.light.Light
 import cga.exercise.components.light.PointLight
 import cga.exercise.components.shader.*
+import cga.exercise.components.shader.DepthShader
+import cga.exercise.components.shader.SilhouetteShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
 import cga.exercise.components.texture.Skybox
@@ -14,7 +17,7 @@ import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
 import cga.exercise.game.level.Level
-import cga.exercise.game.note.NoteKey
+import cga.exercise.game.gameObjects.note.NoteKey
 import cga.framework.GLError
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
@@ -22,7 +25,7 @@ import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.opengl.GL30.*
+import org.lwjgl.opengl.GL33.*
 import kotlin.math.PI
 import kotlin.math.sin
 
@@ -30,13 +33,17 @@ import kotlin.math.sin
 /**
  * Created by Fabian on 16.09.2017.
  */
-class Scene(private val window: GameWindow) {
-    //Game Stuff
-    private val camera: TronCamera
+class Scene(val window: GameWindow) {
+    val camera: TronCamera
     private val level: Level
     private val player = Player()
-    private val gameObjects: MutableList<GameObject> = mutableListOf()
+    val gameObjects: MutableList<GameObject> = mutableListOf()    private val gBufferShader: ShaderProgram
     private val orbs: MutableList<GameObject> = mutableListOf()
+
+    val sun = Sun()
+    private val depthMap: DepthMap = DepthMap()
+    private val depthShader = DepthShader(depthMap)
+    private val silhouetteShader = SilhouetteShader()
 
     //Deferred Shading Stuff
     private val gBuffer = GeometryBuffer(window)
@@ -90,7 +97,7 @@ class Scene(private val window: GameWindow) {
         gameObjects.addAll(
             listOf(
                 Environment(),
-                level, player
+                level, player,sun
             )
         )
         pointLights.addAll(orbs.map { (it as Orb).light })
@@ -102,11 +109,13 @@ class Scene(private val window: GameWindow) {
     }
 
     fun render(dt: Float, t: Float) {
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        depthShader.pass(this, beat)
         deferredRender(dt, t)
         renderSkybox()
-        GLError.checkThrow()
         SoundListener.setPosition(camera)
         GLError.checkThrow()
+        logFps()
     }
 
     private fun renderSkybox() {
@@ -158,6 +167,8 @@ class Scene(private val window: GameWindow) {
         val beat = level.beatsPerSeconds * t
         geometryPassShader.setUniform("beat",beat)
         camera.bind(geometryPassShader)
+        sun.bindShadowViewMatrix(gBufferShader)
+
         //Draw everything into gBuffer
         gameObjects.forEach{it.draw(geometryPassShader)}
 
@@ -249,6 +260,17 @@ class Scene(private val window: GameWindow) {
     //might cause bugs!
     private fun calculateWVP(model: Matrix4f, view: Matrix4f, projection: Matrix4f): Matrix4f{
         return Matrix4f(projection).mul(view).mul(model)
+    }
+
+    var startTime = System.nanoTime();
+    var frames = 0;
+    fun logFps(){
+        frames++;
+        if(System.nanoTime() - startTime >= 1000000000) {
+            println("FPSCounter: fps $frames");
+            frames = 0;
+            startTime = System.nanoTime();
+        }
     }
 
     fun rainbow(vect: Vector3f, p: Float) {

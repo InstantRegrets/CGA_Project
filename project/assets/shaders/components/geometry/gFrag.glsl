@@ -5,8 +5,10 @@ layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec3 gDiffuse;
 layout (location = 3) out vec3 gSpecular;
 layout (location = 4) out vec3 gEmissive;
+layout (location = 5) out vec4 gShadow;
 
 in vec3 FragPos;
+in vec4 FragPosLightSpace;
 in vec2 TexCoords;
 in vec3 Normal;
 
@@ -28,4 +30,6 @@ void main() {
     // and the emmisive
     gEmissive = texture(emitMat, TexCoords).rgb * emitColor;
 
+    // todo maybe we can do the whole calculation in the gshader?
+    gShadow = FragPosLightSpace;
 }

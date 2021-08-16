@@ -3,9 +3,6 @@ package cga.exercise.components.geometry
 import cga.exercise.components.shader.ShaderProgram
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import org.lwjgl.opengl.GLUtil
-import java.lang.Float.max
-import kotlin.math.pow
 
 class Renderable(
     val meshes: MutableList<Mesh>,
@@ -17,13 +14,14 @@ class Renderable(
     IRenderable, Transformable(modelMatrix, parent) {
 
     override fun render(shaderProgram: ShaderProgram) {
-
         val color = Vector3f(emitColor)
-        val mm = getWorldModelMatrix()
+        if (shaderProgram.targetEmitColor)
+            shaderProgram.setUniform("emitColor",color)
+        if(shaderProgram.targetPulseStrength)
+            shaderProgram.setUniform("pulseStrength",pulseStrength)
 
+        val mm = getWorldModelMatrix()
         shaderProgram.setUniform("model_matrix",mm)
-        shaderProgram.setUniform("emitColor",color)
-        shaderProgram.setUniform("pulseStrength",pulseStrength)
         meshes.forEach{
             it.render(shaderProgram)
         }

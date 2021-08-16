@@ -13,13 +13,12 @@ class GeometryBuffer(window: GameWindow){
     private val textureIDs: IntArray = IntArray(totalTextures)
     private val width: Int = window.windowWidth
     private val height: Int = window.windowHeight
-    private val finalColorAttachment = GL_COLOR_ATTACHMENT5
+    private val finalColorAttachment = GL_COLOR_ATTACHMENT6
     val depthTexture = glGenTextures()
     val finalTexture = glGenTextures()
 
     companion object{
-        const val totalTextures: Int = 5
-
+        const val totalTextures: Int = 6
     }
     init {
         glBindFramebuffer(GL_FRAMEBUFFER, gBufferID)
@@ -80,6 +79,7 @@ class GeometryBuffer(window: GameWindow){
             GL_COLOR_ATTACHMENT2, //diffuse
             GL_COLOR_ATTACHMENT3, //specular
             GL_COLOR_ATTACHMENT4, //emissive
+            GL_COLOR_ATTACHMENT5 //shadow
         )
         glDrawBuffers(buffers)
     }
@@ -118,7 +118,7 @@ class GeometryBuffer(window: GameWindow){
 
     fun cleanup(){
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
-        GL30.glDeleteFramebuffers(gBufferID)
+        glDeleteFramebuffers(gBufferID)
         gBufferID = -1
     }
 

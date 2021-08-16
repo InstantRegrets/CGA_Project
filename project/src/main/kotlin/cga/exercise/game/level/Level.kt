@@ -3,9 +3,9 @@ package cga.exercise.game.level
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.chart.IoChart
 import cga.exercise.game.gameObjects.GameObject
-import cga.exercise.game.note.Note
-import cga.exercise.game.note.NoteData
-import cga.exercise.game.note.NoteKey
+import cga.exercise.game.gameObjects.note.Note
+import cga.exercise.game.gameObjects.note.NoteData
+import cga.exercise.game.gameObjects.note.NoteKey
 import cga.framework.GameWindow
 import chart.difficulty.Difficulty
 import chart.difficulty._notes
@@ -96,6 +96,10 @@ class Level: GameObject {
                 .sortedBy { it._time }
                 .map { noteDataFromBsNote(it) }
                 .toSet().iterator()
+        val events = difficulty._events
+            .sortedBy { it._time }
+            .map { println(it) }
+            .iterator()
         advanceNote()
 
         beatsPerSeconds = (info._beatsPerMinute / 60f).toFloat()
