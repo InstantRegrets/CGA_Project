@@ -37,7 +37,7 @@ class Scene(val window: GameWindow) {
     val camera: TronCamera
     private val level: Level
     private val player = Player()
-    val gameObjects: MutableList<GameObject> = mutableListOf()    private val gBufferShader: ShaderProgram
+    val gameObjects: MutableList<GameObject> = mutableListOf()
     private val orbs: MutableList<GameObject> = mutableListOf()
 
     val sun = Sun()
@@ -110,6 +110,7 @@ class Scene(val window: GameWindow) {
 
     fun render(dt: Float, t: Float) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        val beat = level.beatsPerSeconds * t
         depthShader.pass(this, beat)
         deferredRender(dt, t)
         renderSkybox()
@@ -131,8 +132,6 @@ class Scene(val window: GameWindow) {
     }
 
     private fun deferredRender(dt: Float, t: Float){
-        //TODO calc FPS
-
         gBuffer.startFrame()
         GLError.checkThrow()
 
@@ -143,7 +142,6 @@ class Scene(val window: GameWindow) {
         pointLights.forEach {
             stencilPass(it)
             pointLightPass(it)
-
         }
 
         glDisable(GL_STENCIL_TEST)
@@ -167,7 +165,7 @@ class Scene(val window: GameWindow) {
         val beat = level.beatsPerSeconds * t
         geometryPassShader.setUniform("beat",beat)
         camera.bind(geometryPassShader)
-        sun.bindShadowViewMatrix(gBufferShader)
+        sun.bindShadowViewMatrix(geometryPassShader)
 
         //Draw everything into gBuffer
         gameObjects.forEach{it.draw(geometryPassShader)}
