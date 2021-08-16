@@ -39,9 +39,9 @@ class GeometryBuffer(window: GameWindow){
 
 
         GLError.checkThrow()
-
+//GL_FLOAT_32_UNSIGNED_INT_24_8_REV
         glBindTexture(GL_TEXTURE_2D, depthTexture)
-        glTexImage2D(GL_TEXTURE_2D,0, GL_DEPTH32F_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, null as ByteBuffer?)
+        glTexImage2D(GL_TEXTURE_2D,0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, null as ByteBuffer?)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0)
 
 
@@ -113,7 +113,7 @@ class GeometryBuffer(window: GameWindow){
     fun bindForDepthReadout(){
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0)
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferID)
-        glReadBuffer(GL_DEPTH_STENCIL_ATTACHMENT)
+        GLError.checkThrow()
     }
 
     fun cleanup(){

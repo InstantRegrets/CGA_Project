@@ -103,13 +103,14 @@ class Scene(private val window: GameWindow) {
 
     fun render(dt: Float, t: Float) {
         deferredRender(dt, t)
+        renderSkybox()
         GLError.checkThrow()
-        //renderSkybox()
         SoundListener.setPosition(camera)
         GLError.checkThrow()
     }
 
     private fun renderSkybox() {
+        glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
         skyboxShader.use()
         //We eliminate the translation part of the matrix
@@ -139,12 +140,11 @@ class Scene(private val window: GameWindow) {
         glDisable(GL_STENCIL_TEST)
         //TODO Directional Light
 
+        copyDepthBuffer()
+        GLError.checkThrow()
+
         finalPass()
         GLError.checkThrow()
-
-        //copyDepthBuffer()
-        GLError.checkThrow()
-
         //TODO Render FPS
     }
 
@@ -234,10 +234,11 @@ class Scene(private val window: GameWindow) {
     //Experimental DOES cause bugs
     private fun copyDepthBuffer(){
         gBuffer.bindForDepthReadout()
+        GLError.checkThrow()
         //copy the depth buffer from gbuffer to default
         glBlitFramebuffer(
-            0,0, window.windowWidth, window.windowHeight,
-            0,0, window.windowWidth, window.windowHeight,
+            0,0, width, height,
+            0,0, width, height,
             GL_DEPTH_BUFFER_BIT, GL_NEAREST
         )
         GLError.checkThrow()
