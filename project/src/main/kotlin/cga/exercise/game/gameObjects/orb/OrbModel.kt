@@ -10,8 +10,6 @@ import kotlin.math.pow
 class OrbModel(val color: Vector3f): CustomModel(
     "orb"
 ) {
-    val glitchRenderable = loadRenderable("orb")
-    val translation = Vector3f(0f)
 
     init{
         renderable.pulseStrength = Random.nextFloat(0.02f)

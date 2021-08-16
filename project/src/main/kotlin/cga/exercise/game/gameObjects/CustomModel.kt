@@ -1,9 +1,7 @@
 package cga.exercise.game.gameObjects
 
-import cga.exercise.components.geometry.Material
-import cga.exercise.components.geometry.Mesh
-import cga.exercise.components.geometry.Renderable
-import cga.exercise.components.geometry.VertexAttribute
+import cga.exercise.components.geometry.*
+import cga.exercise.components.material.Material
 import cga.exercise.components.texture.Texture2D
 import cga.framework.OBJLoader
 import org.joml.Vector2f
@@ -20,13 +18,13 @@ import org.lwjgl.opengl.GL33.*
 open class CustomModel(
     name: String
  ) {
-    val renderable: Renderable = loadRenderable(name)
+    val objPath = "assets/models/$name/mesh.obj"
+    val emitPath = "assets/models/$name/emit.png"
+    val diffPath = "assets/models/$name/diff.png"
+    val specPath = "assets/models/$name/spec.png"
+    open val renderable: Renderable = loadRenderable(objPath, emitPath, diffPath, specPath)
 
-    fun loadRenderable(name: String): Renderable {
-        val objPath = "assets/models/$name/mesh.obj"
-        val emitPath = "assets/models/$name/emit.png"
-        val diffPath = "assets/models/$name/diff.png"
-        val specPath = "assets/models/$name/spec.png"
+    fun loadRenderable(objPath:String, emitPath: String, diffPath: String, specPath: String): Renderable {
         val groundOBJ = OBJLoader.loadOBJ(objPath)
 
         val groundOBJMesh = groundOBJ.objects.first().meshes.first()

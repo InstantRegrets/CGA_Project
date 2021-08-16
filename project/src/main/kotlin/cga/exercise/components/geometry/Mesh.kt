@@ -1,7 +1,7 @@
 package cga.exercise.components.geometry
 
+import cga.exercise.components.material.Mat
 import cga.exercise.components.shader.ShaderProgram
-import cga.framework.GLError
 import org.lwjgl.opengl.GL30.*
 
 /**
@@ -20,7 +20,7 @@ class Mesh(
     vertexData: FloatArray,
     indexData: IntArray,
     attributes: Array<VertexAttribute>,
-    val material: Material,
+    val material: Mat,
     private val drawMode: Int = GL_TRIANGLES //default to Triangles
 ) {
     //These are just IDs

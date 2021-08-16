@@ -2,9 +2,7 @@ package cga.exercise.components.texture
 
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL13.GL_TEXTURE0
-import org.lwjgl.opengl.GL30
+import org.lwjgl.opengl.GL33.*
 import org.lwjgl.stb.STBImage
 import java.nio.ByteBuffer
 
@@ -49,12 +47,12 @@ class Texture2D(imageData: ByteBuffer, width: Int, height: Int, genMipMaps: Bool
 
     override fun processTexture(imageData: ByteBuffer, width: Int, height: Int, genMipMaps: Boolean) {
         //generate IDs
-        texID = GL30.glGenTextures()
+        texID = glGenTextures()
         //Set working environment
-        GL30.glBindTexture(GL_TEXTURE_2D, texID)
+        glBindTexture(GL_TEXTURE_2D, texID)
         //define texture
-        GL30.glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData)
-        if (genMipMaps) GL30.glGenerateMipmap(GL_TEXTURE_2D)
+        glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData)
+        if (genMipMaps) glGenerateMipmap(GL_TEXTURE_2D)
     }
 
     override fun setTexParams(wrapS: Int, wrapT: Int, minFilter: Int, magFilter: Int) {
@@ -71,13 +69,13 @@ class Texture2D(imageData: ByteBuffer, width: Int, height: Int, genMipMaps: Bool
     }
 
     override fun bind(textureUnit: Int) {
-        GL30.glActiveTexture(GL_TEXTURE0 + textureUnit)
-        GL30.glBindTexture(GL_TEXTURE_2D, texID)
+        glActiveTexture(GL_TEXTURE0 + textureUnit)
+        glBindTexture(GL_TEXTURE_2D, texID)
     }
 
     override fun unbind() {
-        GL30.glActiveTexture(0)
-        GL30.glBindTexture(0,0)
+        glActiveTexture(0)
+        glBindTexture(0,0)
     }
 
     override fun cleanup() {
