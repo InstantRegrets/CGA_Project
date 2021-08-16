@@ -5,6 +5,7 @@ import cga.exercise.components.geometry.DepthMap
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.light.Light
 import cga.exercise.components.shader.DepthShader
+import cga.exercise.components.shader.SilhouetteShader
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
@@ -32,7 +33,7 @@ import kotlin.math.sin
  * Created by Fabian on 16.09.2017.
  */
 class Scene(val window: GameWindow) {
-    private val camera: TronCamera
+    val camera: TronCamera
     private val quad = Quad()
     private val level: Level
     private val player = Player()
@@ -42,6 +43,7 @@ class Scene(val window: GameWindow) {
     private val gBuffer: GeometryBuffer
     private val depthMap: DepthMap = DepthMap()
     private val depthShader = DepthShader(depthMap)
+    private val silhouetteShader = SilhouetteShader()
     private val deferredShader: ShaderProgram
     private val skybox = Skybox.invoke("assets/textures/skyboxNight")
     private val skyboxShader: ShaderProgram
@@ -97,7 +99,11 @@ class Scene(val window: GameWindow) {
 
     fun render(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        glClearColor(0f, 0f, 0f, 1.0f)
+
         depthShader.pass(this, beat)
+        // silhouetteShader.pass(this,beat)
         geometryPass(beat)
         lightingPass(dt, t)
         renderSkybox()
