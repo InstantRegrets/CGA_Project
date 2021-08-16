@@ -11,4 +11,4 @@ package cga.exercise.components.geometry
  * @param stride    Size in bytes of a whole vertex
  * @param offset    Offset in bytes from the beginning of the vertex to the location of this attribute data
  */
-data class VertexAttribute(var n: Int, var type: Int, var stride: Int, var offset: Long)
+data class VertexAttribute(var n: Int, var type: Int, var stride: Int, var offset: Long, var enable: Boolean = true)

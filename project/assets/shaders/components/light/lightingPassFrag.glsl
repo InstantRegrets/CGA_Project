@@ -1,5 +1,4 @@
 #version 330
-out vec4 color;
 
 
 uniform sampler2D inPosition; //Frag Pos
@@ -8,7 +7,9 @@ uniform sampler2D inDiffuse;
 uniform sampler2D inSpecular;
 uniform sampler2D inEmissive;
 
-in vec2 textureCoordinates;
+vec2 textureCoordinates;
+
+uniform vec2 screenSize;
 
 
 
@@ -120,8 +121,10 @@ void ambient(inout vec3 o){
     o += ambientStrength * ambientColor * diffMaterial.xyz;
 }
 
+out vec4 FragColor;
 
 void main(){
+    textureCoordinates = gl_FragCoord.xy / screenSize;
     loadMaterial();
     vec3 fragPos = texture(inPosition, textureCoordinates).xyz;
     vec3 toCamera = -fragPos.xyz;
@@ -129,10 +132,12 @@ void main(){
 
     vec3 o = vec3(0, 0, 0);// output color that get's passed through all the functions
 
-    ambient(o);
-    pointLights(toCamera, N,fragPos, o);
-    spotLights(toCamera, N,fragPos, o);
+    //ambient(o);
+    pointLights(toCamera, N, fragPos, o);
+    spotLights(toCamera, N, fragPos, o);
     emit(o);
 
-    color = vec4(o, 1);
+    FragColor = vec4(o,1);
 }
+
+

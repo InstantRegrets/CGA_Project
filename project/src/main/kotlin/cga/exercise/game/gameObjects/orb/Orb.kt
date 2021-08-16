@@ -19,7 +19,7 @@ import kotlin.math.pow
 class Orb:Transformable(), GameObject {
     private val color = Random.nextColor()
     val model: OrbModel = OrbModel(color)
-    val light = PointLight(color, Vector3f(1f, 0.15f, 0.12f))
+    val light = PointLight(color, Vector3f(1f, 0.7f, 0.4f))
     val direction = Random.nextVec3(-2f*PI.toFloat(), 2f* PI.toFloat())
 
     init {

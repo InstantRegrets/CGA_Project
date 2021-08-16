@@ -12,7 +12,7 @@ import kotlin.math.PI
 class PlayerLighting(parent: Transformable): Lighting {
     val pointLight = PointLight(
         Vector3f(1f, 0f, 0f),
-        Vector3f(1f, 0.15f, 0.12f)
+        Vector3f(1f, 0.7f, 1.8f)
     )
 
     val spotLight = SpotLight(

@@ -16,14 +16,15 @@ class Note(
     val data: NoteData,
 ): Transformable(), GameObject {
     private val color: Vector3f
-    private val renderable: Renderable = CustomModel("orb").renderable
+    private val renderable: Renderable = Renderable(model.meshes)
     private val light: Light
     private val startPosition: Vector3f
-
     // todo move out of this class?
     private val targetPosition: Vector3f
     private val spawnBeat = 2f
-
+    companion object{
+        val model = CustomModel("orb").renderable
+    }
     init {
         if (data.key == NoteKey.Left) {
             color = Vector3f(1f ,0f,0f)

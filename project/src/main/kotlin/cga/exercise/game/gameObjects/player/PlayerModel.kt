@@ -10,5 +10,6 @@ class PlayerModel: Model(
     init {
         renderable.pulseStrength = 0.1f
         renderable.emitColor = Vector3f(0.5f)
+        renderable.translateLocal(Vector3f(0f,-5f,0f))
     }
 }
