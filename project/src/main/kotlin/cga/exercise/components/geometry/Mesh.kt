@@ -47,7 +47,7 @@ class Mesh(
         //Creating attributes & enabling them
         for ((i, a) in attributes.withIndex()) {
             glVertexAttribPointer(i, a.n, a.type, false, a.stride, a.offset)
-            glEnableVertexAttribArray(i)
+            if (a.enable)glEnableVertexAttribArray(i)
         }
 
         glBindVertexArray(0)
@@ -63,6 +63,13 @@ class Mesh(
         //bind our attributes
         if (shaderProgram.targetMaterial)
             material.bind(shaderProgram)
+        glBindVertexArray(vao)
+        //use in constructor specified draw mode, to draw a maximum of <indexCount> vertices, starting with index 0
+        glDrawElements(drawMode, indexCount, GL_UNSIGNED_INT, 0)
+        glBindVertexArray(0) //cleanup
+    }
+
+    fun renderWOMat(){
         glBindVertexArray(vao)
         //use in constructor specified draw mode, to draw a maximum of <indexCount> vertices, starting with index 0
         glDrawElements(drawMode, indexCount, GL_UNSIGNED_INT, 0)

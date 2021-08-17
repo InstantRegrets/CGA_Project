@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW.*
 
 class Player(parent: Transformable? = null): GameObject {
     val model: Model = PlayerModel()
-    private val lighting = PlayerLighting(model.renderable)
+    val lighting = PlayerLighting(model.renderable)
     var movementSpeed: Float = 8f
     var rotationSpeed: Float = 6f
 
