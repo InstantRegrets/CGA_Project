@@ -14,9 +14,18 @@ import kotlin.math.min
 import kotlin.math.pow
 
 class Orb:Transformable(), GameObject {
-    private val color = Random.nextColor()
+    companion object OrbFactory{
+        fun createOrbs(n: Int): Collection<GameObject>{
+            val result = mutableListOf<GameObject>()
+            for (i in 1 until n){
+                result.add(Orb())
+            }
+            return result
+        }
+    }
+    private val color = Vector3f(0f, 1f, 0f)
     val model: OrbModel = OrbModel(color)
-    val light = PointLight(color, Vector3f(1f, 0.7f, 0.4f))
+    val light = PointLight(color, Vector3f(1f, 0.7f, 1.8f))
     val direction = Random.nextVec3(-2f*PI.toFloat(), 2f* PI.toFloat())
 
     init {

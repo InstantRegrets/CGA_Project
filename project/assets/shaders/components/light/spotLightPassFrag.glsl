@@ -5,20 +5,10 @@ uniform sampler2D inNormal;
 uniform sampler2D inDiffuse;
 uniform sampler2D inSpecular;
 uniform sampler2D inShadow;
-
 uniform sampler2D shadowMap;
-
-vec2 textureCoordinates;
-
 uniform vec2 screenSize;
 
-
-
-struct PointLightData{
-    vec3 color;
-    vec3 lightPos;
-    vec3 attenuation;//Values are constant, linear, quadratic
-};
+vec2 textureCoordinates;
 
 struct SpotLightData{
     vec3 color;
@@ -29,21 +19,44 @@ struct SpotLightData{
     vec3 attenuation;//Values are constant, linear, quadratic
 };
 
-#define ambientStrength 0.1
-#define ambientColor vec3(0.5, 1, 1)
-
-uniform PointLightData plData;
-
+uniform SpotLightData slData;
 
 vec3 diffMaterial, specularMaterial, emitMaterial;
 vec4 fragPosLightSpace;
 uniform float shininess;
 
 void loadMaterial(){
-    //emitMaterial = texture(inEmissive, textureCoordinates).rgb;
     diffMaterial = texture(inDiffuse, textureCoordinates).rgb;
     specularMaterial = texture(inSpecular, textureCoordinates).rgb;
     fragPosLightSpace = texture(inShadow, textureCoordinates);
+}
+
+float ShadowCalculation(vec3 normal, vec3 lightDir) {
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+
+    float bias = min(0.05 * (1.0 - dot(normal, normalize(lightDir))), 0.005);
+
+    // output value
+    float shadow = 0.0;
+
+    // check whether current frag pos is in shadow
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+
+    shadow /= 9.0; // nine, since we loop through 9 pixels
+    return shadow;
 }
 
 // Lighting functions
@@ -66,29 +79,30 @@ float calcAttenuation(in vec3 inAtten,in float distance){
     return clamp(att,0,1); // make sure we don't go above 1
 }
 
-void pointLight(in vec3 pToCamera, in vec3 N, in vec3 fragPos, inout vec3 o){
-    vec3 toLight = normalize(plData.lightPos - fragPos);
+void spotLight(in vec3 pToCamera, in vec3 N, in vec3 fragPos , inout vec3 o){
+    vec3 toLight = normalize(slData.lightPos - fragPos);
     vec3 toCamera = normalize(pToCamera);
+    vec3 dir = normalize(slData.direction);
+    float theta = dot(toLight, - dir);
+    float distance = length(slData.lightPos - fragPos);
+    float attenuation = calcAttenuation(slData.attenuation, distance);
 
-    float distance = length(plData.lightPos - fragPos);
-    float attenuation = calcAttenuation(plData.attenuation, distance);
-    o += diffuse(N, toLight, plData.color)*attenuation;
-    o += specularBlinn(N, toLight, toCamera, plData.color)*attenuation;
+    float epsilon = slData.innerCone- slData.outerCone;
+    float intensity = clamp((theta - slData.outerCone) / epsilon, 0.0, 1.0);
+    vec3 diff = intensity * diffuse(N, toLight, slData.color)*attenuation;
+    vec3 spec = intensity * specularBlinn(N, toLight, toCamera, slData.color)*attenuation;
+    o += (diff + spec) * (1.0-ShadowCalculation(N, slData.direction));
 }
 
 out vec4 FragColor;
-
-void main(){
+void main() {
     textureCoordinates = gl_FragCoord.xy / screenSize;
     loadMaterial();
     vec3 fragPos = texture(inPosition, textureCoordinates).xyz;
     vec3 toCamera = -fragPos.xyz;
     vec3 N = normalize(texture(inNormal, textureCoordinates).xyz);
-
     vec3 o = vec3(0, 0, 0);// output color that get's passed through all the functions
-
-    pointLight(toCamera, N, fragPos, o);
-
-    FragColor = vec4(o,1);
+    
+    spotLight(toCamera, N,fragPos, o);
+    FragColor += vec4(o,1);
 }
-

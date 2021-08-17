@@ -16,7 +16,7 @@ class PointLight(
 ): Light() {
     val intensity: Float = 1f
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
-        val structName = "plData[$plAmount]."
+        val structName = "plData."
         plAmount++;
 
         val pos = Vector4f(super.getWorldPosition(), 1f).mul(viewMatrix).toVector3f()
@@ -31,6 +31,6 @@ class PointLight(
         val maxChannel = maxOf(color.x, color.y, color.z)
         val ret = (-linear + sqrt(linear*linear - 4 * exp * (constant - 256/5 * maxChannel * intensity)))/
                 2 * exp
-        return ret*5
+        return ret*30
     }
 }

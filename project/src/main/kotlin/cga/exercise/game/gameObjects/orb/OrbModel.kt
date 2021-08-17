@@ -1,5 +1,6 @@
 package cga.exercise.game.gameObjects.orb
 
+import cga.exercise.components.geometry.Renderable
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.CustomModel
 import cga.framework.Random
@@ -7,21 +8,17 @@ import org.joml.Vector3f
 import kotlin.math.max
 import kotlin.math.pow
 
-class OrbModel(val color: Vector3f): CustomModel(
-    "orb"
-) {
+class OrbModel(val color: Vector3f) {
+    companion object{
+        val meshes = CustomModel("orb").renderable.meshes
+    }
+    val renderable = Renderable(meshes)
 
     init{
         renderable.pulseStrength = Random.nextFloat(0.02f)
     }
     fun draw(shaderProgram: ShaderProgram) {
         renderable.render(shaderProgram)
-
-        // glitchRenderable.translateLocal(translation)
-        // glitchRenderable.emitColor.set(Random.nextColor())
-        // glitchRenderable.render(shaderProgram)
-        // translation.mul(-1f)
-        // glitchRenderable.translateLocal(translation)
     }
 
     fun update(dt: Float, beat: Float){

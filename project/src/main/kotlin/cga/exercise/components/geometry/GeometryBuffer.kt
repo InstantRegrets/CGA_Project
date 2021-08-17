@@ -38,21 +38,18 @@ class GeometryBuffer(window: GameWindow){
 
 
         GLError.checkThrow()
-//GL_FLOAT_32_UNSIGNED_INT_24_8_REV
         glBindTexture(GL_TEXTURE_2D, depthTexture)
-        glTexImage2D(GL_TEXTURE_2D,0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, null as ByteBuffer?)
+        glTexImage2D(GL_TEXTURE_2D,0, GL_DEPTH24_STENCIL8, width, height, 0,
+            GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, null as ByteBuffer?)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0)
 
 
         glBindTexture(GL_TEXTURE_2D, finalTexture)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_FLOAT, null as ByteBuffer?)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+            GL_RGB, GL_FLOAT, null as ByteBuffer?)
         glFramebufferTexture2D(GL_FRAMEBUFFER, finalColorAttachment, GL_TEXTURE_2D,finalTexture,0)
 
         glDrawBuffer(GL_NONE)
-
-        //val renderBufferObject = glGenRenderbuffers()
-        //glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject)
-        //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, window.windowWidth, window.windowHeight)
 
         val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
         if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -96,12 +93,6 @@ class GeometryBuffer(window: GameWindow){
             glActiveTexture(GL_TEXTURE0+i)
             glBindTexture(GL_TEXTURE_2D, tex)
         }
-    }
-
-    fun bindDepthDebug(){
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)
-        glActiveTexture(GL_TEXTURE0+5)
-        glBindTexture(GL_TEXTURE_2D, depthTexture)
     }
 
     fun bindForFinalPass(){

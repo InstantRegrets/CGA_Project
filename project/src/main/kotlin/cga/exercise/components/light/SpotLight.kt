@@ -20,9 +20,7 @@ class SpotLight(
 ) : Light() {
 
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
-        val structName = "slData[$slAmount]."
-        slAmount++;
-
+        val structName = "slData."
         val dir = (Vector4f(super.getWorldZAxis(), 0f)).mul(viewMatrix).toVector3f()
         val pos = Vector4f(super.getWorldPosition(), 1f).mul(viewMatrix).toVector3f()
         shaderProgram.setUniform("${structName}lightPos",pos)
