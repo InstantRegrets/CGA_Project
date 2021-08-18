@@ -26,8 +26,6 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL33.*
-import kotlin.math.PI
-import kotlin.math.sin
 
 
 /**
@@ -80,7 +78,7 @@ class Scene(val window: GameWindow) {
         camera = TronCamera()
         camera.rotateLocal(-0.65f, 0.0f, 0f)
         camera.translateLocal(Vector3f(0f, 0f, 4f))
-        camera.parent = player.model.renderable
+        camera.parent = player.renderable
 
         //Sound and level
         SoundContext.setup()
@@ -105,7 +103,7 @@ class Scene(val window: GameWindow) {
             )
         )
         pointLights.addAll(orbs.map { (it as Orb).light })
-        pointLights.add(player.lighting.pointLight)
+        pointLights.add(player.light)
         gameObjects.addAll(orbs)
 
         //Sphere Mesh for Light Volumes
@@ -313,14 +311,6 @@ class Scene(val window: GameWindow) {
         }
     }
 
-    fun rainbow(vect: Vector3f, p: Float) {
-        val r = (sin(p * 2 * PI + 0 / 3.0 * PI) / 2 + 0.5).toFloat()
-        val g = (sin(p * 2 * PI + 2 / 3.0 * PI) / 2 + 0.5).toFloat()
-        val b = (sin(p * 2 * PI + 4 / 3.0 * PI) / 2 + 0.5).toFloat()
-        vect.x = r
-        vect.y = g
-        vect.z = b
-    }
 
     //GAME LOGIC
 
