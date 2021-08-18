@@ -175,8 +175,10 @@ class Scene(val window: GameWindow) {
         glBlendFunc(GL_ONE, GL_ONE) //equal rights for every pointLight!
 
 
-        gBuffer.bindForLightPass()
         spotLightShader.use()
+        gBuffer.bindForLightPass()
+        glActiveTexture(GL_TEXTURE6)
+        glBindTexture(GL_TEXTURE_2D, depthMap.texture)
         spotLight.bind(spotLightShader, camera.getCalculateViewMatrix())
         quad.draw(spotLightShader)
         glDisable(GL_BLEND)
