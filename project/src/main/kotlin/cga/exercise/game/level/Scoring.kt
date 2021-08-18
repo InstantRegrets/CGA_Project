@@ -38,7 +38,7 @@ class Scoring {
     }
 
     fun fail() {
-        if (combo > 0) missSound.random().play()
+        if (combo > 3) missSound.random().play()
         combo = 0
         multiplier = 1
     }

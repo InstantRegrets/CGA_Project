@@ -13,7 +13,6 @@ class DeferredShader(): ShaderProgram(
         setUniform("inDiffuse", 2)
         setUniform("inSpecular", 3)
         setUniform("inEmissive", 4)
-        setUniform("inShadow", 5)
         setUniform("shininess", 64f)
     }
 

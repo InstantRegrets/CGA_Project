@@ -13,12 +13,12 @@ class GeometryBuffer(window: GameWindow){
     private val textureIDs: IntArray = IntArray(totalTextures)
     private val width: Int = window.windowWidth
     private val height: Int = window.windowHeight
-    private val finalColorAttachment = GL_COLOR_ATTACHMENT6
+    private val finalColorAttachment = GL_COLOR_ATTACHMENT0 + totalTextures
     val depthTexture = glGenTextures()
     val finalTexture = glGenTextures()
 
     companion object{
-        const val totalTextures: Int = 6
+        const val totalTextures: Int = 5
     }
     init {
         glBindFramebuffer(GL_FRAMEBUFFER, gBufferID)
@@ -76,7 +76,6 @@ class GeometryBuffer(window: GameWindow){
             GL_COLOR_ATTACHMENT2, //diffuse
             GL_COLOR_ATTACHMENT3, //specular
             GL_COLOR_ATTACHMENT4, //emissive
-            GL_COLOR_ATTACHMENT5 //shadow
         )
         glDrawBuffers(buffers)
     }
@@ -88,11 +87,14 @@ class GeometryBuffer(window: GameWindow){
 
     fun bindForLightPass(){
         //affects final image
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER,gBufferID)
         glDrawBuffer(finalColorAttachment)
+        GLError.checkThrow("YIHA")
         for ((i, tex) in textureIDs.withIndex()){
             glActiveTexture(GL_TEXTURE0+i)
             glBindTexture(GL_TEXTURE_2D, tex)
         }
+        GLError.checkThrow("YIHA")
     }
 
     fun bindForFinalPass(){

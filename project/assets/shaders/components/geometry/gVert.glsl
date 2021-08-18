@@ -8,15 +8,10 @@ layout(location = 2) in vec3 normal;
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 
-// shadows
-uniform mat4 lightProjection;
-uniform mat4 lightView;
-
 // textures
 uniform vec2 tcMultiplier;
 
 out vec3 vFragPos;
-out vec4 vFragPosLightSpace;
 out vec2 vTexCoords;
 out vec3 vNormal;
 
@@ -32,7 +27,4 @@ void main(){
     vFragPos = cameraSpace.xyz;
     vNormal = norm.xyz;
     vTexCoords = tcMultiplier * texture;
-
-    // also calculate the position from the light pov
-    vFragPosLightSpace = lightProjection * lightView * pos;
 }

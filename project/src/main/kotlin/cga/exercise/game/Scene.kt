@@ -8,7 +8,6 @@ import cga.exercise.components.light.PointLight
 import cga.exercise.components.light.SpotLight
 import cga.exercise.components.shader.*
 import cga.exercise.components.shader.DepthShader
-import cga.exercise.components.shader.SilhouetteShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
 import cga.exercise.components.texture.Skybox
@@ -54,6 +53,7 @@ class Scene(val window: GameWindow) {
     private val spotLightShader: ShaderProgram
     private val sphereMesh: Mesh
     private val pointLights: ArrayList<PointLight> = arrayListOf()
+    private val spotLights: ArrayList<SpotLight> = arrayListOf()
     private val quad = Quad()
     private var phase = Phase.Day
 
@@ -104,6 +104,8 @@ class Scene(val window: GameWindow) {
                 level, player,sun
             )
         )
+        spotLights.add(sun.light)
+        spotLights.add(level.lightShow.sceneLight)
         pointLights.addAll(orbs.map { (it as Orb).light })
         pointLights.add(player.light)
         gameObjects.addAll(orbs)
@@ -120,8 +122,6 @@ class Scene(val window: GameWindow) {
 
     fun render(dt: Float, t: Float) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-        val beat = level.beatsPerSeconds * t
-        depthShader.pass(this, beat)
         deferredRender(dt, t)
         renderSkybox()
         SoundListener.setPosition(camera)
@@ -145,21 +145,22 @@ class Scene(val window: GameWindow) {
     }
 
     private fun deferredRender(dt: Float, t: Float){
+        val beat = level.beatsPerSeconds * t
         gBuffer.startFrame()
         GLError.checkThrow()
 
-        geometryPass(dt, t)
-
-
-
-        spotLightPass(sun.light)
+        geometryPass(dt, beat)
         ambientPass()
+
+        spotLights.forEach {
+            depthShader.pass(it,this, beat)
+            spotLightPass(it)
+        }
+
         glEnable(GL_STENCIL_TEST)
-
-
         pointLights.forEach {
-            stencilPass(it)
-            pointLightPass(it)
+             stencilPass(it)
+             pointLightPass(it)
         }
 
         glDisable(GL_STENCIL_TEST)
@@ -180,6 +181,8 @@ class Scene(val window: GameWindow) {
 
         spotLightShader.use()
         gBuffer.bindForLightPass()
+        spotLightShader.setUniform("CameraViewMatrix",camera.getCalculateViewMatrix())
+        spotLightShader.setUniform("LightProjectionViewMatrix",spotLight.calcPVMatrix())
         glActiveTexture(GL_TEXTURE6)
         glBindTexture(GL_TEXTURE_2D, depthMap.texture)
         spotLight.bind(spotLightShader, camera.getCalculateViewMatrix())
@@ -187,17 +190,15 @@ class Scene(val window: GameWindow) {
         glDisable(GL_BLEND)
     }
 
-    private fun geometryPass(dt: Float, t:Float){
+    private fun geometryPass(dt: Float, beat: Float){
         geometryPassShader.use()
         gBuffer.bindForGeomPass()
         glDepthMask(true)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         glEnable(GL_DEPTH_TEST)
 
-        val beat = level.beatsPerSeconds * t
         geometryPassShader.setUniform("beat",beat)
         camera.bind(geometryPassShader)
-        sun.bindShadowViewMatrix(geometryPassShader)
 
         //Draw everything into gBuffer
         gameObjects.forEach{it.draw(geometryPassShader)}

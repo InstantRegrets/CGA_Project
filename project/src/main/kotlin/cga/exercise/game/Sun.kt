@@ -42,15 +42,6 @@ class Sun(
         rotateAroundPoint(0f,0.4f,0f,Vector3f())
     }
 
-    fun bindShadowViewMatrix(shaderProgram: ShaderProgram){
-        val up = getWorldYAxis()
-        val position = getWorldPosition()
-        lightView = Matrix4f().lookAt(position, Vector3f(0f), up)
-        projectionMatrix =  Matrix4f().ortho(-shadowQuadSize,shadowQuadSize,-shadowQuadSize,shadowQuadSize, near_plane, far_plane)
-        shaderProgram.setUniform("lightProjection", projectionMatrix)
-        shaderProgram.setUniform("lightView", lightView)
-    }
-
     override fun draw(shaderProgram: ShaderProgram) {
         if (shaderProgram !is DepthShader)
             model.renderable.render(shaderProgram)
@@ -74,7 +65,7 @@ class Sun(
         when(phase){
             Phase.Day -> {
                 model.renderable.scaleLocal(Vector3f(0.25f))
-                light.color.set(1f,1f,0f)
+                light.color.set(0.5f,0.25f,0f)
                 model.renderable.emitColor.set(1f,1f,0f)
                 model.renderable.pulseStrength = 40f
             }

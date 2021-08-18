@@ -30,5 +30,20 @@ class SpotLight(
         shaderProgram.setUniform("${structName}outerCone",cos(outerCone))
         shaderProgram.setUniform("${structName}attenuation", attenuation)
     }
+
+    var near_plane: Float = 350f
+    var far_plane: Float = 450f
+    val shadowQuadSize = 20f
+    fun calcViewMatrix(): Matrix4f{
+        val up = getWorldYAxis()
+        val position = getWorldPosition()
+        return Matrix4f().lookAt(position, Vector3f(0f), up)
+    }
+
+    fun calcPVMatrix(): Matrix4f {
+        val projectionMatrix =  Matrix4f().ortho(-shadowQuadSize,shadowQuadSize,-shadowQuadSize,shadowQuadSize, near_plane, far_plane)
+        projectionMatrix.mul(calcViewMatrix())
+        return projectionMatrix
+    }
 }
 

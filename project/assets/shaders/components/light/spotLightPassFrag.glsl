@@ -7,6 +7,8 @@ uniform sampler2D inSpecular;
 uniform sampler2D inShadow;
 uniform sampler2D shadowMap;
 uniform vec2 screenSize;
+uniform mat4 LightProjectionViewMatrix;
+uniform mat4 CameraViewMatrix;
 
 vec2 textureCoordinates;
 
@@ -28,12 +30,11 @@ uniform float shininess;
 void loadMaterial(){
     diffMaterial = texture(inDiffuse, textureCoordinates).rgb;
     specularMaterial = texture(inSpecular, textureCoordinates).rgb;
-    fragPosLightSpace = texture(inShadow, textureCoordinates);
 }
 
 float ShadowCalculation(vec3 normal, vec3 lightDir) {
     // perform perspective divide
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    vec3 projCoords = fragPosLightSpace.xyz;
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
@@ -102,10 +103,15 @@ void main() {
     textureCoordinates = gl_FragCoord.xy / screenSize;
     loadMaterial();
     vec3 fragPos = texture(inPosition, textureCoordinates).xyz;
+    fragPosLightSpace =  LightProjectionViewMatrix * inverse(CameraViewMatrix) * vec4(fragPos,1);
     vec3 toCamera = -fragPos.xyz;
     vec3 N = normalize(texture(inNormal, textureCoordinates).xyz);
     vec3 o = vec3(0, 0, 0);// output color that get's passed through all the functions
     
     spotLight(toCamera, N,fragPos, o);
     FragColor += vec4(o,1);
+
+    // debugging
+    // FragColor = vec4(texture(shadowMap,textureCoordinates).xyz,1);
+    // FragColor = vec4(fragPosLightSpace.xyz,1);
 }

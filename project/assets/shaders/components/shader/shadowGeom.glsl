@@ -4,8 +4,7 @@ layout (triangles) in;
 layout (triangle_strip) out;
 layout (max_vertices = 9) out;
 
-uniform mat4 lightProjection;
-uniform mat4 lightView;
+uniform mat4 LightProjectionViewMatrix;
 uniform mat4 model_matrix;
 uniform float pulseStrength;
 uniform float beat;
@@ -17,7 +16,7 @@ in vec3 vNormal[];
 
 void makeVertex(int index){
     vec3 pos = vFragPos[index];
-    gl_Position = lightProjection * lightView * model_matrix * vec4(pos, 1.0);
+    gl_Position = LightProjectionViewMatrix * model_matrix * vec4(pos, 1.0);
     EmitVertex();
 }
 
@@ -35,7 +34,7 @@ float pulse(float x){
 }
 void makeMiddle(){
     vec3 pos = middlePos + middleNorm * (pulseStrength * pulse(mod(beat, 1)));
-    gl_Position = lightProjection * lightView * model_matrix * vec4(pos, 1.0);
+    gl_Position = LightProjectionViewMatrix * model_matrix * vec4(pos, 1.0);
     EmitVertex();
 }
 
