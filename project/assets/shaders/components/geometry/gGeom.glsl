@@ -24,7 +24,7 @@ vec3 calcPos(int index){
     vec3 pos = vFragPos[index];
     float distance = length(pos);
 
-    float strength = smoothstep(40,80,distance) * 0.95+ 0.05;
+    float strength = smoothstep(40,80,distance);
     pos.y += strength * sin(pos.x/2 + mod(beat,2)*2*pi);
     return pos;
 }
