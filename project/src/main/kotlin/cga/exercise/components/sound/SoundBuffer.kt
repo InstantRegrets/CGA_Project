@@ -1,5 +1,6 @@
 package cga.exercise.components.sound
 
+import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL10.*
 import org.lwjgl.stb.STBVorbis.*
 import org.lwjgl.stb.STBVorbisInfo
@@ -35,9 +36,9 @@ class SoundBuffer(path: File) {
 
             val channels: Int = info.channels();
 
-            val lengthSamples: Int = stb_vorbis_stream_length_in_samples(decoder);
+            val lengthSamples: Int = stb_vorbis_stream_length_in_samples(decoder) * channels;
 
-            val pcm = MemoryUtil.memAllocShort(lengthSamples);
+            val pcm = BufferUtils.createShortBuffer(lengthSamples)
 
             pcm.limit(stb_vorbis_get_samples_short_interleaved(decoder, channels, pcm) * channels);
             stb_vorbis_close(decoder);
