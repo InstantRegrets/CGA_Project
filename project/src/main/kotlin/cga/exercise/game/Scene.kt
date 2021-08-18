@@ -42,7 +42,6 @@ class Scene(val window: GameWindow) {
     val sun: Sun
     private val depthMap: DepthMap = DepthMap()
     private val depthShader = DepthShader(depthMap)
-    private val silhouetteShader = SilhouetteShader()
 
     //Deferred Shading Stuff
     private val gBuffer = GeometryBuffer(window)

@@ -9,7 +9,7 @@ class TronCamera(
     private val fieldOfView: Float = 0.5f * PI.toFloat(),
     private val aspectRatio: Float = 16f / 9f,
     private val nearPlane: Float = 0.1f,
-    private val farPlane: Float = 500f,
+    private val farPlane: Float = 3000f,
     parent: Transformable = Transformable()
 ): Transformable(parent = parent), ICamera {
     var viewMatrix: Matrix4f = Matrix4f()

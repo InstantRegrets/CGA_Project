@@ -3,6 +3,7 @@ package cga.exercise.game.level
 import chart.difficulty._events
 
 class Event (
+    val beat: Float,
     val light: Type,
     val effect: Effect,
 ){

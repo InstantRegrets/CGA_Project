@@ -15,6 +15,10 @@ open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Tra
         modelMatrix.rotateXYZ(pitch, yaw, roll)
     }
 
+    fun rotateLocalAxis(angle: Float, axis: Vector3f) {
+        modelMatrix.rotate(angle, axis)
+    }
+
     /**
      * Rotates object around given rotation center.
      * @param pitch radiant angle around x-axis ccw

@@ -11,7 +11,7 @@ void loadMaterial(){
     emitMaterial = texture(inEmissive, textureCoordinates).rgb;
     diffMaterial = texture(inDiffuse, textureCoordinates).rgb;
 }
-    #define ambientStrength 0.1
+    #define ambientStrength 0.05
     #define ambientColor vec3(0.5, 1, 1)
 
 out vec4 FragColor;
