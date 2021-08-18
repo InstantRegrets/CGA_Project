@@ -26,6 +26,7 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL33.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -120,10 +121,13 @@ class Scene(val window: GameWindow) {
 
     //RENDERING
 
+    var rendStart: Long = 0L
     fun render(dt: Float, t: Float) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         deferredRender(dt, t)
+        rendStart= System.nanoTime()
         renderSkybox()
+        skyboxTime += (System.nanoTime() - rendStart)
         SoundListener.setPosition(camera)
         GLError.checkThrow()
         logFps()
@@ -149,19 +153,25 @@ class Scene(val window: GameWindow) {
         gBuffer.startFrame()
         GLError.checkThrow()
 
+        rendStart = System.nanoTime()
         geometryPass(dt, beat)
+        geometryTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
         ambientPass()
+        ambientTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
 
         spotLights.forEach {
             depthShader.pass(it,this, beat)
             spotLightPass(it) // todo second pass for mountain lights
         }
+        spotLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
 
         glEnable(GL_STENCIL_TEST)
         pointLights.forEach {
              stencilPass(it)
              pointLightPass(it)
         }
+
+        pointLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
 
         glDisable(GL_STENCIL_TEST)
 
@@ -170,6 +180,7 @@ class Scene(val window: GameWindow) {
         GLError.checkThrow()
 
         finalPass()
+        finalPassTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
         GLError.checkThrow()
     }
 
@@ -308,12 +319,31 @@ class Scene(val window: GameWindow) {
     //Framerate calculation
     private var startTime = System.nanoTime()
     private var frames = 0
+    private var geometryTime = 0L
+    private var ambientTime = 0L
+    private var spotLightTime = 0L
+    private var pointLightTime = 0L
+    private var finalPassTime = 0L
+    private var skyboxTime = 0L
     private fun logFps(){
         frames++
         if(System.nanoTime() - startTime >= 1000000000) {
+            println("=======================")
             println("FPSCounter: fps $frames")
+            println("avg geometry Pass:   ${geometryTime/frames}")
+            println("avg ambient Pass:    ${ambientTime/frames}")
+            println("avg spotlight Pass:  ${spotLightTime/frames}")
+            println("avg pointLight Pass: ${pointLightTime/frames}")
+            println("avg final PassTime:  ${finalPassTime/frames}")
+            println("avg skybox PassTime: ${skyboxTime/frames}")
             frames = 0
             startTime = System.nanoTime()
+            geometryTime = 0
+            skyboxTime= 0
+            ambientTime = 0
+            pointLightTime = 0
+            spotLightTime = 0
+            finalPassTime = 0
         }
     }
 
