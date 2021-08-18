@@ -6,18 +6,20 @@ import cga.exercise.components.shader.DepthShader
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.CustomModel
 import cga.exercise.game.gameObjects.GameObject
+import cga.exercise.game.gameObjects.Phase
+import cga.exercise.game.gameObjects.phaseAmount
 import cga.framework.GameWindow
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import kotlin.math.PI
 
 class Sun(
+    private val songLength: Float,
     private val near_plane: Float = 350f,
     private val far_plane: Float = 450f
 ): GameObject, Transformable() {
 
     private val shadowQuadSize = 20f
-    private var phase = Phase.Sun
 
     private var lightView = Matrix4f()
     private var projectionMatrix = Matrix4f()
@@ -34,9 +36,10 @@ class Sun(
         light.parent = this
         model.renderable.pulseStrength = 10f
         translateLocal(Vector3f(50f,400f,0f))
-        scaleLocal(Vector3f(10f))
+        scaleLocal(Vector3f(40f))
         light.rotateLocal(-1.5f * PI.toFloat(),0f,0f)
-        // rotateAroundPoint((-0.5* PI).toFloat(),0f,0f, Vector3f())
+        rotateAroundPoint(0f,0f,(-0.5* PI).toFloat(), Vector3f())
+        rotateAroundPoint(0f,0.4f,0f,Vector3f())
     }
 
     fun bindShadowViewMatrix(shaderProgram: ShaderProgram){
@@ -53,12 +56,9 @@ class Sun(
             model.renderable.render(shaderProgram)
     }
 
+    private val rotPerSecond = (2f* PI.toFloat()) / (songLength / phaseAmount)
     override fun update(dt: Float, beat: Float) {
-        rotateAroundPoint(0.2f*dt, 0f,0f, Vector3f(0f))
-        if (getWorldPosition().y < -40){
-            switchPhase()
-            rotateAroundPoint(0.25f* PI.toFloat(), 0f,0f, Vector3f(0f))
-        }
+        rotateAroundPoint(0f, 0f, rotPerSecond*dt,  Vector3f(0f))
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
@@ -69,33 +69,22 @@ class Sun(
         light.bind(shaderProgram, viewMatrix4f)
     }
 
-    enum class Phase{
-        Sun,
-        Moon,
-        BloodMoon,
-    }
 
-    fun switchPhase(){
-        phase = when(phase){
-            Phase.Sun -> Phase.Moon
-            Phase.Moon -> Phase.BloodMoon
-            Phase.BloodMoon -> Phase.Sun
-        }
-
+    override fun switchPhase(phase: Phase) {
         when(phase){
-            Phase.Sun -> {
+            Phase.Day -> {
                 model.renderable.scaleLocal(Vector3f(0.25f))
                 light.color.set(1f,1f,0f)
                 model.renderable.emitColor.set(1f,1f,0f)
                 model.renderable.pulseStrength = 40f
             }
-            Phase.Moon -> {
+            Phase.Night -> {
                 model.renderable.scaleLocal(Vector3f(2f))
                 light.color.set(0.1f,0.1f,0.1f)
                 model.renderable.emitColor.set(0.1f,0.1f,0.1f)
                 model.renderable.pulseStrength = 0f
             }
-            Phase.BloodMoon -> {
+            Phase.Chaos -> {
                 model.renderable.scaleLocal(Vector3f(2f))
                 light.color.set(0.8f,0f,0f)
                 model.renderable.emitColor.set(0.8f,0f,0f)

@@ -6,6 +6,10 @@ import kotlin.math.PI
 object Random  {
     private val r = kotlin.random.Random(0)
 
+    fun nextBool(): Boolean {
+        return r.nextBoolean()
+    }
+
     fun nextColor(): Vector3f {
         return Vector3f(r.nextFloat(), r.nextFloat(), r.nextFloat())
     }

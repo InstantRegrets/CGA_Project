@@ -6,6 +6,7 @@ import cga.exercise.components.light.PointLight
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Model
+import cga.exercise.game.gameObjects.Phase
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import cga.framework.OBJLoader
@@ -23,17 +24,46 @@ class Player : Transformable(), GameObject {
     val light = PointLight(color, Vector3f(1f, 0.7f, 1.8f))
     var movementSpeed: Float = 8f
     var rotationSpeed: Float = 6f
+    var army: ArrayList<Player> = arrayListOf()
+
 
     enum class Pose { Right, Left, Neutral}
+
+    override fun switchPhase(phase: Phase) {
+        when(phase){
+            Phase.Day -> {
+                renderable.pulseStrength = 0.1f
+                army.clear()
+            }
+            Phase.Night -> {
+                renderable.pulseStrength = 0.05f
+            }
+            Phase.Chaos -> {
+                renderable.pulseStrength = 0.5f
+                for(i in -10..10) {
+                    for (j in -10..10) {
+                        val p = Player()
+                        p.translateLocal(Vector3f(2f*i.toFloat(), 0f, 2f*j.toFloat()))
+                        p.scaleLocal(Vector3f(0.2f))
+                        p.renderable.pulseStrength = 0.01f
+                        army.add(p)
+                    }
+                }
+            }
+        }
+    }
 
     init {
         renderable.parent = this
         light.parent = this
-        translateLocal(Vector3f(-3.6f))
+
+        translateLocal(Vector3f(0f,-4.4f,0f))
+        scaleLocal(Vector3f(0.5f))
     }
 
     override fun draw(shaderProgram: ShaderProgram) {
         renderable.render(shaderProgram)
+        army.forEach { it.draw(shaderProgram) }
     }
 
     override fun update(dt: Float, beat: Float) {
@@ -67,9 +97,9 @@ class Player : Transformable(), GameObject {
     }
 
     companion object{
-        private val meshLeft = ModelLoader.loadModel("assets/models/duck/Duckpose1.obj",0f,0f,0f)!!.meshes
-        private val meshRight = ModelLoader.loadModel("assets/models/duck/Duckpose1.obj",0f,0f,0f)!!.meshes // todo change
-        private val meshneutral = ModelLoader.loadModel("assets/models/duck/Duckpose1.obj",0f,0f,0f)!!.meshes // todo chagne
+        private val meshLeft = ModelLoader.loadModel("assets/models/duck/Duckpose1.obj",0f, PI.toFloat(),0f)!!.meshes
+        private val meshRight = ModelLoader.loadModel("assets/models/duck/Duckpose1.obj",0f,PI.toFloat(),0f)!!.meshes // todo change
+        private val meshneutral = ModelLoader.loadModel("assets/models/duck/Duckpose1.obj",0f,PI.toFloat(),0f)!!.meshes // todo chagne
 
         // Custom getter so we create a new Renderable everytime it is called
         fun renderable(color: Vector3f, pose: Pose): Renderable {
@@ -78,6 +108,7 @@ class Player : Transformable(), GameObject {
                 Pose.Right-> Renderable(meshRight)
                 Pose.Neutral-> Renderable(meshneutral)
             }
+
 
             r.emitColor = color
             return r

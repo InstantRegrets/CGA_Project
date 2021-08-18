@@ -6,6 +6,7 @@ import cga.exercise.components.light.PointLight
 import cga.exercise.components.material.AnimatedMaterial
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
+import cga.exercise.game.gameObjects.Phase
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import cga.framework.OBJLoader
@@ -65,6 +66,10 @@ class Note(
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
         light.bind(shaderProgram, viewMatrix4f)
+    }
+
+    override fun switchPhase(phase: Phase) {
+        // TODO("Not yet implemented")
     }
 
     companion object {

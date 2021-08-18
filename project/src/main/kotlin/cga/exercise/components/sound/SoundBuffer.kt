@@ -14,6 +14,7 @@ import java.nio.file.Path
 
 class SoundBuffer(path: File) {
     internal val bufferId: Int = alGenBuffers()
+    var length: Float = 0f
     init {
         val info = STBVorbisInfo.malloc()
         val pcm = readVorbis(path.absolutePath, info)
@@ -37,6 +38,7 @@ class SoundBuffer(path: File) {
             val channels: Int = info.channels();
 
             val lengthSamples: Int = stb_vorbis_stream_length_in_samples(decoder) * channels;
+            length = stb_vorbis_stream_length_in_seconds(decoder)
 
             val pcm = BufferUtils.createShortBuffer(lengthSamples)
 

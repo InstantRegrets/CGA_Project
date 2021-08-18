@@ -3,6 +3,7 @@ package cga.exercise.game.level
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.chart.IoChart
 import cga.exercise.game.gameObjects.GameObject
+import cga.exercise.game.gameObjects.Phase
 import cga.exercise.game.gameObjects.note.Note
 import cga.exercise.game.gameObjects.note.NoteData
 import cga.exercise.game.gameObjects.note.NoteKey
@@ -62,6 +63,10 @@ class Level: GameObject {
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
         visibleNotes.forEach { it.processLighting(shaderProgram, viewMatrix4f) }
+    }
+
+    override fun switchPhase(phase: Phase) {
+        visibleNotes.forEach { it.switchPhase(phase) }
     }
 
     fun onKey(key: NoteKey) {

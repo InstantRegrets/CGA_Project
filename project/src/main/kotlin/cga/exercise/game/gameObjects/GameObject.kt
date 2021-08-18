@@ -14,4 +14,15 @@ interface GameObject {
     fun processInput(window: GameWindow, dt: Float)
     //Call light binding methods
     fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) //TODO: Remove view matrix and upload in scene
+    // switching between game phases
+    fun switchPhase(phase:Phase)
 }
+
+enum class Phase() {
+    Day,
+    Night,
+    Chaos,
+}
+val phaseAmount = Phase.values().size + 1
+
+

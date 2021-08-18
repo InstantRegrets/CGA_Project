@@ -14,6 +14,7 @@ import cga.exercise.components.sound.SoundListener
 import cga.exercise.components.texture.Skybox
 import cga.exercise.game.environment.chaos.Environment
 import cga.exercise.game.gameObjects.GameObject
+import cga.exercise.game.gameObjects.Phase
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
 import cga.exercise.game.level.Level
@@ -38,7 +39,7 @@ class Scene(val window: GameWindow) {
     val gameObjects: MutableList<GameObject> = mutableListOf()
     private val orbs: MutableList<GameObject> = mutableListOf()
 
-    val sun = Sun()
+    val sun: Sun
     private val depthMap: DepthMap = DepthMap()
     private val depthShader = DepthShader(depthMap)
     private val silhouetteShader = SilhouetteShader()
@@ -55,6 +56,7 @@ class Scene(val window: GameWindow) {
     private val sphereMesh: Mesh
     private val pointLights: ArrayList<PointLight> = arrayListOf()
     private val quad = Quad()
+    private var phase = Phase.Day
 
     //Convenience
     private val width = window.windowWidth
@@ -77,7 +79,7 @@ class Scene(val window: GameWindow) {
         // CAMERA
         camera = TronCamera()
         camera.rotateLocal(-0.65f, 0.0f, 0f)
-        camera.translateLocal(Vector3f(0f, 0f, 4f))
+        camera.translateLocal(Vector3f(0f, -3f, 8f)) // since the ground is a bit below 0
         camera.parent = player.renderable
 
         //Sound and level
@@ -93,6 +95,7 @@ class Scene(val window: GameWindow) {
         skyboxShader.setup()
 
         //Game Object creation
+        sun = Sun(level.song.length)
         orbs.addAll(
             Orb.createOrbs(10)
         )
@@ -109,6 +112,8 @@ class Scene(val window: GameWindow) {
         //Sphere Mesh for Light Volumes
         val objMesh = ModelLoader.loadModel("assets/models/lightSphere.obj",0f,0f,0f)
         sphereMesh = objMesh?.meshes?.first() ?: throw Exception("yeet")
+
+        gameObjects.forEach { it.switchPhase(phase) }
     }
 
     //RENDERING
@@ -320,10 +325,16 @@ class Scene(val window: GameWindow) {
             it.processInput(window, dt)
             it.update(dt, beat)
         }
+        if (phase == Phase.Day && t > level.song.length * 0.25 && t < level.song.length * 0.75){
+            phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
+        } else if (phase == Phase.Night && t > level.song.length * 0.5){
+            phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
+        } else if (phase == Phase.Night && t > level.song.length * 0.75) {
+            phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+        }
+}
 
-    }
-
-    fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
+fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
         if (key == GLFW_KEY_F && action == 1) {
             level.onKey(NoteKey.Left)
         }

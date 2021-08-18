@@ -2,6 +2,7 @@ package cga.exercise.game.environment.chaos
 
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
+import cga.exercise.game.gameObjects.Phase
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import org.joml.Matrix4f
@@ -20,6 +21,10 @@ class Environment : GameObject {
     }
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
+    }
+
+    override fun switchPhase(phase: Phase) {
+        // TODO("Not yet implemented")
     }
 
     fun getPosition(): Vector3f {
