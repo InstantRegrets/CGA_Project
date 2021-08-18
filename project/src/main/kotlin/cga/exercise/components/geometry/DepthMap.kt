@@ -15,7 +15,7 @@ class DepthMap {
 
         when(quality){
             Quality.Low -> { width = 512; height = 512 }
-            Quality.High -> { width = 1024; height = 1024 }
+            Quality.High -> { width = 4*1024; height = 4*1024 }
             Quality.Ultra -> { width = 16*1024; height = 16*1024 }
         }
 

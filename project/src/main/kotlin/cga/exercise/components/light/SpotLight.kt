@@ -16,7 +16,10 @@ class SpotLight(
     val color: Vector3f,
     val attenuation: Vector3f,
     val outerCone: Float = (0.4* PI).toFloat(), // Outer Cone in radians
-    val innerCone: Float = (0.2* PI).toFloat(), // Inner Cone in radians
+    val innerCone: Float = (0.2* PI).toFloat(),
+    var near_plane: Float = 250f,
+    var far_plane: Float = 450f,
+    val shadowQuadSize: Float = 80f, // Inner Cone in radians
 ) : Light() {
 
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {
@@ -31,9 +34,6 @@ class SpotLight(
         shaderProgram.setUniform("${structName}attenuation", attenuation)
     }
 
-    var near_plane: Float = 350f
-    var far_plane: Float = 450f
-    val shadowQuadSize = 20f
     fun calcViewMatrix(): Matrix4f{
         val up = getWorldYAxis()
         val position = getWorldPosition()

@@ -154,7 +154,7 @@ class Scene(val window: GameWindow) {
 
         spotLights.forEach {
             depthShader.pass(it,this, beat)
-            spotLightPass(it)
+            spotLightPass(it) // todo second pass for mountain lights
         }
 
         glEnable(GL_STENCIL_TEST)

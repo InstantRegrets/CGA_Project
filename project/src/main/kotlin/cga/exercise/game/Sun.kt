@@ -72,7 +72,7 @@ class Sun(
             Phase.Night -> {
                 model.renderable.scaleLocal(Vector3f(2f))
                 light.color.set(0.1f,0.1f,0.1f)
-                model.renderable.emitColor.set(0.1f,0.1f,0.1f)
+                model.renderable.emitColor.set(0.3f,0.3f,0.3f)
                 model.renderable.pulseStrength = 0f
             }
             Phase.Chaos -> {

@@ -25,8 +25,8 @@ class LightShow: GameObject {
     init {
         sceneLight.translateGlobal(Vector3f(0f,1000f,-2000f))
         sceneLight.rotateLocalAxis(0.4f, Vector3f(0f,1f,0f))
-        sceneLight.near_plane = sceneLight.getPosition().length()- 50f
-        sceneLight.far_plane = sceneLight.getPosition().length() + 50f
+        sceneLight.near_plane = sceneLight.getPosition().length()- 100f
+        sceneLight.far_plane = sceneLight.getPosition().length() + 100f
     }
 
     fun fire(event: Event) {
@@ -47,7 +47,7 @@ class LightShow: GameObject {
         for(l in colors){
             o.add(l)
         }
-        o.div(size/2f, sceneLight.color)
+        o.div(size/1f, sceneLight.color)
     }
 
 
