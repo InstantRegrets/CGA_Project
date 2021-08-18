@@ -7,7 +7,11 @@ import kotlin.math.ln
 import kotlin.math.max
 
 class Scoring {
-    private val hitsounds = arrayOf(
+    private val hitSounds = arrayOf<SoundSource>(
+        SoundSource(false,false, SoundBuffer(File("assets/sound/bongo.ogg"))),
+    )
+
+    private val missSound = arrayOf(
         SoundSource(false,false, SoundBuffer(File("assets/sound/hit-1.ogg"))),
         SoundSource(false,false, SoundBuffer(File("assets/sound/hit-2.ogg"))),
         SoundSource(false,false, SoundBuffer(File("assets/sound/hit-3.ogg"))),
@@ -17,10 +21,14 @@ class Scoring {
         SoundSource(false,false, SoundBuffer(File("assets/sound/hit-7.ogg"))),
         SoundSource(false,false, SoundBuffer(File("assets/sound/hit-8.ogg"))),
     )
+    init {
+        hitSounds.forEach { it.setGain(0.2f) }
+        missSound.forEach { it.setGain(0.6f) }
+    }
 
     val maxMultiplier = 8
     fun score(v: Float){
-        hitsounds.random().play()
+        hitSounds.random().play()
         points += multiplier * v
         combo++
         if (combo > maxCombo)
@@ -30,6 +38,7 @@ class Scoring {
     }
 
     fun fail() {
+        if (combo > 0) missSound.random().play()
         combo = 0
         multiplier = 1
     }
