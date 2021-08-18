@@ -23,7 +23,7 @@ class Orb:Transformable(), GameObject {
             return result
         }
     }
-    private val color = Vector3f(0f, 1f, 0f)
+    private val color = Random.nextColor()
     val model: OrbModel = OrbModel(color)
     val light = PointLight(color, Vector3f(1f, 0.7f, 1.8f))
     val direction = Random.nextVec3(-2f*PI.toFloat(), 2f* PI.toFloat())
