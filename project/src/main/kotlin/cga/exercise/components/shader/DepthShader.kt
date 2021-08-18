@@ -20,6 +20,7 @@ class DepthShader(val depthMap: DepthMap) : ShaderProgram(
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         glCullFace(GL_FRONT)
+        glDepthMask(true)
 
         use()
         glViewport(0, 0, depthMap.width, depthMap.height)
@@ -35,6 +36,7 @@ class DepthShader(val depthMap: DepthMap) : ShaderProgram(
         glCullFace(GL_BACK)
         glViewport(0, 0, scene.window.windowWidth, scene.window.windowHeight)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        glDepthMask(false)
 
 
     }

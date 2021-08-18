@@ -55,6 +55,9 @@ float ShadowCalculation(vec3 normal, vec3 lightDir) {
         }
     }
 
+    if (projCoords.z > 1.0)
+        shadow = 0.0;
+
     shadow /= 9.0; // nine, since we loop through 9 pixels
     return shadow;
 }

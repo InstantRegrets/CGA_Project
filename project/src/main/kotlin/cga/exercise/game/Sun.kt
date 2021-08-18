@@ -24,7 +24,7 @@ class Sun(
     val model = CustomModel("orb")
     val light = SpotLight(
         color = Vector3f(1f, 1f, 1f),
-        attenuation = Vector3f(0.0000001f, 0f, 0f),
+        attenuation = Vector3f(1f, 0f, 0f),
         outerCone = 0.6f * PI.toFloat(),
         innerCone = 0.4f *PI.toFloat(),
     )
