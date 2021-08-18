@@ -7,6 +7,7 @@ layout (max_vertices = 9) out;
 uniform mat4 projection_matrix;
 uniform float beat;
 uniform float pulseStrength;
+uniform float vibeStrength;
 
 in vec3 vFragPos[];
 in vec2 vTexCoords[];
@@ -24,8 +25,8 @@ vec3 calcPos(int index){
     vec3 pos = vFragPos[index];
     float distance = length(pos);
 
-    float strength = smoothstep(40,80,distance);
-    pos.y += strength * sin(pos.x/2 + mod(beat,2)*2*pi);
+    float strength = smoothstep(20,80,distance) * vibeStrength;
+    pos.y += strength * sin(distance + mod(beat,2)*2*pi);
     return pos;
 }
 

@@ -12,6 +12,7 @@ class DepthShader(val depthMap: DepthMap) : ShaderProgram(
     override val targetMaterial: Boolean = false
     override val targetPulseStrength: Boolean = true
     override val targetEmitColor: Boolean = false
+    override val targetVibeStrength: Boolean = false
     init {
         setUniform("depthMap",6)
     }

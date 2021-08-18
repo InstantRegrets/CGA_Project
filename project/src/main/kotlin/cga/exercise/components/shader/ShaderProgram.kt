@@ -19,6 +19,7 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String, g
     open val targetMaterial = true
     open val targetPulseStrength = true
     open val targetEmitColor = true
+    open val targetVibeStrength = true
 
     var vShaderId: Int = 0
     var fShaderId: Int = 0

@@ -10,6 +10,7 @@ class Renderable(
     parent: Transformable? = null,
     var emitColor: Vector3f = Vector3f(1f),
     var pulseStrength: Float= 0f,
+    var vibeStrength: Float= 1f,
 ):
     IRenderable, Transformable(modelMatrix, parent) {
 
@@ -19,6 +20,8 @@ class Renderable(
             shaderProgram.setUniform("emitColor",color)
         if(shaderProgram.targetPulseStrength)
             shaderProgram.setUniform("pulseStrength",pulseStrength)
+        if(shaderProgram.targetVibeStrength)
+            shaderProgram.setUniform("vibeStrength",vibeStrength)
 
         val mm = getWorldModelMatrix()
         shaderProgram.setUniform("model_matrix",mm)

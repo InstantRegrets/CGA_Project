@@ -114,6 +114,7 @@ class Scene(val window: GameWindow) {
         sphereMesh = objMesh?.meshes?.first() ?: throw Exception("yeet")
 
         gameObjects.forEach { it.switchPhase(phase) }
+        level.song.play()
     }
 
     //RENDERING
@@ -329,7 +330,7 @@ class Scene(val window: GameWindow) {
             phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
         } else if (phase == Phase.Night && t > level.song.length * 0.5){
             phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
-        } else if (phase == Phase.Night && t > level.song.length * 0.75) {
+        } else if (phase == Phase.Chaos && t > level.song.length * 0.75) {
             phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
         }
 }

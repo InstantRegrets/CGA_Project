@@ -1,7 +1,8 @@
 # Levels
 
 More levels can be downloaded from 
-[beatsaver](https://beatsaver.com/browse/hot)
-and placed in this directory.
+[beatsaver](https://beatsaver.com/)
 
-They can be selected from the Scene file.
+**Installation**
+- Unzip folder into levels/
+- edit select.txt and enter folder name 

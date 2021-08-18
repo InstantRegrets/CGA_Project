@@ -24,7 +24,11 @@ class Environment : GameObject {
     }
 
     override fun switchPhase(phase: Phase) {
-        // TODO("Not yet implemented")
+        when(phase){
+            Phase.Day -> { model.renderable.vibeStrength = 1f}
+            Phase.Night -> { model.renderable.vibeStrength = 0.1f}
+            Phase.Chaos -> { model.renderable.vibeStrength = 5f}
+        }
     }
 
     fun getPosition(): Vector3f {

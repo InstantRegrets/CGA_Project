@@ -46,12 +46,12 @@ class Level: GameObject {
     override fun update(dt: Float, beat: Float) {
         this.beat = beat
         for (n in visibleNotes){
-            if(n.data.beat < beat) {
+            if(n.data.beat < beat - 0.2f) {
                 println(beat)
-                println("missed Note ${n.data.key} on beat ${n.data.beat}")
+                println("missed ${n.data.key} Note on beat ${n.data.beat} at $beat")
                 scoring.fail()
                 advanceNote()
-            } else if (n.data.beat > beat && n.data.beat < (beat + 1.0)){
+            } else if (n.data.beat > beat && n.data.beat < (beat + 2.0)){
                 n.update(dt,beat)
             }
         }
@@ -121,7 +121,6 @@ class Level: GameObject {
     private fun loadSounds(){
         val songfile = path.resolve(info._songFilename)
         song = Song(songfile)
-        song.play()
     }
 
     private fun advanceNote(){
