@@ -54,18 +54,14 @@ class TronCamera(
         return mul * exp(exponent)
     }
 
-    var a = 0f
     fun update(dt: Float, time: Float){
         shake = max(0f,shake-0.1f*dt)
         val e = gausEase((time - transitionStartTime))
         translateLocal(Vector3f(transitionPos).mul(dt * e))
-        a += dt*e
-        println(a)
     }
 
 
     fun switchPhase(phase: Phase, beat: Float){
-        a = 0f
         when(phase){
             Phase.Day -> {
                 transitionPos.set(Vector3f(-2f,2f,8f).sub(this.getPosition()))
