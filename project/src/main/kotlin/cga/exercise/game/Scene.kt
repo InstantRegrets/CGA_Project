@@ -356,16 +356,39 @@ class Scene(val window: GameWindow) {
             it.processInput(window, dt)
             it.update(dt, beat)
         }
-        if (phase == Phase.Day && t > level.song.length * 0.25 && t < level.song.length * 0.75){
-            phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
-        } else if (phase == Phase.Night && t > level.song.length * 0.5){
-            phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
-        } else if (phase == Phase.Chaos && t > level.song.length * 0.75) {
-            phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
-        }
-}
 
-fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
+        when {
+            phase == Phase.Day          && t > level.song.length * 0.107f && t < level.song.length * 0.2f -> {
+                phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Night && t > level.song.length * 0.205 && t< level.song.length * 0.3f -> {
+                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Day && t > level.song.length * 0.303f && t< level.song.length * 0.4f -> {
+                phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Chaos && t > level.song.length * 0.400 && t< level.song.length * 0.5f -> {
+                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Day && t > level.song.length * 0.5f && t< level.song.length * 0.59f -> {
+                phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Chaos && t > level.song.length * 0.598f && t< level.song.length * 0.7f -> {
+                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Day && t > level.song.length * 0.7f && t< level.song.length * 0.8f -> {
+                phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Night && t > level.song.length * 0.8f && t< level.song.length * 0.9f -> {
+                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+            }
+            phase == Phase.Day && t > level.song.length * 0.9f && t< level.song.length * 1.0f -> {
+                phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
+            }
+        }
+    }
+
+    fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
         if (key == GLFW_KEY_F && action == 1) {
             level.onKey(NoteKey.Left)
         }
@@ -384,13 +407,13 @@ fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
             x = xPos
             camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
         }
-          if (y == 0.0) {
-              y = yPos
-          } else {
-              val diff = (y - yPos) * 0.002
-              y = yPos
-              camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f,  Vector3f(0f,0f,0f))
-          }
+        if (y == 0.0) {
+            y = yPos
+        } else {
+            val diff = (y - yPos) * 0.002
+            y = yPos
+            camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f,  Vector3f(0f,0f,0f))
+        }
     }
 
     fun cleanup() {
