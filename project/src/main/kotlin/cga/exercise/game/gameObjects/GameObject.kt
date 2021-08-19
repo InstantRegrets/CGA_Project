@@ -24,6 +24,6 @@ enum class Phase() {
     Night,
     Chaos,
 }
-val phaseAmount = Phase.values().size + 1
+val phaseAmount = 3*Phase.values().size + 1
 
 
