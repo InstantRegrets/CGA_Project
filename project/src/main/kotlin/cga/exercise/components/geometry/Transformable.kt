@@ -18,6 +18,9 @@ open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Tra
     fun rotateLocalAxis(angle: Float, axis: Vector3f) {
         modelMatrix.rotate(angle, axis)
     }
+    fun rotateGlobalAxis(angle: Float, axis: Vector3f) {
+        Matrix4f().rotate(angle, axis).mul(modelMatrix,modelMatrix)
+    }
 
     /**
      * Rotates object around given rotation center.
