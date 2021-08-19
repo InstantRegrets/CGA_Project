@@ -60,6 +60,7 @@ class Scene(val window: GameWindow) {
     //Convenience
     private val width = window.windowWidth
     private val height = window.windowHeight
+
     init {
         //initial opengl state
         glClearColor(0f, 0f, 0f, 1.0f); GLError.checkThrow()
@@ -77,8 +78,7 @@ class Scene(val window: GameWindow) {
 
         // CAMERA
         camera = TronCamera()
-        camera.rotateLocal(-0.65f, 0.0f, 0f)
-        camera.translateLocal(Vector3f(0f, -3f, 8f)) // since the ground is a bit below 0
+        camera.translateLocal(Vector3f(0f, 6f, 5f)) // since the ground is a bit below 0
         camera.parent = player.renderable
 
         //Sound and level
@@ -96,12 +96,12 @@ class Scene(val window: GameWindow) {
         //Game Object creation
         sun = Sun(level.song.length)
         orbs.addAll(
-            Orb.createOrbs(10)
+            Orb.createOrbs(100)
         )
         gameObjects.addAll(
             listOf(
                 Environment(),
-                level, player,sun
+                level, player, sun
             )
         )
         spotLights.add(sun.light)
@@ -111,7 +111,7 @@ class Scene(val window: GameWindow) {
         gameObjects.addAll(orbs)
 
         //Sphere Mesh for Light Volumes
-        val objMesh = ModelLoader.loadModel("assets/models/lightSphere.obj",0f,0f,0f)
+        val objMesh = ModelLoader.loadModel("assets/models/lightSphere.obj", 0f, 0f, 0f)
         sphereMesh = objMesh?.meshes?.first() ?: throw Exception("yeet")
 
         gameObjects.forEach { it.switchPhase(phase) }
@@ -144,7 +144,7 @@ class Scene(val window: GameWindow) {
         glDepthFunc(GL_LESS)
     }
 
-    private fun deferredRender(dt: Float, t: Float){
+    private fun deferredRender(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
         gBuffer.startFrame()
         GLError.checkThrow()
@@ -153,14 +153,17 @@ class Scene(val window: GameWindow) {
         ambientPass()
 
         spotLights.forEach {
-            depthShader.pass(it,this, beat)
+            depthShader.pass(it, this, beat)
             spotLightPass(it) // todo second pass for mountain lights
         }
 
+        val viewLocal = camera.getCalculateViewMatrix()
+        val projectionLocal = camera.getCalculateProjectionMatrix()
+
         glEnable(GL_STENCIL_TEST)
         pointLights.forEach {
-             stencilPass(it)
-             pointLightPass(it)
+            stencilPass(it, viewLocal, projectionLocal)
+            pointLightPass(it, viewLocal, projectionLocal)
         }
 
         glDisable(GL_STENCIL_TEST)
@@ -181,8 +184,8 @@ class Scene(val window: GameWindow) {
 
         spotLightShader.use()
         gBuffer.bindForLightPass()
-        spotLightShader.setUniform("CameraViewMatrix",camera.getCalculateViewMatrix())
-        spotLightShader.setUniform("LightProjectionViewMatrix",spotLight.calcPVMatrix())
+        spotLightShader.setUniform("CameraViewMatrix", camera.getCalculateViewMatrix())
+        spotLightShader.setUniform("LightProjectionViewMatrix", spotLight.calcPVMatrix())
         glActiveTexture(GL_TEXTURE6)
         glBindTexture(GL_TEXTURE_2D, depthMap.texture)
         spotLight.bind(spotLightShader, camera.getCalculateViewMatrix())
@@ -190,23 +193,24 @@ class Scene(val window: GameWindow) {
         glDisable(GL_BLEND)
     }
 
-    private fun geometryPass(dt: Float, beat: Float){
+    private fun geometryPass(dt: Float, beat: Float) {
         geometryPassShader.use()
         gBuffer.bindForGeomPass()
         glDepthMask(true)
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         glEnable(GL_DEPTH_TEST)
 
-        geometryPassShader.setUniform("beat",beat)
+        geometryPassShader.setUniform("beat", beat)
         camera.bind(geometryPassShader)
 
         //Draw everything into gBuffer
-        gameObjects.forEach{it.draw(geometryPassShader)}
+        gameObjects.forEach { it.draw(geometryPassShader) }
 
         glDepthMask(false)
         GLError.checkThrow("Geometry Pass")
     }
-    private fun stencilPass(pointLight: PointLight) {
+
+    private fun stencilPass(pointLight: PointLight, viewLocal: Matrix4f, projectionLocal: Matrix4f) {
         stencilShader.use()
         gBuffer.bindForStencilPass()
         //we want to run a depth test
@@ -215,7 +219,7 @@ class Scene(val window: GameWindow) {
         glClear(GL_STENCIL_BUFFER_BIT) //Clear the stencil buffer (it's called for every pointLight)
 
         //we always want it to pass only depth matters (discard faces later)
-        glStencilFunc(GL_ALWAYS,0,0)
+        glStencilFunc(GL_ALWAYS, 0, 0)
         //Increase stencil value, if the back facing polygon fails the depth test, unchanged otherwise
         glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP)
         //decrease stencil value, if the front facing polygon fails the depth test, unchanged otherwise
@@ -224,16 +228,14 @@ class Scene(val window: GameWindow) {
 
 
         //Calculate world view projection matrix and upload to shader for correct sphere rendering
-        val viewLocal = camera.getCalculateViewMatrix()
-        val projectionLocal = camera.getCalculateProjectionMatrix()
         val mm = Matrix4f().translate(pointLight.getWorldPosition()).scale(pointLight.calcBoundingSphere())
         val wvp = calculateWVP(mm, viewLocal, projectionLocal)
-        stencilShader.setUniform("wvp",wvp)
+        stencilShader.setUniform("wvp", wvp)
         sphereMesh.renderWOMat()
         GLError.checkThrow("Stencil Pass")
     }
 
-    private fun pointLightPass(pointLight: PointLight){
+    private fun pointLightPass(pointLight: PointLight, viewLocal: Matrix4f, projectionLocal: Matrix4f) {
         //we render into the final color attachment
         //also activates all textures from the gBuffer
         gBuffer.bindForLightPass()
@@ -249,8 +251,7 @@ class Scene(val window: GameWindow) {
         glEnable(GL_CULL_FACE) //enable culling, so we can discard faces
         glCullFace(GL_FRONT)
 
-        val viewLocal = camera.getCalculateViewMatrix()
-        val projectionLocal = camera.getCalculateProjectionMatrix()
+
         val mm = Matrix4f().translate(pointLight.getWorldPosition()).scale(pointLight.calcBoundingSphere())
         val wvp = calculateWVP(mm, viewLocal, projectionLocal)
 
@@ -266,7 +267,8 @@ class Scene(val window: GameWindow) {
         glCullFace(GL_BACK)
         glDisable(GL_BLEND)
     }
-    fun ambientPass(){
+
+    fun ambientPass() {
         glEnable(GL_BLEND) //need to blend the volumes over one another
         glBlendEquation(GL_FUNC_ADD) //just straight up adding this, no calc required
         glBlendFunc(GL_ONE, GL_ONE) //equal rights for every pointLight!
@@ -281,19 +283,21 @@ class Scene(val window: GameWindow) {
         //Copy gBuffer into default Framebuffer
         gBuffer.bindForFinalPass()
         glBlitFramebuffer(
-            0,0, width, height,
-            0,0, width, height,
-            GL_COLOR_BUFFER_BIT, GL_LINEAR)
+            0, 0, width, height,
+            0, 0, width, height,
+            GL_COLOR_BUFFER_BIT, GL_LINEAR
+        )
     }
+
     //we need to copy the depth buffer to render things like the skybox correctly
-    private fun copyDepthBuffer(){
+    private fun copyDepthBuffer() {
         //binds the gBuffer for reading, the default FBO for writing
         gBuffer.bindForDepthReadout()
         GLError.checkThrow()
         //copy the content of the gBuffers depth_buffer_bit to the default FBO
         glBlitFramebuffer(
-            0,0, width, height,
-            0,0, width, height,
+            0, 0, width, height,
+            0, 0, width, height,
             GL_DEPTH_BUFFER_BIT, GL_NEAREST
         )
         GLError.checkThrow()
@@ -301,16 +305,16 @@ class Scene(val window: GameWindow) {
     }
 
     //world view projection matrix calculation (to save uniforms)
-    private fun calculateWVP(model: Matrix4f, view: Matrix4f, projection: Matrix4f): Matrix4f{
+    private fun calculateWVP(model: Matrix4f, view: Matrix4f, projection: Matrix4f): Matrix4f {
         return Matrix4f(projection).mul(view).mul(model)
     }
 
     //Framerate calculation
     private var startTime = System.nanoTime()
     private var frames = 0
-    private fun logFps(){
+    private fun logFps() {
         frames++
-        if(System.nanoTime() - startTime >= 1000000000) {
+        if (System.nanoTime() - startTime >= 1000000000) {
             println("FPSCounter: fps $frames")
             frames = 0
             startTime = System.nanoTime()
@@ -322,20 +326,20 @@ class Scene(val window: GameWindow) {
 
     fun update(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
-        gameObjects.forEach{
+        gameObjects.forEach {
             it.processInput(window, dt)
             it.update(dt, beat)
         }
-        if (phase == Phase.Day && t > level.song.length * 0.25 && t < level.song.length * 0.75){
-            phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
-        } else if (phase == Phase.Night && t > level.song.length * 0.5){
+        if (phase == Phase.Day && t > level.song.length * 0.05 && t < level.song.length * 0.75) {
+            phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
+        } else if (phase == Phase.Night && t > level.song.length * 0.5) {
             phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
         } else if (phase == Phase.Chaos && t > level.song.length * 0.75) {
             phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
         }
-}
+    }
 
-fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
+    fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
         if (key == GLFW_KEY_F && action == 1) {
             level.onKey(NoteKey.Left)
         }
@@ -344,27 +348,26 @@ fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
         }
     }
 
-    var x: Double = 0.0
-    var y: Double = 0.0
+    var x: Double = width / 2.0
+    var y: Double = height / 2.0
     fun onMouseMove(xPos: Double, yPos: Double) {
         if (x == 0.0) {
             x = xPos
         } else {
             val diff = (x - xPos) * 0.002
             x = xPos
-            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
+            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f, 0f, 0f))
         }
-          if (y == 0.0) {
-              y = yPos
-          } else {
-              val diff = (y - yPos) * 0.002
-              y = yPos
-              camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f,  Vector3f(0f,0f,0f))
-          }
+        if (y == 0.0) {
+            y = yPos
+        } else {
+            val diff = (y - yPos) * 0.002
+            y = yPos
+            camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f, Vector3f(0f, 0f, 0f))
+        }
     }
 
     fun cleanup() {
-        //level.cleanup()
         SoundContext.cleanup()
     }
 }
