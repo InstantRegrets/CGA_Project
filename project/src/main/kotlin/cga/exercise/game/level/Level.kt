@@ -25,6 +25,7 @@ class Level: GameObject {
     lateinit var notes: Iterator<NoteData>
     lateinit var events: Iterator<Event>
     // this could probably be done much more efficiently
+    var nextNote:NoteData? = null
     var visibleNotes: ArrayList<Note> = arrayListOf()
     var nextEvent: Event = Event(0f,Event.Type.BackLasers,Event.Effect.LightOff)
 
@@ -52,16 +53,22 @@ class Level: GameObject {
 
     override fun update(dt: Float, beat: Float) {
         this.beat = beat
+        val db = beatsPerSeconds * dt
         for (n in visibleNotes){
             if(n.data.beat < beat - 0.2f) {
                 println(beat)
                 println("missed ${n.data.key} Note on beat ${n.data.beat} at $beat")
-                scoring.fail()
-                advanceNote()
-            } else if (n.data.beat > beat && n.data.beat < (beat + 2.0)){
-                n.update(dt,beat)
+            } else {
+                n.update(db,beat)
             }
         }
+        visibleNotes.removeIf { it.data.beat < beat -0.2f }
+
+        while (nextNote != null && nextNote!!.beat < beat+2f){
+            visibleNotes.add(Note(nextNote!!, beat))
+            nextNote = if (notes.hasNext()) notes.next() else null
+        }
+
         while (nextEvent.beat < beat && events.hasNext()){
             lightShow.fire(nextEvent)
             nextEvent = events.next()
@@ -84,21 +91,20 @@ class Level: GameObject {
     }
 
     fun onKey(key: NoteKey) {
-        for (n in visibleNotes){
-            if( beat - 0.4f < n.data.beat  && n.data.beat < beat + 0.52){
-                if (key == n.data.key){
-                    val score = 1 - abs(beat - n.data.beat)
-                    scoring.score(score)
-                    advanceNote()
-                }else {
-                    println("wrong note")
-                    scoring.fail()
-                    advanceNote()
-                }
+        val n = visibleNotes.firstOrNull() ?: return
+        if( beat - 0.4f < n.data.beat  && n.data.beat < beat + 0.52){
+            if (key == n.data.key){
+                val score = 1 - abs(beat - n.data.beat)
+                scoring.score(score)
+                visibleNotes.remove(n)
+            }else {
+                println("wrong note")
+                scoring.fail()
+                visibleNotes.remove(n)
             }
-         else {
-                 scoring.fail()
-             }
+        }
+        else {
+            scoring.fail()
         }
     }
 
@@ -120,7 +126,7 @@ class Level: GameObject {
             .map { eventFromBsEvent(it) }
             .iterator()
 
-        advanceNote()
+        if (notes.hasNext()) nextNote = notes.next()
         beatsPerSeconds = (info._beatsPerMinute / 60f).toFloat()
     }
 
@@ -157,12 +163,5 @@ class Level: GameObject {
     private fun loadSounds(){
         val songfile = path.resolve(info._songFilename)
         song = Song(songfile)
-    }
-
-    private fun advanceNote(){
-        if (visibleNotes.isNotEmpty())
-            visibleNotes.removeAt(0)
-        if (notes.hasNext())
-            visibleNotes.add(Note(notes.next()))
     }
 }

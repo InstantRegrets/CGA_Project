@@ -1,8 +1,6 @@
 package cga.exercise.game.gameObjects.note
 
 import cga.exercise.components.geometry.*
-import cga.exercise.components.light.Light
-import cga.exercise.components.light.PointLight
 import cga.exercise.components.material.AnimatedMaterial
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
@@ -13,37 +11,31 @@ import cga.framework.OBJLoader
 import org.joml.Matrix4f
 import org.joml.Vector2f
 import org.joml.Vector3f
-import kotlin.random.Random
 
 class Note(
     val data: NoteData,
+    currentBeat: Float,
 ): Transformable(), GameObject {
     private val color: Vector3f
     private val renderable: Renderable = noteRenderable()
-    private val light: Light
     private val startPosition: Vector3f
+    private val direction: Vector3f
 
-    // todo move out of this class?
-    private val targetPosition: Vector3f
-    private val spawnBeat = 2f
+    private val beatOffset = data.beat - currentBeat
 
     init {
         if (data.key == NoteKey.Left) {
             color = Vector3f(1f ,0f,0f)
-            startPosition = Vector3f(Random.nextFloat()*-1f- 2f,1.5f, -2f )
-            targetPosition = Vector3f(-1f,2f,0f)
+            startPosition = Vector3f(-10f,-2f,-10f )
+            direction = Vector3f(9f,0f,10f)
         } else {
             color = Vector3f(0f ,0f,1f)
-            startPosition = Vector3f(Random.nextFloat()*1f + 2f,1.5f, -2f)
-            targetPosition = Vector3f(1f,2f,0f)
+            startPosition = Vector3f(10f,-2f,-10f)
+            direction = Vector3f(-9f,0f,10f)
         }
         translateLocal(startPosition)
-        scaleLocal(Vector3f(0.2f))
         renderable.emitColor = color
-        light = PointLight(color, Vector3f(1f,0.15f,0.15f))
-
         renderable.parent = this
-        light.parent = this
     }
 
     override fun draw(shaderProgram: ShaderProgram) {
@@ -51,22 +43,18 @@ class Note(
     }
 
     // todo this could be done so much more efficient
+    private val movement = Vector3f()
     override fun update(dt: Float, beat: Float) {
         renderable.meshes.forEach { (it.material as AnimatedMaterial).counter += dt*30 }
-        // val f = (data.beat - beat) / spawnBeat
-        // val newPos = Vector3f(targetPosition).sub(Vector3f(startPosition.mul(f)))
-        // setPosition(newPos)
-        scaleLocal(Vector3f(1.02f))
-        // translateLocal(Vector3f(0f,0f,1.2f*dt))
+        direction.mul(dt/beatOffset,movement)
+        translateLocal(movement)
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
 
     }
 
-    override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
-        light.bind(shaderProgram, viewMatrix4f)
-    }
+    override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) { }
 
     override fun switchPhase(phase: Phase) {
         // TODO("Not yet implemented")

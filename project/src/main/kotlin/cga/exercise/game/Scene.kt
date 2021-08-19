@@ -78,9 +78,6 @@ class Scene(val window: GameWindow) {
 
         // CAMERA
         camera = TronCamera()
-        camera.rotateLocal(-0.65f, 0.0f, 0f)
-        camera.translateLocal(Vector3f(0f, -3f, 8f)) // since the ground is a bit below 0
-        camera.parent = player
 
         //Sound and level
         SoundContext.setup()

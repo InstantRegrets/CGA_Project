@@ -16,20 +16,22 @@ class TronCamera(
 ): Transformable(parent = parent), ICamera {
     var viewMatrix: Matrix4f = Matrix4f()
     var i = 0
-    val camTarget = Transformable(parent = this)
+    val camTarget = Vector3f(0f)
     private var shake = 0f
     private var transitionDuration = 0f
     private var transitionStartTime = 0f
     private val transitionPos = Vector3f(0f)
     init {
-        camTarget.translateLocal(getWorldZAxis().negate())
+        translateLocal(Vector3f(0f, -4f, 8f)) // since the ground is a bit below 0
     }
 
     override fun getCalculateViewMatrix(): Matrix4f {
         val up = getWorldYAxis()
         val cameraPosition = getWorldPosition()
-        val cameraTarget = (parent?:camTarget).getWorldPosition().normalize()
-        cameraTarget.add(Random.nextVec3(-0.01f,0.01f).mul(shake))
+        val cameraTarget = Vector3f()
+        cameraPosition.sub(camTarget, cameraTarget)
+        cameraTarget.normalize()
+        cameraTarget.add(Random.nextVec3(-0.01f,0.02f).mul(shake))
         viewMatrix = Matrix4f().lookAt(cameraPosition, cameraTarget, up)
 
         return viewMatrix
@@ -64,18 +66,18 @@ class TronCamera(
     fun switchPhase(phase: Phase, beat: Float){
         when(phase){
             Phase.Day -> {
-                transitionPos.set(Vector3f(-2f,2f,8f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(-2f,-1f,8f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 4f
             }
             Phase.Night -> {
-                transitionPos.set(Vector3f(2f,2f,8f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(2f,-1f,8f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
 
             }
             Phase.Chaos -> {
-                transitionPos.set(Vector3f(0f,3f,16f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(0f,1f,12f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
                 shake = 1.0f
