@@ -9,21 +9,34 @@ our spirit animal!
 - Bastian Abt
 - Jannik Alexander
 
+
+
+# Disclaimer: verwendete externe Inhalte
+
+- [Duck sound](https://freesound.org/people/dobroide/sounds/185134/)
+- [Bongo sound](https://freesound.org/people/stomachache/sounds/29803/)
+- [Skybox Texture](https://assetstore.unity.com/packages/vfx/shaders/polyverse-skies-low-poly-skybox-shaders-104017)
+- [Dirt Texture](https://www.vectorstock.com/royalty-free-vector/seamless-pattern-ground-with-stones-brown-soil-vector-37512397)
+
+
+
 # Featureliste
 
-- soundausgabe
-- einfaches rythmusspiel 
-- deferred Rendering
-- Pointlights durch Light Volumes 
+- Soundausgabe
+- Einfaches rythmusspiel
+- Deferred Rendering
+- Light Volume implementation für Point Lights
 - Lichtshow durch Lasersystem
 - Shadowmapping der spotlights (Sonne und Laser)
-- Skybox
+- iSkybox
 - Camera Shake
-- mehrere Phasen abhaengig von der Musik
-- Geometry shader abhaengig von der Musik
-- Animierte Notentexture
-- Animierte Orbs, die um den Spieler fliegen
-- eigen gemodelte Umgebung
+- Mehrere Phasen abhängig von der Musik
+- Geometry shader abhängig von der Musik
+- Animierte Orbs, die um den Spieler fliegen 
+- Selbst modellierte(s)/colorierte(s):
+  - Umgebung
+  - Spielermodell
+  - Notenmodell
 
 see [project README](project/REAMDE.md)
 
