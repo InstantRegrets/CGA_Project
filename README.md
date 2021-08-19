@@ -11,7 +11,19 @@ our spirit animal!
 
 # Featureliste
 
-- [x] soundausgabe (B)
-- [x] einfaches rythmusspiel (B)
-- todo
+- soundausgabe
+- einfaches rythmusspiel 
+- deferred Rendering
+- Pointlights durch Light Volumes 
+- Lichtshow durch Lasersystem
+- Shadowmapping der spotlights (Sonne und Laser)
+- Skybox
+- Camera Shake
+- mehrere Phasen abhaengig von der Musik
+- Geometry shader abhaengig von der Musik
+- Animierte Notentexture
+- Animierte Orbs, die um den Spieler fliegen
+- eigen gemodelte Umgebung
+
+see [project README](project/REAMDE.md)
 
