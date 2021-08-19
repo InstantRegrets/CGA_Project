@@ -26,6 +26,7 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL33.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -78,8 +79,6 @@ class Scene(val window: GameWindow) {
 
         // CAMERA
         camera = TronCamera()
-        camera.translateLocal(Vector3f(0f, 6f, 5f)) // since the ground is a bit below 0
-        camera.parent = player.renderable
 
         //Sound and level
         SoundContext.setup()
@@ -96,7 +95,7 @@ class Scene(val window: GameWindow) {
         //Game Object creation
         sun = Sun(level.song.length)
         orbs.addAll(
-            Orb.createOrbs(100)
+            Orb.createOrbs(10)
         )
         gameObjects.addAll(
             listOf(
@@ -120,10 +119,13 @@ class Scene(val window: GameWindow) {
 
     //RENDERING
 
+    var rendStart: Long = 0L
     fun render(dt: Float, t: Float) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         deferredRender(dt, t)
+        rendStart= System.nanoTime()
         renderSkybox()
+        skyboxTime += (System.nanoTime() - rendStart)
         SoundListener.setPosition(camera)
         GLError.checkThrow()
         logFps()
@@ -149,13 +151,17 @@ class Scene(val window: GameWindow) {
         gBuffer.startFrame()
         GLError.checkThrow()
 
+        rendStart = System.nanoTime()
         geometryPass(dt, beat)
+        geometryTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
         ambientPass()
+        ambientTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
 
         spotLights.forEach {
             depthShader.pass(it, this, beat)
             spotLightPass(it) // todo second pass for mountain lights
         }
+        spotLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
 
         val viewLocal = camera.getCalculateViewMatrix()
         val projectionLocal = camera.getCalculateProjectionMatrix()
@@ -166,6 +172,8 @@ class Scene(val window: GameWindow) {
             pointLightPass(it, viewLocal, projectionLocal)
         }
 
+        pointLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+
         glDisable(GL_STENCIL_TEST)
 
 
@@ -173,6 +181,7 @@ class Scene(val window: GameWindow) {
         GLError.checkThrow()
 
         finalPass()
+        finalPassTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
         GLError.checkThrow()
     }
 
@@ -312,12 +321,31 @@ class Scene(val window: GameWindow) {
     //Framerate calculation
     private var startTime = System.nanoTime()
     private var frames = 0
-    private fun logFps() {
+    private var geometryTime = 0L
+    private var ambientTime = 0L
+    private var spotLightTime = 0L
+    private var pointLightTime = 0L
+    private var finalPassTime = 0L
+    private var skyboxTime = 0L
+    private fun logFps(){
         frames++
-        if (System.nanoTime() - startTime >= 1000000000) {
+        if(System.nanoTime() - startTime >= 1000000000) {
+            println("=======================")
             println("FPSCounter: fps $frames")
+            println("avg geometry Pass:   ${geometryTime/frames}")
+            println("avg ambient Pass:    ${ambientTime/frames}")
+            println("avg spotlight Pass:  ${spotLightTime/frames}")
+            println("avg pointLight Pass: ${pointLightTime/frames}")
+            println("avg final PassTime:  ${finalPassTime/frames}")
+            println("avg skybox PassTime: ${skyboxTime/frames}")
             frames = 0
             startTime = System.nanoTime()
+            geometryTime = 0
+            skyboxTime= 0
+            ambientTime = 0
+            pointLightTime = 0
+            spotLightTime = 0
+            finalPassTime = 0
         }
     }
 
@@ -326,17 +354,46 @@ class Scene(val window: GameWindow) {
 
     fun update(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
-        gameObjects.forEach {
+        camera.update(dt,t)
+        gameObjects.forEach{
             it.processInput(window, dt)
             it.update(dt, beat)
         }
-        if (phase == Phase.Day && t > level.song.length * 0.05 && t < level.song.length * 0.75) {
-            phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
-        } else if (phase == Phase.Night && t > level.song.length * 0.5) {
-            phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
-        } else if (phase == Phase.Chaos && t > level.song.length * 0.75) {
-            phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+
+        when {
+            phase == Phase.Day          && t > level.song.length * 0.107f && t < level.song.length * 0.2f -> {
+                switchPhase(Phase.Night,t)
+            }
+            phase == Phase.Night && t > level.song.length * 0.205 && t< level.song.length * 0.3f -> {
+                switchPhase(Phase.Day,t)
+            }
+            phase == Phase.Day && t > level.song.length * 0.303f && t< level.song.length * 0.4f -> {
+                switchPhase(Phase.Chaos,t)
+            }
+            phase == Phase.Chaos && t > level.song.length * 0.400 && t< level.song.length * 0.5f -> {
+                switchPhase(Phase.Day,t)
+            }
+            phase == Phase.Day && t > level.song.length * 0.5f && t< level.song.length * 0.59f -> {
+                switchPhase(Phase.Chaos,t)
+            }
+            phase == Phase.Chaos && t > level.song.length * 0.598f && t< level.song.length * 0.7f -> {
+                switchPhase(Phase.Day,t)
+            }
+            phase == Phase.Day && t > level.song.length * 0.7f && t< level.song.length * 0.8f -> {
+                switchPhase(Phase.Night,t)
+            }
+            phase == Phase.Night && t > level.song.length * 0.8f && t< level.song.length * 0.9f -> {
+                switchPhase(Phase.Day,t)
+            }
+            phase == Phase.Day && t > level.song.length * 0.9f && t< level.song.length * 1.0f -> {
+                switchPhase(Phase.Night,t)
+            }
         }
+    }
+    private fun switchPhase(newPhase: Phase, beat: Float){
+        this.phase = newPhase
+        gameObjects.forEach { it.switchPhase(phase) }
+        camera.switchPhase(phase,beat) //todo
     }
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
@@ -351,20 +408,20 @@ class Scene(val window: GameWindow) {
     var x: Double = width / 2.0
     var y: Double = height / 2.0
     fun onMouseMove(xPos: Double, yPos: Double) {
-        if (x == 0.0) {
-            x = xPos
-        } else {
-            val diff = (x - xPos) * 0.002
-            x = xPos
-            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f, 0f, 0f))
-        }
-        if (y == 0.0) {
-            y = yPos
-        } else {
-            val diff = (y - yPos) * 0.002
-            y = yPos
-            camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f, Vector3f(0f, 0f, 0f))
-        }
+        // if (x == 0.0) {
+        //     x = xPos
+        // } else {
+        //     val diff = (x - xPos) * 0.002
+        //     x = xPos
+        //     camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
+        // }
+        // if (y == 0.0) {
+        //     y = yPos
+        // } else {
+        //     val diff = (y - yPos) * 0.002
+        //     y = yPos
+        //     camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f,  Vector3f(0f,0f,0f))
+        // }
     }
 
     fun cleanup() {

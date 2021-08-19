@@ -4,9 +4,7 @@ uniform sampler2D inPosition; //Frag Pos
 uniform sampler2D inNormal;
 uniform sampler2D inDiffuse;
 uniform sampler2D inSpecular;
-uniform sampler2D inShadow;
 
-uniform sampler2D shadowMap;
 
 vec2 textureCoordinates;
 
@@ -20,22 +18,11 @@ struct PointLightData{
     vec3 attenuation;//Values are constant, linear, quadratic
 };
 
-struct SpotLightData{
-    vec3 color;
-    vec3 lightPos;
-    vec3 direction;
-    float innerCone;
-    float outerCone;
-    vec3 attenuation;//Values are constant, linear, quadratic
-};
-
-#define ambientStrength 0.1
-#define ambientColor vec3(0.5, 1, 1)
 
 uniform PointLightData plData;
 
 
-vec3 diffMaterial, specularMaterial, emitMaterial;
+vec3 diffMaterial, specularMaterial;
 vec4 fragPosLightSpace;
 uniform float shininess;
 
@@ -43,7 +30,6 @@ void loadMaterial(){
     //emitMaterial = texture(inEmissive, textureCoordinates).rgb;
     diffMaterial = texture(inDiffuse, textureCoordinates).rgb;
     specularMaterial = texture(inSpecular, textureCoordinates).rgb;
-    fragPosLightSpace = texture(inShadow, textureCoordinates);
 }
 
 // Lighting functions

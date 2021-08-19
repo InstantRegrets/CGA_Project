@@ -34,7 +34,7 @@ class Player : Transformable(), GameObject {
                 army.clear()
             }
             Phase.Night -> {
-                renderable.pulseStrength = 0.05f
+                renderable.pulseStrength = 0.0f
             }
             Phase.Chaos -> {
                 renderable.pulseStrength = 0.3f

@@ -3,7 +3,7 @@ In diesem Ordner sollen alle Dateien untergebracht werden, die zur Ausführung i
 
 # Change Quality
 
-you can change the Graphik Quality in framework/Quality.kt
+you can change the Graphic Quality in framework/Quality.kt
 
 # Credit, where Credit is due
 

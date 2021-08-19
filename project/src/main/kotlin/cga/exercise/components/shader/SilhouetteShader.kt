@@ -19,7 +19,7 @@ class SilhouetteShader: ShaderProgram(
         glDepthMask(true)
 
         GLError.checkThrow()
-        scene.camera.bind(this)
+        // scene.camera.bind(this)
         setUniform("outlineColor", Vector3f(0f,0f,0f))
         setUniform("normal_offset", 0.65f)
         scene.gameObjects.forEach { it.draw(this) }
