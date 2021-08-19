@@ -80,7 +80,7 @@ class Scene(val window: GameWindow) {
         camera = TronCamera()
         camera.rotateLocal(-0.65f, 0.0f, 0f)
         camera.translateLocal(Vector3f(0f, -3f, 8f)) // since the ground is a bit below 0
-        camera.parent = player.renderable
+        camera.parent = player
 
         //Sound and level
         SoundContext.setup()
@@ -352,6 +352,7 @@ class Scene(val window: GameWindow) {
 
     fun update(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
+        camera.update(dt,t)
         gameObjects.forEach{
             it.processInput(window, dt)
             it.update(dt, beat)
@@ -359,33 +360,38 @@ class Scene(val window: GameWindow) {
 
         when {
             phase == Phase.Day          && t > level.song.length * 0.107f && t < level.song.length * 0.2f -> {
-                phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Night,t)
             }
             phase == Phase.Night && t > level.song.length * 0.205 && t< level.song.length * 0.3f -> {
-                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Day,t)
             }
             phase == Phase.Day && t > level.song.length * 0.303f && t< level.song.length * 0.4f -> {
-                phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Chaos,t)
             }
             phase == Phase.Chaos && t > level.song.length * 0.400 && t< level.song.length * 0.5f -> {
-                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Day,t)
             }
             phase == Phase.Day && t > level.song.length * 0.5f && t< level.song.length * 0.59f -> {
-                phase = Phase.Chaos; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Chaos,t)
             }
             phase == Phase.Chaos && t > level.song.length * 0.598f && t< level.song.length * 0.7f -> {
-                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Day,t)
             }
             phase == Phase.Day && t > level.song.length * 0.7f && t< level.song.length * 0.8f -> {
-                phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Night,t)
             }
             phase == Phase.Night && t > level.song.length * 0.8f && t< level.song.length * 0.9f -> {
-                phase = Phase.Day; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Day,t)
             }
             phase == Phase.Day && t > level.song.length * 0.9f && t< level.song.length * 1.0f -> {
-                phase = Phase.Night; gameObjects.forEach { it.switchPhase(phase) }
+                switchPhase(Phase.Night,t)
             }
         }
+    }
+    private fun switchPhase(newPhase: Phase, beat: Float){
+        this.phase = newPhase
+        gameObjects.forEach { it.switchPhase(phase) }
+        camera.switchPhase(phase,beat) //todo
     }
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
@@ -400,20 +406,20 @@ class Scene(val window: GameWindow) {
     var x: Double = 0.0
     var y: Double = 0.0
     fun onMouseMove(xPos: Double, yPos: Double) {
-        if (x == 0.0) {
-            x = xPos
-        } else {
-            val diff = (x - xPos) * 0.002
-            x = xPos
-            camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
-        }
-        if (y == 0.0) {
-            y = yPos
-        } else {
-            val diff = (y - yPos) * 0.002
-            y = yPos
-            camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f,  Vector3f(0f,0f,0f))
-        }
+        // if (x == 0.0) {
+        //     x = xPos
+        // } else {
+        //     val diff = (x - xPos) * 0.002
+        //     x = xPos
+        //     camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
+        // }
+        // if (y == 0.0) {
+        //     y = yPos
+        // } else {
+        //     val diff = (y - yPos) * 0.002
+        //     y = yPos
+        //     camera.camTarget.rotateAroundPoint(diff.toFloat(), 0f, 0f,  Vector3f(0f,0f,0f))
+        // }
     }
 
     fun cleanup() {
