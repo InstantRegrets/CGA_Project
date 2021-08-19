@@ -1,0 +1,41 @@
+# Blender MTL File: 'duck.blend'
+# Material Count: 3
+
+newmtl Body
+Ns 267.768582
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.222727 0.222727 0.222727
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd caguyapalette.tga
+map_Ke blankMap.png
+map_Ks blankMap.png
+
+newmtl Eye
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd brightPalette.tga
+map_Ke blankMap.png
+map_Ks blankMap.png
+
+newmtl feet
+Ns 212.894639
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.522727 0.522727 0.522727
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd caguyapalette.tga
+map_Ke blankMap.png
+map_Ks blankMap.png

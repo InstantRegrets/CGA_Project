@@ -1,6 +1,5 @@
-package cga.exercise.game
+package cga.exercise.components.geometry
 
-import cga.exercise.components.geometry.VertexAttribute
 import cga.exercise.components.shader.ShaderProgram
 import org.lwjgl.opengl.GL33.*
 

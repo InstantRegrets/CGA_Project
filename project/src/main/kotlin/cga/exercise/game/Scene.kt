@@ -4,6 +4,7 @@ import cga.exercise.components.camera.TronCamera
 import cga.exercise.components.geometry.DepthMap
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.geometry.Mesh
+import cga.exercise.components.geometry.Quad
 import cga.exercise.components.light.PointLight
 import cga.exercise.components.light.SpotLight
 import cga.exercise.components.shader.*
@@ -11,7 +12,7 @@ import cga.exercise.components.shader.DepthShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
 import cga.exercise.components.texture.Skybox
-import cga.exercise.game.environment.chaos.Environment
+import cga.exercise.game.environment.Environment
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
 import cga.exercise.game.gameObjects.orb.Orb
@@ -79,6 +80,7 @@ class Scene(val window: GameWindow) {
 
         // CAMERA
         camera = TronCamera()
+        camera.translateLocal(Vector3f(7f,5f,40f))
 
         //Sound and level
         SoundContext.setup()

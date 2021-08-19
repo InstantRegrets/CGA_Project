@@ -1,4 +1,4 @@
-package cga.exercise.game.environment.chaos
+package cga.exercise.game.environment
 
 import cga.exercise.game.gameObjects.Model
 
