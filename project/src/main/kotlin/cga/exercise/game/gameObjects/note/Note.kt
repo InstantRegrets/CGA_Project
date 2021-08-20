@@ -17,7 +17,7 @@ class Note(
     currentBeat: Float,
 ): Transformable(), GameObject {
     private val color: Vector3f
-    private val renderable: Renderable = note.renderable
+    private val renderable: Renderable = noteRenderable()
     private val startPosition: Vector3f
     private val direction: Vector3f
 
@@ -61,22 +61,18 @@ class Note(
     }
 
     companion object {
-        val note = SimonNote("assets/models/note/SimonNote/note.obj")
-        private val obj = OBJLoader.loadOBJ("assets/models/note/mesh.obj")
-        private val meshes =  obj.objects.flatMap { it.meshes }
+        private val obj = SimonNote("assets/models/note/SimonNote/note.obj")
+        private val meshes =  obj.renderable.meshes
         private val diff = ModelLoader.loadTexArray("note", "diff")
         private val emit = ModelLoader.loadTexArray("note", "emit")
         private val spec = ModelLoader.loadTexArray("note", "spec")
 
-        init {
-            note.renderable.scaleLocal(Vector3f(0.75f))
-            note.renderable.translateLocal(Vector3f(0f, -4f, 0f))
-        }
-
         fun noteRenderable(): Renderable {
             val mat = AnimatedMaterial(diff,emit,spec, Vector2f(3.0f))
-            val m =  meshes.map { Mesh(it.vertexData, it.indexData, ModelLoader.defaultOBJAttributes, mat) }.toMutableList()
-            val r = Renderable(m)
+            // val m =  meshes.map { Mesh(it.vertexData, it.indexData, ModelLoader.defaultOBJAttributes, mat) }.toMutableList()
+            val r = Renderable(meshes)
+            r.scaleLocal(Vector3f(0.75f))
+            r.translateLocal(Vector3f(0f, -4f, 0f))
             return r
         }
     }
