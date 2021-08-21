@@ -62,6 +62,7 @@ class Scene(val window: GameWindow) {
     //Convenience
     private val width = window.windowWidth
     private val height = window.windowHeight
+    private val fpsLogger = FPSLogger()
 
     init {
         //initial opengl state
@@ -121,16 +122,12 @@ class Scene(val window: GameWindow) {
 
     //RENDERING
 
-    var rendStart: Long = 0L
     fun render(dt: Float, t: Float) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         deferredRender(dt, t)
-        rendStart= System.nanoTime()
         renderSkybox()
-        skyboxTime += (System.nanoTime() - rendStart)
-        SoundListener.setPosition(camera)
         GLError.checkThrow()
-        logFps()
+        fpsLogger.logFps()
     }
 
     private fun renderSkybox() {
@@ -146,6 +143,7 @@ class Scene(val window: GameWindow) {
         skybox.render()
         //restore depth function
         glDepthFunc(GL_LESS)
+        fpsLogger.logSkyBox()
     }
 
     private fun deferredRender(dt: Float, t: Float) {
@@ -153,17 +151,18 @@ class Scene(val window: GameWindow) {
         gBuffer.startFrame()
         GLError.checkThrow()
 
-        rendStart = System.nanoTime()
+        fpsLogger.resetTimer()
         geometryPass(dt, beat)
-        geometryTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+        fpsLogger.logGeometryPass();
         ambientPass()
-        ambientTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+        fpsLogger.logAmbientPass()
 
         spotLights.forEach {
             depthShader.pass(it, this, beat)
             spotLightPass(it) // todo second pass for mountain lights
         }
-        spotLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+
+        fpsLogger.logSpotLightPass()
 
         val viewLocal = camera.getCalculateViewMatrix()
         val projectionLocal = camera.getCalculateProjectionMatrix()
@@ -174,8 +173,7 @@ class Scene(val window: GameWindow) {
             pointLightPass(it, viewLocal, projectionLocal)
         }
 
-        pointLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
-
+        fpsLogger.logPointLightPass()
         glDisable(GL_STENCIL_TEST)
 
 
@@ -183,7 +181,7 @@ class Scene(val window: GameWindow) {
         GLError.checkThrow()
 
         finalPass()
-        finalPassTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+        fpsLogger.logFinalPass()
         GLError.checkThrow()
     }
 
@@ -320,36 +318,6 @@ class Scene(val window: GameWindow) {
         return Matrix4f(projection).mul(view).mul(model)
     }
 
-    //Framerate calculation
-    private var startTime = System.nanoTime()
-    private var frames = 0
-    private var geometryTime = 0L
-    private var ambientTime = 0L
-    private var spotLightTime = 0L
-    private var pointLightTime = 0L
-    private var finalPassTime = 0L
-    private var skyboxTime = 0L
-    private fun logFps(){
-        frames++
-        if(System.nanoTime() - startTime >= 1000000000) {
-            println("=======================")
-            println("FPSCounter: fps $frames")
-            println("avg geometry Pass:   ${geometryTime/frames}")
-            println("avg ambient Pass:    ${ambientTime/frames}")
-            println("avg spotlight Pass:  ${spotLightTime/frames}")
-            println("avg pointLight Pass: ${pointLightTime/frames}")
-            println("avg final PassTime:  ${finalPassTime/frames}")
-            println("avg skybox PassTime: ${skyboxTime/frames}")
-            frames = 0
-            startTime = System.nanoTime()
-            geometryTime = 0
-            skyboxTime= 0
-            ambientTime = 0
-            pointLightTime = 0
-            spotLightTime = 0
-            finalPassTime = 0
-        }
-    }
 
 
     //GAME LOGIC
@@ -357,6 +325,7 @@ class Scene(val window: GameWindow) {
     fun update(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
         camera.update(dt,t)
+        SoundListener.setPosition(camera)
         gameObjects.forEach{
             it.processInput(window, dt)
             it.update(dt, beat)
@@ -427,6 +396,7 @@ class Scene(val window: GameWindow) {
     }
 
     fun cleanup() {
+        level.cleanup()
         SoundContext.cleanup()
     }
 }
