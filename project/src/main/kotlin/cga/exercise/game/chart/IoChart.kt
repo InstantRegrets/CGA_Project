@@ -43,7 +43,7 @@ class IoChart{
     fun loadLowestDiff(): Difficulty {
         val bms = info._difficultyBeatmapSets.find { it._beatmapCharacteristicName == "Standard" }
         if (bms != null && bms._difficultyBeatmaps.isNotEmpty())
-            return loadDifficulty(bms._difficultyBeatmaps.last()._difficultyRank)
+            return loadDifficulty(bms._difficultyBeatmaps.first()._difficultyRank)
         else{
             val set = info._difficultyBeatmapSets.first()
             return loadDifficulty(set._difficultyBeatmaps.first()._difficultyRank, set._beatmapCharacteristicName)

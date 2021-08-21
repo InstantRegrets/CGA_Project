@@ -15,6 +15,7 @@ import cga.exercise.components.texture.Skybox
 import cga.exercise.game.environment.Environment
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
+import cga.exercise.game.gameObjects.note.HitKey
 import cga.exercise.game.gameObjects.note.NoteKey
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
@@ -22,7 +23,6 @@ import cga.exercise.game.level.Level
 import cga.framework.GLError
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
-import cga.framework.OBJLoader
 import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -390,10 +390,13 @@ class Scene(val window: GameWindow) {
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
         if (key == GLFW_KEY_A && action == 1) {
-            level.onKey(NoteKey.Left)
+            level.onKey(HitKey.Left)
         }
         if (key == GLFW_KEY_D && action == 1) {
-            level.onKey(NoteKey.Right)
+            level.onKey(HitKey.Right)
+        }
+        if (key == GLFW_KEY_S && action == 1) {
+            level.onKey(HitKey.Middle)
         }
     }
 

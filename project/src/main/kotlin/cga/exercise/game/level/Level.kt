@@ -5,6 +5,7 @@ import cga.exercise.game.chart.IoChart
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
 import cga.exercise.game.gameObjects.laser.LightShow
+import cga.exercise.game.gameObjects.note.HitKey
 import cga.exercise.game.gameObjects.note.Note
 import cga.exercise.game.gameObjects.note.NoteData
 import cga.exercise.game.gameObjects.note.NoteKey
@@ -102,21 +103,35 @@ class Level: GameObject {
         }
     }
 
-    fun onKey(key: NoteKey) {
-        val n = visibleNotes.firstOrNull() ?: return
-        // todo allow for 2 notes at once
-        if( beat - 0.4f < n.data.beat  && n.data.beat < beat + 0.52){
-            if (key == n.data.key){
-                val score = 1 - abs(beat - n.data.beat)
-                scoring.score(score)
-                visibleNotes.remove(n)
-            }else {
-                scoring.fail()
-                visibleNotes.remove(n)
+    fun onKey(key: HitKey) {
+        val timedNote = visibleNotes.filter { beat - 0.3f < it.data.beat && it.data.beat < beat + 0.3f }
+        when(key){
+            HitKey.Left -> {
+                val n = timedNote.firstOrNull { it.data.key == NoteKey.Left }
+                if (n != null){
+                    visibleNotes.remove(n)
+                    scoring.score(1 - abs(beat - n.data.beat))
+                } else { scoring.fail() }
             }
-        }
-        else {
-            scoring.fail()
+            HitKey.Right -> {
+                val n = timedNote.firstOrNull { it.data.key == NoteKey.Right }
+                if (n != null){
+                    visibleNotes.remove(n)
+                    scoring.score(1 - abs(beat - n.data.beat))
+                } else { scoring.fail() }
+            }
+            HitKey.Middle -> {
+                val r = timedNote.firstOrNull { it.data.key == NoteKey.Right }
+                val l = timedNote.firstOrNull { it.data.key == NoteKey.Left }
+                if (r != null ){
+                    visibleNotes.remove(r)
+                    scoring.score(1 - abs(beat - r.data.beat))
+                } else { scoring.fail() }
+                if (l != null ){
+                    visibleNotes.remove(l)
+                    scoring.score(1 - abs(beat - l.data.beat))
+                } else { scoring.fail() }
+            }
         }
     }
 
