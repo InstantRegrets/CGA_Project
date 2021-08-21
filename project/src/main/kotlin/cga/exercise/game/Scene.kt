@@ -34,7 +34,6 @@ import org.lwjgl.opengl.GL33.*
  * Created by Fabian on 16.09.2017.
  */
 class Scene(val window: GameWindow) {
-    private var orbActualMesh: Mesh
     val camera: TronCamera
     private val level: Level
     private val player = Player()
@@ -122,23 +121,6 @@ class Scene(val window: GameWindow) {
         gameObjects.forEach { it.switchPhase(phase) }
         level.song.play()
 
-        //WIP
-        val orbMesh =ModelLoader.loadModel("assets/models/lightSphere.obj",0f,0f,0f)
-        orbActualMesh = orbMesh?.meshes?.first() ?: throw Exception("yeet")
-        val offsets = arrayListOf(
-            Vector3f(-5f,1f,2f),
-            Vector3f(-4f,0f,0f),
-            Vector3f(-3f,0f,0f),
-            Vector3f(-2f,0f,0f),
-            Vector3f(-1f,0f,0f),
-            Vector3f(0f,0f,0f),
-            Vector3f(1f,0f,0f),
-            Vector3f(2f,0f,0f),
-            Vector3f(3f,0f,0f),
-            Vector3f(4f,0f,0f),
-            Vector3f(5f,0f,0f),
-        )
-        orbActualMesh.setupInstancing(offsets)
     }
 
     //RENDERING
@@ -394,6 +376,11 @@ class Scene(val window: GameWindow) {
                 switchPhase(Phase.Night,t)
             }
         }
+        if(window.getKeyState(GLFW_KEY_UP)) camera.translateLocal(Vector3f(0f,0f,5f*dt))
+        if (window.getKeyState(GLFW_KEY_LEFT)) camera.translateLocal(Vector3f(-5f*dt,0f,0f))
+        if (window.getKeyState(GLFW_KEY_RIGHT)) camera.translateLocal(Vector3f(5f*dt,0f,0f))
+        if (window.getKeyState(GLFW_KEY_DOWN)) camera.translateLocal(Vector3f(0f,0f,-5f*dt))
+        if (window.getKeyState(GLFW_KEY_LEFT_CONTROL)) camera.translateLocal(Vector3f(0f,-5f*dt,0f))
     }
     private fun switchPhase(newPhase: Phase, beat: Float){
         this.phase = newPhase

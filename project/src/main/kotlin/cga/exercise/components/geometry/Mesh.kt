@@ -90,9 +90,8 @@ class Mesh(
             it.get(bufferPosition, buffer)
             bufferPosition+=3
         }
-        GLError.checkThrow()
 
-        buffer.get()
+        GLError.checkThrow()
         GL15.glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW)
         GLError.checkThrow()
 
@@ -117,7 +116,7 @@ class Mesh(
             material.bind(shaderProgram)
         glBindVertexArray(vao)
         //use in constructor specified draw mode, to draw a maximum of <indexCount> vertices, starting with index 0
-        glDrawElementsInstanced(drawMode,indexCount*elementCount,GL_UNSIGNED_INT,0,elementCount)
+        glDrawElementsInstanced(drawMode,indexCount,GL_UNSIGNED_INT,0,elementCount)
         glBindVertexArray(0) //cleanup
     }
 

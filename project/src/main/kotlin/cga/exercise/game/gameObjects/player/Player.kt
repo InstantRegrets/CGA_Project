@@ -3,6 +3,7 @@ package cga.exercise.game.gameObjects.player
 import cga.exercise.components.geometry.Renderable
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.light.PointLight
+import cga.exercise.components.shader.GeometryShader
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
@@ -10,6 +11,7 @@ import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import cga.framework.Random
 import org.joml.Matrix4f
+import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import kotlin.math.PI
@@ -18,7 +20,7 @@ class Player : Transformable(), GameObject {
     var color = Random.nextColor()
     var pose = Pose.Neutral
     var renderable: Renderable = getPose(color,pose)
-    var army: ArrayList<Renderable> = arrayListOf()
+    var army: ArrayList<Transformable> = arrayListOf()
     enum class Pose { Right, Left, Wide, Neutral}
 
     init {
@@ -42,17 +44,36 @@ class Player : Transformable(), GameObject {
             }
             Phase.Chaos -> {
                 playerModels.forEach{it.pulseStrength = 0.3f}
-                for(i in -5..5) {
-                    for (j in -10..0) {
-                        val p = createRenderable(Random.nextColor())
-                        p.translateGlobal(this.getWorldPosition())
-                        p.translateLocal(Vector3f(2f*i.toFloat(), 0f, 2f*j.toFloat()))
-                        p.scaleLocal(Vector3f(0.2f))
-                        p.pulseStrength = 0.01f
-                        army.add(p)
-                    }
-                }
+                createArmy()
             }
+        }
+    }
+    fun createArmy(){
+        for(i in -50..50) {
+            for (j in -50..50) {
+                val p = Transformable()
+                p.translateLocal(Vector3f(5f*i.toFloat(), 0f, 5f*j.toFloat()))
+                p.translateLocal(Vector3f(0f,2f,0f))
+                army.add(p)
+            }
+        }
+        val offsets = arrayListOf<Vector3f>()
+        army.forEach {
+            offsets.add(it.getPosition())
+        }
+        meshLeft2.forEach { it.setupInstancing(offsets) }
+        meshRight2.forEach { it.setupInstancing(offsets) }
+    }
+    var currentMeshes = meshLeft2
+    fun renderInstancedArmy(shaderProgram: ShaderProgram) {
+        if (shaderProgram is GeometryShader) {
+            val mm = getWorldModelMatrix().scale(0.5f)
+            val pulseStrength = 0.00f
+            shaderProgram.setUniform("model_matrix", mm)
+            shaderProgram.setUniform("pulseStrength", pulseStrength)
+            shaderProgram.setUniform("vibeStrength", 0.5f)
+            shaderProgram.setUniform("emitColor", Vector3f(0f))
+            currentMeshes.forEach { it.renderInstanced(shaderProgram, army.size) }
         }
     }
 
@@ -64,11 +85,18 @@ class Player : Transformable(), GameObject {
         renderable.render(shaderProgram)
         bongoLeft.render(shaderProgram)
         bongoRight.render(shaderProgram)
-        army.forEach { it.render(shaderProgram) }
+        renderInstancedArmy(shaderProgram)
     }
 
     override fun update(dt: Float, beat: Float) {
         renderable = getPose(color, pose)
+
+        if( beat.toInt()%2 == 0){
+            currentMeshes = meshLeft2
+        }
+        else{
+            currentMeshes = meshRight2
+        }
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
@@ -100,6 +128,10 @@ class Player : Transformable(), GameObject {
             ?: throw Exception("Could not load left Player model")
         private val meshRight = ModelLoader.loadModel("assets/models/duck/duckPoseRight.obj",0f,PI.toFloat(),0f)?.meshes
             ?: throw Exception("Could not load right Player model")
+        private val meshRight2 = ModelLoader.loadModel("assets/models/duck/duckPoseRight.obj",0f,PI.toFloat(),0f)?.meshes
+            ?: throw Exception("Could not load right Player model")
+        private val meshLeft2 = ModelLoader.loadModel("assets/models/duck/duckPoseLeft.obj",0f, PI.toFloat(),0f)?.meshes
+            ?: throw Exception("Could not load left Player model")
         private val meshWide = ModelLoader.loadModel("assets/models/duck/duckPoseWide.obj",0f,PI.toFloat(),0f)?.meshes
             ?: throw Exception("Could not load right Player model")
         private val meshNeutral = ModelLoader.loadModel("assets/models/duck/duckPoseNeutral.obj",0f,PI.toFloat(),0f)?.meshes
