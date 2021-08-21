@@ -1,24 +1,24 @@
 package cga.exercise.game
 
 import cga.exercise.components.camera.TronCamera
-import cga.exercise.components.geometry.DepthMap
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.geometry.Mesh
 import cga.exercise.components.geometry.Quad
 import cga.exercise.components.light.PointLight
 import cga.exercise.components.light.SpotLight
 import cga.exercise.components.shader.*
-import cga.exercise.components.shader.DepthShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
+import cga.exercise.components.texture.DepthCubemap
+import cga.exercise.components.texture.DepthMap
 import cga.exercise.components.texture.Skybox
 import cga.exercise.game.environment.Environment
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
+import cga.exercise.game.gameObjects.note.NoteKey
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
 import cga.exercise.game.level.Level
-import cga.exercise.game.gameObjects.note.NoteKey
 import cga.framework.GLError
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
@@ -28,7 +28,6 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL33.*
-import kotlin.collections.ArrayList
 
 
 /**
@@ -45,6 +44,8 @@ class Scene(val window: GameWindow) {
     val sun: Sun
     private val depthMap: DepthMap = DepthMap()
     private val depthShader = DepthShader(depthMap)
+    private val depthCubeMap = DepthCubemap()
+    private val depthCubeShader = DepthCubeShader(depthCubeMap)
 
     //Deferred Shading Stuff
     private val gBuffer = GeometryBuffer(window)
@@ -64,6 +65,7 @@ class Scene(val window: GameWindow) {
     //Convenience
     private val width = window.windowWidth
     private val height = window.windowHeight
+    private val fpsLogger = FPSLogger()
 
     init {
         //initial opengl state
@@ -141,17 +143,12 @@ class Scene(val window: GameWindow) {
 
     //RENDERING
 
-    var rendStart: Long = 0L
     fun render(dt: Float, t: Float) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         deferredRender(dt, t)
-        rendStart= System.nanoTime()
         renderSkybox()
-        skyboxTime += (System.nanoTime() - rendStart)
-        SoundListener.setPosition(camera)
         GLError.checkThrow()
-        logFps()
-
+        fpsLogger.logFps()
     }
 
     private fun renderSkybox() {
@@ -167,6 +164,7 @@ class Scene(val window: GameWindow) {
         skybox.render()
         //restore depth function
         glDepthFunc(GL_LESS)
+        fpsLogger.logSkyBox()
     }
 
     private fun deferredRender(dt: Float, t: Float) {
@@ -174,17 +172,18 @@ class Scene(val window: GameWindow) {
         gBuffer.startFrame()
         GLError.checkThrow()
 
-        rendStart = System.nanoTime()
+        fpsLogger.resetTimer()
         geometryPass(dt, beat)
-        geometryTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+        fpsLogger.logGeometryPass();
         ambientPass()
-        ambientTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+        fpsLogger.logAmbientPass()
 
         spotLights.forEach {
             depthShader.pass(it, this, beat)
             spotLightPass(it) // todo second pass for mountain lights
         }
-        spotLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+
+        fpsLogger.logSpotLightPass()
 
         val viewLocal = camera.getCalculateViewMatrix()
         val projectionLocal = camera.getCalculateProjectionMatrix()
@@ -192,11 +191,11 @@ class Scene(val window: GameWindow) {
         glEnable(GL_STENCIL_TEST)
         pointLights.forEach {
             stencilPass(it, viewLocal, projectionLocal)
+            depthCubeShader.pass(it,this,beat)
             pointLightPass(it, viewLocal, projectionLocal)
         }
 
-        pointLightTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
-
+        fpsLogger.logPointLightPass()
         glDisable(GL_STENCIL_TEST)
 
 
@@ -204,7 +203,7 @@ class Scene(val window: GameWindow) {
         GLError.checkThrow()
 
         finalPass()
-        finalPassTime += (System.nanoTime()-rendStart); rendStart= System.nanoTime()
+        fpsLogger.logFinalPass()
         GLError.checkThrow()
     }
 
@@ -295,6 +294,13 @@ class Scene(val window: GameWindow) {
         //upload world view projection matrix to shader for correct sphere rendering
         pointLightShader.setUniform("wvp", wvp)
         pointLight.bind(pointLightShader, viewLocal)
+
+        // bind all the uniforms for shading
+        // pointLightShader.setUniform("LightProjectionViewMatrix", pointLight.calcPVMatrixArray(depthCubeMap.aspect))
+        pointLightShader.setUniform("farPlane", pointLight.farPlane)
+        glActiveTexture(GL_TEXTURE6)
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap.texture)
+
         //render the sphere without any materials, it's just to kick off the fragment shader
         sphereMesh.renderWOMat()
         //Light.bindAmount(lightingPassShader)
@@ -346,36 +352,6 @@ class Scene(val window: GameWindow) {
         return Matrix4f(projection).mul(view).mul(model)
     }
 
-    //Framerate calculation
-    private var startTime = System.nanoTime()
-    private var frames = 0
-    private var geometryTime = 0L
-    private var ambientTime = 0L
-    private var spotLightTime = 0L
-    private var pointLightTime = 0L
-    private var finalPassTime = 0L
-    private var skyboxTime = 0L
-    private fun logFps(){
-        frames++
-        if(System.nanoTime() - startTime >= 1000000000) {
-            println("=======================")
-            println("FPSCounter: fps $frames")
-            println("avg geometry Pass:   ${geometryTime/frames}")
-            println("avg ambient Pass:    ${ambientTime/frames}")
-            println("avg spotlight Pass:  ${spotLightTime/frames}")
-            println("avg pointLight Pass: ${pointLightTime/frames}")
-            println("avg final PassTime:  ${finalPassTime/frames}")
-            println("avg skybox PassTime: ${skyboxTime/frames}")
-            frames = 0
-            startTime = System.nanoTime()
-            geometryTime = 0
-            skyboxTime= 0
-            ambientTime = 0
-            pointLightTime = 0
-            spotLightTime = 0
-            finalPassTime = 0
-        }
-    }
 
 
     //GAME LOGIC
@@ -383,6 +359,7 @@ class Scene(val window: GameWindow) {
     fun update(dt: Float, t: Float) {
         val beat = level.beatsPerSeconds * t
         camera.update(dt,t)
+        SoundListener.setPosition(camera)
         gameObjects.forEach{
             it.processInput(window, dt)
             it.update(dt, beat)
@@ -453,6 +430,7 @@ class Scene(val window: GameWindow) {
     }
 
     fun cleanup() {
+        level.cleanup()
         SoundContext.cleanup()
     }
 }

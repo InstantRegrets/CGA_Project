@@ -48,8 +48,15 @@ void makeTriangle(int index1, int index2){
 
 
 void main(){
-    setupMiddle();
-    makeTriangle(0,1);
-    makeTriangle(1,2);
-    makeTriangle(2,0);
+    if(pulseStrength > 0){
+        setupMiddle();
+        makeTriangle(0,1);
+        makeTriangle(1,2);
+        makeTriangle(2,0);
+    } else {
+        makeVertex(0);
+        makeVertex(1);
+        makeVertex(2);
+        EndPrimitive();
+    }
 }

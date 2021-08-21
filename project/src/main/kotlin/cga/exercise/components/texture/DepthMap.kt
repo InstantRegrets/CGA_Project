@@ -1,4 +1,4 @@
-package cga.exercise.components.geometry
+package cga.exercise.components.texture
 
 import cga.framework.Quality
 import cga.framework.quality

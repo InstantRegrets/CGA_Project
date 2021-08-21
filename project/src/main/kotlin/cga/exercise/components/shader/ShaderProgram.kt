@@ -79,6 +79,12 @@ open class ShaderProgram(vertexShaderPath: String, fragmentShaderPath: String, g
     fun setUniform(name: String, value: Vector3f) =
         setUniform(name){ glUniform3f(it, value.x, value.y, value.z) }
 
+    fun setUniform(name: String, value: Array<Matrix4f>) {
+        for ((index, m) in value.withIndex()){
+            setUniform("${name}[${index}]", m)
+        }
+    }
+
     private fun createShader(shaderType: Int, shaderPath: String): Int {
         val source = File(shaderPath).readText()
         val shader = glCreateShader(shaderType)

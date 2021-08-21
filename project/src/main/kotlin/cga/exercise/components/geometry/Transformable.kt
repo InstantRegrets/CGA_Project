@@ -2,6 +2,7 @@ package cga.exercise.components.geometry
 
 import org.joml.Matrix4f
 import org.joml.Vector3f
+import org.joml.Vector4f
 
 open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Transformable? = null) {
 
@@ -93,6 +94,10 @@ open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Tra
     fun getWorldPosition(): Vector3f {
             val mm = getWorldModelMatrix()
             return Vector3f(mm.m30(), mm.m31(), mm.m32())
+    }
+    fun getWorldPosition4f(): Vector4f {
+        val mm = getWorldModelMatrix()
+        return Vector4f(mm.m30(), mm.m31(), mm.m32(),mm.m33())
     }
 
     /**
