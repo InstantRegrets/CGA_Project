@@ -56,8 +56,7 @@ class Level: GameObject {
         val db = beatsPerSeconds * dt
         for (n in visibleNotes){
             if(n.data.beat < beat - 0.2f) {
-                println(beat)
-                println("missed ${n.data.key} Note on beat ${n.data.beat} at $beat")
+                scoring.fail()
             } else {
                 n.update(db,beat)
             }
@@ -98,7 +97,6 @@ class Level: GameObject {
                 scoring.score(score)
                 visibleNotes.remove(n)
             }else {
-                println("wrong note")
                 scoring.fail()
                 visibleNotes.remove(n)
             }
@@ -109,6 +107,7 @@ class Level: GameObject {
     }
 
     fun cleanup(){
+        scoring.printScore()
         song.cleanup()
     }
 
