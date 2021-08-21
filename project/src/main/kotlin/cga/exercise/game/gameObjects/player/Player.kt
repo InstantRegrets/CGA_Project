@@ -72,7 +72,7 @@ class Player : Transformable(), GameObject {
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
-        if (window.getKeyState(GLFW_KEY_D) && window.getKeyState(GLFW_KEY_A)) {
+        if (window.getKeyState(GLFW_KEY_D) && window.getKeyState(GLFW_KEY_A) || window.getKeyState(GLFW_KEY_S)) {
             pose = Pose.Wide
             bongoRight.emitColor.set(0f,0f,1f)
             bongoLeft.emitColor.set(1f,0f,0f)

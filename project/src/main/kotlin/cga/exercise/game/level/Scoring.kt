@@ -38,6 +38,7 @@ class Scoring {
         " POTG: RED NOTE ",
         "     WASTED     ",
         "      FAIL      ",
+        "     UNLUCKY    "
     )
 
     init {
