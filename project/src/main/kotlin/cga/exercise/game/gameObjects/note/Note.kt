@@ -25,11 +25,11 @@ class Note(
 
     init {
         if (data.key == NoteKey.Left) {
-            color = Vector3f(0f ,0f,1f)
+            color = Vector3f(1f ,0f,0f)
             startPosition = Vector3f(1.55f,0.2f,27f)
             direction = Vector3f(7f,0f,10f)
         } else {
-            color = Vector3f(1f ,0f,0f)
+            color = Vector3f(0f ,0f,1f)
             startPosition = Vector3f(18.15f,0.2f,27f)
             direction = Vector3f(-7f,0f,10f)
         }

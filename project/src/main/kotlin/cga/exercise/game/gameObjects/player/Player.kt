@@ -72,10 +72,24 @@ class Player : Transformable(), GameObject {
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
-        if (window.getKeyState(GLFW_KEY_D) && window.getKeyState(GLFW_KEY_A)) pose = Pose.Wide
-        else if (window.getKeyState(GLFW_KEY_D)) pose = Pose.Right
-        else if(window.getKeyState(GLFW_KEY_A)) pose = Pose.Left
-        else pose = Pose.Neutral
+        if (window.getKeyState(GLFW_KEY_D) && window.getKeyState(GLFW_KEY_A)) {
+            pose = Pose.Wide
+            bongoRight.emitColor.set(0f,0f,1f)
+            bongoLeft.emitColor.set(1f,0f,0f)
+        }
+        else if (window.getKeyState(GLFW_KEY_D)) {
+            pose = Pose.Right
+            bongoRight.emitColor.set(0f,0f,1f)
+        }
+        else if(window.getKeyState(GLFW_KEY_A)) {
+            pose = Pose.Left
+            bongoLeft.emitColor.set(1f,0f,0f)
+        }
+        else {
+            pose = Pose.Neutral
+            bongoRight.emitColor.set(0.25f)
+            bongoLeft.emitColor.set(0.25f)
+        }
     }
 
     override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) { }

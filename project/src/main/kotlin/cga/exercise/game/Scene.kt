@@ -402,10 +402,10 @@ class Scene(val window: GameWindow) {
     }
 
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
-        if (key == GLFW_KEY_F && action == 1) {
+        if (key == GLFW_KEY_A && action == 1) {
             level.onKey(NoteKey.Left)
         }
-        if (key == GLFW_KEY_J && action == 1) {
+        if (key == GLFW_KEY_D && action == 1) {
             level.onKey(NoteKey.Right)
         }
     }

@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 class FPSLogger{
     //Framerate calculation
-    val printOut = true
+    val printOut = false
     private var startTime = System.nanoTime()
     private var timer: Long = 0L
     private var frames = 0

@@ -89,8 +89,22 @@ class Level: GameObject {
         visibleNotes.forEach { it.switchPhase(phase) }
     }
 
+    fun checkKeyPress(n: Note, key: NoteKey){
+        if( beat - 0.4f < n.data.beat  && n.data.beat < beat + 0.52){
+            if (key == n.data.key){
+                val score = 1 - abs(beat - n.data.beat)
+                scoring.score(score)
+                visibleNotes.remove(n)
+            }else {
+                scoring.fail()
+                visibleNotes.remove(n)
+            }
+        }
+    }
+
     fun onKey(key: NoteKey) {
         val n = visibleNotes.firstOrNull() ?: return
+        // todo allow for 2 notes at once
         if( beat - 0.4f < n.data.beat  && n.data.beat < beat + 0.52){
             if (key == n.data.key){
                 val score = 1 - abs(beat - n.data.beat)
