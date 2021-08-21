@@ -3,6 +3,7 @@ package cga.exercise.game.gameObjects.orb
 import cga.exercise.components.geometry.Renderable
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.light.PointLight
+import cga.exercise.components.shader.DepthCubeShader
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.CustomModel
 import cga.exercise.game.gameObjects.GameObject
@@ -28,9 +29,9 @@ class Orb:Transformable(), GameObject {
     private val baseColor = Random.nextColor()
     private val color = Vector3f(baseColor)
     private val encRend = Renderable(encMeshes,parent = this, emitColor = Vector3f(baseColor).mul(0.4f), pulseStrength = 0.0f)
-    private val rend1 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.2f)
-    private val rend2 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.2f)
-    private val rend3 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.2f)
+    private val rend1 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.0f)
+    private val rend2 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.0f)
+    private val rend3 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.0f)
     private val renderables = arrayOf(rend1,rend2,rend3)
     private val rend1Axis = Vector3f(0f,0f,-1f)
     private val rend2Axis = Vector3f(1f,0f,0f)
@@ -38,7 +39,7 @@ class Orb:Transformable(), GameObject {
     private val encRendAxis = Vector3f(0f,-1f,0f)
 
 
-    val light = PointLight(color, Vector3f(1f, 0.8f, 1.0f))
+    val light = PointLight(color, Vector3f(1f, 0.8f, 0.8f),0f)
     val direction = Random.nextVec3(-2f*PI.toFloat(), 2f* PI.toFloat())
     var basespeed = 0.5f
     var jumpSpeed = 0.0f
@@ -50,13 +51,15 @@ class Orb:Transformable(), GameObject {
         rend2.translateLocal(Vector3f(0f,2f,0f))
         rend3.translateLocal(Vector3f(0f,0f,3f))
         light.parent = this
-        translateLocal(Vector3f(0f,Random.nextFloat(8f,15f),0f)) // minimum camera offset
+        translateLocal(Vector3f(0f,Random.nextFloat(4f,5f),0f)) // minimum camera offset
     }
 
     override fun draw(shaderProgram: ShaderProgram) {
         encRend.render(shaderProgram)
-        for (r in renderables){
-            r.render(shaderProgram)
+        if(shaderProgram !is DepthCubeShader){
+            for (r in renderables){
+                r.render(shaderProgram)
+            }
         }
     }
 
@@ -103,15 +106,12 @@ class Orb:Transformable(), GameObject {
             Phase.Day -> {
                 basespeed = 0.4f
                 jumpSpeed = 0f
-                renderables.forEach { it.pulseStrength = Random.nextFloat(0.02f) }
             }
             Phase.Night -> {
                 basespeed = 0.3f
                 jumpSpeed = 0f
-                renderables.forEach { it.pulseStrength = Random.nextFloat(0.1f) }
             }
             Phase.Chaos -> {
-                renderables.forEach { it.pulseStrength = Random.nextFloat(0.1f,0.2f) }
                 basespeed = 1f
                 jumpSpeed = 0.5f
             }

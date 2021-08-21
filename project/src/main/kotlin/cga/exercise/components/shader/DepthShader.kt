@@ -1,9 +1,10 @@
 package cga.exercise.components.shader
 
-import cga.exercise.components.geometry.DepthMap
+import cga.exercise.components.texture.DepthMap
 import cga.exercise.components.light.SpotLight
 import cga.exercise.game.Scene
-import cga.exercise.game.gameObjects.GameObject
+import org.joml.Vector3f
+import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL33.*
 
 class DepthShader(val depthMap: DepthMap) : ShaderProgram(

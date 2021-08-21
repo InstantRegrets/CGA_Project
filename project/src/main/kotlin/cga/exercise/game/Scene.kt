@@ -1,24 +1,24 @@
 package cga.exercise.game
 
 import cga.exercise.components.camera.TronCamera
-import cga.exercise.components.geometry.DepthMap
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.geometry.Mesh
 import cga.exercise.components.geometry.Quad
 import cga.exercise.components.light.PointLight
 import cga.exercise.components.light.SpotLight
 import cga.exercise.components.shader.*
-import cga.exercise.components.shader.DepthShader
 import cga.exercise.components.sound.SoundContext
 import cga.exercise.components.sound.SoundListener
+import cga.exercise.components.texture.DepthCubemap
+import cga.exercise.components.texture.DepthMap
 import cga.exercise.components.texture.Skybox
 import cga.exercise.game.environment.Environment
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
+import cga.exercise.game.gameObjects.note.NoteKey
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
 import cga.exercise.game.level.Level
-import cga.exercise.game.gameObjects.note.NoteKey
 import cga.framework.GLError
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
@@ -27,7 +27,6 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL33.*
-import kotlin.collections.ArrayList
 
 
 /**
@@ -43,6 +42,8 @@ class Scene(val window: GameWindow) {
     val sun: Sun
     private val depthMap: DepthMap = DepthMap()
     private val depthShader = DepthShader(depthMap)
+    private val depthCubeMap = DepthCubemap()
+    private val depthCubeShader = DepthCubeShader(depthCubeMap)
 
     //Deferred Shading Stuff
     private val gBuffer = GeometryBuffer(window)
@@ -170,6 +171,7 @@ class Scene(val window: GameWindow) {
         glEnable(GL_STENCIL_TEST)
         pointLights.forEach {
             stencilPass(it, viewLocal, projectionLocal)
+            depthCubeShader.pass(it,this,beat)
             pointLightPass(it, viewLocal, projectionLocal)
         }
 
@@ -267,6 +269,13 @@ class Scene(val window: GameWindow) {
         //upload world view projection matrix to shader for correct sphere rendering
         pointLightShader.setUniform("wvp", wvp)
         pointLight.bind(pointLightShader, viewLocal)
+
+        // bind all the uniforms for shading
+        // pointLightShader.setUniform("LightProjectionViewMatrix", pointLight.calcPVMatrixArray(depthCubeMap.aspect))
+        pointLightShader.setUniform("farPlane", pointLight.farPlane)
+        glActiveTexture(GL_TEXTURE6)
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap.texture)
+
         //render the sphere without any materials, it's just to kick off the fragment shader
         sphereMesh.renderWOMat()
         //Light.bindAmount(lightingPassShader)

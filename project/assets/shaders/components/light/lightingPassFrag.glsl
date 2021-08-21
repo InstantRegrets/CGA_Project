@@ -4,7 +4,7 @@ uniform sampler2D inPosition; //Frag Pos
 uniform sampler2D inNormal;
 uniform sampler2D inDiffuse;
 uniform sampler2D inSpecular;
-
+uniform samplerCube shadowMap;
 
 vec2 textureCoordinates;
 
@@ -23,13 +23,26 @@ uniform PointLightData plData;
 
 
 vec3 diffMaterial, specularMaterial;
-vec4 fragPosLightSpace;
 uniform float shininess;
+uniform float farPlane;
 
 void loadMaterial(){
     //emitMaterial = texture(inEmissive, textureCoordinates).rgb;
     diffMaterial = texture(inDiffuse, textureCoordinates).rgb;
     specularMaterial = texture(inSpecular, textureCoordinates).rgb;
+}
+
+float ShadowCalculation(vec3 normal, vec3 fragPos) {
+    vec3 fragToLight =  fragPos - plData.lightPos; //vec4(fragPos,1)) - (inverse(CameraViewMatrix)* vec4(plData.lightPos,1))).xyz;
+    float closestDepth = texture(shadowMap, fragToLight).r;
+    closestDepth *= farPlane;
+    // get depth of current fragment from light's perspective
+    float currentDepth = length(fragToLight);
+
+    // now test for shadows
+    float bias = 0.05;
+    float shadow = currentDepth -bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
 }
 
 // Lighting functions
@@ -58,8 +71,9 @@ void pointLight(in vec3 pToCamera, in vec3 N, in vec3 fragPos, inout vec3 o){
 
     float distance = length(plData.lightPos - fragPos);
     float attenuation = calcAttenuation(plData.attenuation, distance);
-    o += diffuse(N, toLight, plData.color)*attenuation;
-    o += specularBlinn(N, toLight, toCamera, plData.color)*attenuation;
+    vec3 diff = diffuse(N, toLight, plData.color)*attenuation;
+    vec3 spec = specularBlinn(N, toLight, toCamera, plData.color)*attenuation;
+    o += (diff + spec) * (1.0-ShadowCalculation(N, fragPos));
 }
 
 out vec4 FragColor;

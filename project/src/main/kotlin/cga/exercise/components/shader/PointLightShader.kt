@@ -13,6 +13,7 @@ class PointLightShader:ShaderProgram(
         setUniform("inDiffuse", 2)
         setUniform("inSpecular", 3)
         //setUniform("inEmissive", 4)
+        setUniform("shadowMap",6)
         setUniform("shininess", 64f)
         setUniform("screenSize", Vector2f(width, height))
     }
