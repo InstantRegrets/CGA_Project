@@ -101,7 +101,7 @@ class Scene(val window: GameWindow) {
         //Game Object creation
         sun = Sun(level.song.length)
         orbs.addAll(
-            Orb.createOrbs(2, player)
+            Orb.createOrbs(20, player)
         )
         gameObjects.addAll(
             listOf(
@@ -219,11 +219,6 @@ class Scene(val window: GameWindow) {
         //Draw everything into gBuffer
         gameObjects.forEach { it.draw(geometryPassShader) }
 
-        //geometryPassShader.setUniform("view_matrix", camera.getCalculateViewMatrix())
-        //geometryPassShader.setUniform("projection_matrix", camera.getCalculateProjectionMatrix())
-        //geometryPassShader.setUniform("model_matrix", Matrix4f())
-        //orbActualMesh.renderInstanced(geometryPassShader, 11)
-
         glDepthMask(false)
         GLError.checkThrow("Geometry Pass")
     }
@@ -293,7 +288,7 @@ class Scene(val window: GameWindow) {
         glDisable(GL_BLEND)
     }
 
-    fun ambientPass() {
+    private fun ambientPass() {
         glEnable(GL_BLEND) //need to blend the volumes over one another
         glBlendEquation(GL_FUNC_ADD) //just straight up adding this, no calc required
         glBlendFunc(GL_ONE, GL_ONE) //equal rights for every pointLight!

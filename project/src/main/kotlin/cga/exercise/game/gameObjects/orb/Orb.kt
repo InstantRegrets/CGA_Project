@@ -41,7 +41,7 @@ class Orb:Transformable(), GameObject {
     private val encRendAxis = Vector3f(0f,-1f,0f)
 
 
-    val light = PointLight(color, Vector3f(1f, 0.1f, 0.1f),0.1f)
+    val light = PointLight(color, Vector3f(1f, 0.22f, 0.20f),0.1f)
     val direction = Random.nextVec3(-2f*PI.toFloat(), 2f* PI.toFloat())
     var basespeed = 0.5f
     var jumpSpeed = 0.0f
@@ -85,7 +85,6 @@ class Orb:Transformable(), GameObject {
         rend1.rotateGlobalAxis(8*dt + 8f * basespeed*dt, rend1Axis)
         rend2.rotateGlobalAxis(8*dt + 6f* basespeed*dt, rend2Axis)
         rend3.rotateGlobalAxis(8*dt + 4f* basespeed*dt, rend3Axis)
-
         val colorStrength = 0.4f*sin((2f*PI.toFloat()*(beat-0.5f)-0.5f* PI.toFloat()))+0.6f
         // baseColor.mul(colorStrength,color)
     }

@@ -3,6 +3,8 @@ package cga.exercise.game.gameObjects.player
 import cga.exercise.components.geometry.Renderable
 import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.light.PointLight
+import cga.exercise.components.shader.DepthCubeShader
+import cga.exercise.components.shader.DepthShader
 import cga.exercise.components.shader.GeometryShader
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
@@ -29,7 +31,7 @@ class Player : Transformable(), GameObject {
         }
         bongoLeft.parent = renderableNeutral
         bongoRight.parent = renderableNeutral
-        translateLocal(Vector3f(9.8f,-4.3f,38f))
+        translateLocal(Vector3f(10f,-4.3f,38f))
         scaleLocal(Vector3f(0.75f))
     }
 
@@ -43,18 +45,21 @@ class Player : Transformable(), GameObject {
                 playerModels.forEach{it.pulseStrength = 0.0f}
             }
             Phase.Chaos -> {
-                playerModels.forEach{it.pulseStrength = 0.3f}
+                playerModels.forEach{it.pulseStrength = 0.2f}
                 createArmy()
             }
         }
     }
     fun createArmy(){
-        for(i in -50..50) {
-            for (j in -50..50) {
-                val p = Transformable()
-                p.translateLocal(Vector3f(5f*i.toFloat(), 0f, 5f*j.toFloat()))
-                p.translateLocal(Vector3f(0f,2f,0f))
-                army.add(p)
+        for(i in (-4..4)) {
+            for (j in (-4..4)) {
+                if (i == 0 && j == 0){}
+                else {
+                    val p = Transformable()
+                    p.translateLocal(Vector3f(5.5f * i.toFloat(), 0f, 5.5f * j.toFloat()))
+                    p.translateLocal(Vector3f(0f, -2.2f, 0f))
+                    army.add(p)
+                }
             }
         }
         val offsets = arrayListOf<Vector3f>()
@@ -66,13 +71,18 @@ class Player : Transformable(), GameObject {
     }
     var currentMeshes = meshLeft2
     fun renderInstancedArmy(shaderProgram: ShaderProgram) {
-        if (shaderProgram is GeometryShader) {
+        if (shaderProgram is GeometryShader
+            //|| shaderProgram is DepthCubeShader
+            || shaderProgram is DepthShader
+        ) {
             val mm = getWorldModelMatrix().scale(0.5f)
             val pulseStrength = 0.00f
             shaderProgram.setUniform("model_matrix", mm)
             shaderProgram.setUniform("pulseStrength", pulseStrength)
-            shaderProgram.setUniform("vibeStrength", 0.5f)
-            shaderProgram.setUniform("emitColor", Vector3f(0f))
+            if (shaderProgram is GeometryShader) {
+                shaderProgram.setUniform("vibeStrength", 0.5f)
+                shaderProgram.setUniform("emitColor", Vector3f(0f))
+            }
             currentMeshes.forEach { it.renderInstanced(shaderProgram, army.size) }
         }
     }

@@ -27,15 +27,17 @@ class PointLight(
         shaderProgram.setUniform("${structName}color", color)
         shaderProgram.setUniform("${structName}attenuation", attenuation)
     }
+
     // todo fix calcBoundingSphere
-    fun calcBoundingSphere(): Float{
+    fun calcBoundingSphere(): Float {
         val constant = attenuation.x
         val linear = attenuation.y
         val exp = attenuation.z
         val maxChannel = maxOf(color.x, color.y, color.z)
-        val ret = (-linear + sqrt(linear*linear - 4 * exp * (constant - 256/5 * maxChannel * intensity)))/
-                2 * exp
-        return ret*300
+        //(-linear +  std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * lightMax)))
+        //  / (2 * quadratic);
+        return ((-linear + sqrt(linear * linear - 4 * exp * (exp - (256f / 1f) * maxChannel))) /
+                2 * exp)*10
     }
 
     private val cameraViewMatrix4f = Matrix4f()
