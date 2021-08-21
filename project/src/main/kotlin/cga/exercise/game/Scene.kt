@@ -16,7 +16,6 @@ import cga.exercise.game.environment.Environment
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
 import cga.exercise.game.gameObjects.note.HitKey
-import cga.exercise.game.gameObjects.note.NoteKey
 import cga.exercise.game.gameObjects.orb.Orb
 import cga.exercise.game.gameObjects.player.Player
 import cga.exercise.game.level.Level
@@ -82,7 +81,7 @@ class Scene(val window: GameWindow) {
         spotLightShader = SpotLightShader()
 
         // CAMERA
-        camera = TronCamera()
+        camera = TronCamera(camTarget = player)
         camera.translateLocal(Vector3f(0f,10f,0f))
         camera.parent = player
 

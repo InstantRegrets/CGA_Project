@@ -12,11 +12,11 @@ class TronCamera(
     private val aspectRatio: Float = 16f / 9f,
     private val nearPlane: Float = 0.1f,
     private val farPlane: Float = 3000f,
-    parent: Transformable = Transformable()
+    parent: Transformable = Transformable(),
+    val camTarget: Transformable = Transformable()
 ): Transformable(parent = parent), ICamera {
     var viewMatrix: Matrix4f = Matrix4f()
     var i = 0
-    val camTarget = getWorldZAxis()
     private var shake = 0f
     private var transitionDuration = 0f
     private var transitionStartTime = 0f
@@ -29,9 +29,9 @@ class TronCamera(
         val up = getWorldYAxis()
         val cameraPosition = getWorldPosition()
         val cameraTarget = Vector3f(0f,0f,0f)
-        cameraPosition.sub(camTarget, cameraTarget)
-        //cameraTarget.normalize()
-        //cameraTarget.add(Random.nextVec3(-0.01f,0.02f).mul(shake))
+        cameraPosition.sub(camTarget.getWorldPosition(), cameraTarget)
+        cameraTarget.normalize()
+        cameraTarget.add(Random.nextVec3(-0.4f,0.4f).mul(shake))
         viewMatrix = Matrix4f().lookAt(cameraPosition, cameraTarget, up)
 
         return viewMatrix
@@ -66,18 +66,19 @@ class TronCamera(
     fun switchPhase(phase: Phase, beat: Float){
         when(phase){
             Phase.Day -> {
-                transitionPos.set(Vector3f(0f))
+                transitionPos.set(Vector3f(-2f,5f,7f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 4f
+                shake = 0.3f
             }
             Phase.Night -> {
-                transitionPos.set(Vector3f(0f))
+                transitionPos.set(Vector3f(2f,5f,7f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
 
             }
             Phase.Chaos -> {
-                transitionPos.set(Vector3f(0f))
+                transitionPos.set(Vector3f(0f,5f,8f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
                 shake = 1.0f

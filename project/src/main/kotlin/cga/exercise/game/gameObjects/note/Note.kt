@@ -27,11 +27,11 @@ class Note(
         if (data.key == NoteKey.Left) {
             color = Vector3f(1f ,0f,0f)
             startPosition = Vector3f(1.55f,0.2f,27f)
-            direction = Vector3f(7f,0f,10f)
+            direction = Vector3f(7.5f,0f,10.5f)
         } else {
             color = Vector3f(0f ,0f,1f)
             startPosition = Vector3f(18.15f,0.2f,27f)
-            direction = Vector3f(-7f,0f,10f)
+            direction = Vector3f(-7.5f,0f,10.5f)
         }
         translateLocal(startPosition)
         renderable.emitColor = color

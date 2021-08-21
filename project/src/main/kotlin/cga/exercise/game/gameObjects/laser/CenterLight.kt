@@ -8,7 +8,7 @@ class CenterLight(left: Boolean) : Laser(){
     val site = if (left) -1.0f else 1.0f
     var rotation = 0f
     init {
-        translateLocal(Vector3f(site*400,1000f,-1028f))
+        translateLocal(Vector3f(site*350,1000f,-1028f))
     }
 
     override fun updatePos(dt: Float, beat: Float) {

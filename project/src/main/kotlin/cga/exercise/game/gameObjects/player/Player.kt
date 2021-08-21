@@ -38,14 +38,21 @@ class Player : Transformable(), GameObject {
     override fun switchPhase(phase: Phase) {
         when(phase){
             Phase.Day -> {
-                playerModels.forEach{it.pulseStrength = 0.05f}
+                playerModels.forEach{it.pulseStrength = 0.07f}
+                bongoLeft.pulseStrength = 0.07f
+                bongoRight.pulseStrength = 0.07f
                 army.clear()
             }
             Phase.Night -> {
                 playerModels.forEach{it.pulseStrength = 0.0f}
+                bongoLeft.pulseStrength = 0.00f
+                bongoRight.pulseStrength = 0.00f
+                army.clear()
             }
             Phase.Chaos -> {
                 playerModels.forEach{it.pulseStrength = 0.2f}
+                bongoLeft.pulseStrength = 0.15f
+                bongoRight.pulseStrength = 0.15f
                 createArmy()
             }
         }

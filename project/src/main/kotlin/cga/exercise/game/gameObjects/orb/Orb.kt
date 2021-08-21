@@ -30,7 +30,7 @@ class Orb:Transformable(), GameObject {
     }
     private val baseColor = Random.nextColor()
     private val color = Vector3f(baseColor)
-    private val encRend = Renderable(encMeshes,parent = this, emitColor = Vector3f(baseColor).mul(0.4f), pulseStrength = 0.0f)
+    private val encRend = Renderable(encMeshes,parent = this, emitColor = Vector3f(baseColor).mul(0.3f), pulseStrength = 0.0f)
     private val rend1 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.0f)
     private val rend2 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.0f)
     private val rend3 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.0f)
@@ -85,8 +85,8 @@ class Orb:Transformable(), GameObject {
         rend1.rotateGlobalAxis(8*dt + 8f * basespeed*dt, rend1Axis)
         rend2.rotateGlobalAxis(8*dt + 6f* basespeed*dt, rend2Axis)
         rend3.rotateGlobalAxis(8*dt + 4f* basespeed*dt, rend3Axis)
-        val colorStrength = 0.4f*sin((2f*PI.toFloat()*(beat-0.5f)-0.5f* PI.toFloat()))+0.6f
-        // baseColor.mul(colorStrength,color)
+        val colorStrength = 0.3f*sin((2f*PI.toFloat()*(beat-0.5f)-0.5f* PI.toFloat()))+0.7f
+        baseColor.mul(colorStrength,color)
     }
 
     private fun dir(float: Float): Float {
@@ -113,7 +113,7 @@ class Orb:Transformable(), GameObject {
                 jumpSpeed = 0f
             }
             Phase.Chaos -> {
-                basespeed = 1f
+                basespeed = 0.6f
                 jumpSpeed = 0.5f
             }
         }

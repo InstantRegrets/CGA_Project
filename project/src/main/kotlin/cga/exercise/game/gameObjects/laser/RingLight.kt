@@ -8,7 +8,7 @@ class RingLight(left: Boolean) : Laser(){
     val site = if (left) -1.0f else 1.0f
     var rotation = 0f
     init {
-        translateLocal(Vector3f(0f, 1000f,-1028f))
+        translateLocal(Vector3f(0f, 700f,-1028f))
         rotateLocalAxis(0.25f*PI.toFloat()*site, Vector3f(0f,0f,1f))
     }
 
