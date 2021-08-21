@@ -5,4 +5,5 @@
 /project/.idea/
 /project/.gradle/
 /project/assets/levels/*/
+/project/assets/levels/select.txt
 !/project/assets/levels/map/
