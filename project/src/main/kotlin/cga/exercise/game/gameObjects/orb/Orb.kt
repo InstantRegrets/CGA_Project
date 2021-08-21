@@ -11,7 +11,6 @@ import cga.framework.GameWindow
 import cga.framework.Random
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import org.lwjgl.opengl.GL33.*
 import kotlin.math.*
 
 class Orb(pParent: Transformable?):Transformable(parent = pParent), GameObject {
@@ -28,7 +27,7 @@ class Orb(pParent: Transformable?):Transformable(parent = pParent), GameObject {
     }
     private val baseColor = Random.nextColor()
     private val color = Vector3f(baseColor)
-    private val wireFrameRend = Renderable(encMeshes,parent = this, emitColor = Vector3f(baseColor).mul(0.4f), pulseStrength = 0.0f)
+    private val encRend = Renderable(encMeshes,parent = this, emitColor = Vector3f(baseColor).mul(0.4f), pulseStrength = 0.0f)
     private val rend1 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.2f)
     private val rend2 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.2f)
     private val rend3 = Renderable(meshes,parent = this, emitColor = color, pulseStrength = 0.2f)
@@ -36,6 +35,7 @@ class Orb(pParent: Transformable?):Transformable(parent = pParent), GameObject {
     private val rend1Axis = Vector3f(0f,0f,-1f)
     private val rend2Axis = Vector3f(1f,0f,0f)
     private val rend3Axis = Vector3f(0f,-1f,0f)
+    private val encRendAxis = Vector3f(0f,-1f,0f)
 
 
     val light = PointLight(color, Vector3f(1f, 0.8f, 1.0f))
@@ -44,7 +44,7 @@ class Orb(pParent: Transformable?):Transformable(parent = pParent), GameObject {
     var jumpSpeed = 0.0f
 
     init {
-        wireFrameRend.scaleLocal(Vector3f(0.8f))
+        encRend.scaleLocal(Vector3f(0.8f))
         renderables.forEach { it.scaleLocal(Vector3f(0.2f)) }
         rend1.translateLocal(Vector3f(1f,0f,0f))
         rend2.translateLocal(Vector3f(0f,2f,0f))
@@ -54,7 +54,7 @@ class Orb(pParent: Transformable?):Transformable(parent = pParent), GameObject {
     }
 
     override fun draw(shaderProgram: ShaderProgram) {
-        wireFrameRend.render(shaderProgram)
+        encRend.render(shaderProgram)
         for (r in renderables){
             r.render(shaderProgram)
         }
@@ -68,6 +68,12 @@ class Orb(pParent: Transformable?):Transformable(parent = pParent), GameObject {
              direction.z * dt * speed,
              Vector3f(0f)
          )
+        direction.cross(Vector3f(0f,1f,0f),encRendAxis)
+        encRend.rotateLocal(
+            encRendAxis.x*dt*speed,
+            encRendAxis.y*dt*speed,
+            encRendAxis.z*dt*speed,
+        )
         direction.x = dir(direction.x)
         direction.y = dir(direction.y)
         direction.z = dir(direction.z)
