@@ -19,7 +19,7 @@ class Player : Transformable(), GameObject {
     var pose = Pose.Neutral
     var renderable: Renderable = getPose(color,pose)
     var army: ArrayList<Renderable> = arrayListOf()
-    enum class Pose { Right, Left, Neutral}
+    enum class Pose { Right, Left, Wide, Neutral}
 
     init {
         playerModels.forEach {
@@ -72,8 +72,9 @@ class Player : Transformable(), GameObject {
     }
 
     override fun processInput(window: GameWindow, dt: Float) {
-        if (window.getKeyState(GLFW_KEY_A)) pose = Pose.Left
+        if (window.getKeyState(GLFW_KEY_D) && window.getKeyState(GLFW_KEY_A)) pose = Pose.Wide
         else if (window.getKeyState(GLFW_KEY_D)) pose = Pose.Right
+        else if(window.getKeyState(GLFW_KEY_A)) pose = Pose.Left
         else pose = Pose.Neutral
     }
 
@@ -85,6 +86,8 @@ class Player : Transformable(), GameObject {
             ?: throw Exception("Could not load left Player model")
         private val meshRight = ModelLoader.loadModel("assets/models/duck/duckPoseRight.obj",0f,PI.toFloat(),0f)?.meshes
             ?: throw Exception("Could not load right Player model")
+        private val meshWide = ModelLoader.loadModel("assets/models/duck/duckPoseWide.obj",0f,PI.toFloat(),0f)?.meshes
+            ?: throw Exception("Could not load right Player model")
         private val meshNeutral = ModelLoader.loadModel("assets/models/duck/duckPoseNeutral.obj",0f,PI.toFloat(),0f)?.meshes
             ?: throw Exception("Could not load neutral Player model")
         val bongoLeft = ModelLoader.loadModel("assets/models/duck/bongo1.obj",0f,0f,0f)
@@ -94,8 +97,9 @@ class Player : Transformable(), GameObject {
 
         private val renderableLeft = Renderable(meshLeft)
         private val renderableRight = Renderable(meshRight)
+        private val renderableWide = Renderable(meshWide)
         private val renderableNeutral = Renderable(meshNeutral)
-        val playerModels = listOf(renderableLeft, renderableRight, renderableNeutral)
+        val playerModels = listOf(renderableLeft, renderableRight, renderableWide, renderableNeutral)
         init {
 
         }
@@ -104,6 +108,7 @@ class Player : Transformable(), GameObject {
             val r = when(pose) {
                 Pose.Left-> renderableLeft
                 Pose.Right-> renderableRight
+                Pose.Wide-> renderableWide
                 Pose.Neutral-> renderableNeutral
             }
             r.emitColor = color
