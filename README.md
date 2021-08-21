@@ -28,15 +28,17 @@ our spirit animal!
 - Light Volume implementation für Point Lights
 - Lichtshow durch Lasersystem
 - Shadowmapping der spotlights (Sonne und Laser)
-- iSkybox
+- Point Shadows
+- Instancing
+- Skybox Code
 - Camera Shake
 - Mehrere Phasen abhängig von der Musik
 - Geometry shader abhängig von der Musik
-- Animierte Orbs, die um den Spieler fliegen 
+- Animierte Orbs, die um den Spieler fliegen
 - Selbst modellierte(s)/colorierte(s):
   - Umgebung
   - Spielermodell
   - Notenmodell
 
-see [project README](project/REAMDE.md)
+see [project README](project/README.md)
 
