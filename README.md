@@ -40,5 +40,5 @@ our spirit animal!
   - Spielermodell
   - Notenmodell
 
-see [project README](project/REAMDE.md)
+see [project README](project/README.md)
 
