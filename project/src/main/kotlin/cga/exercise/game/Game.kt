@@ -7,7 +7,7 @@ import cga.framework.GameWindow
  */
 class Game(width: Int,
            height: Int,
-           fullscreen: Boolean = false,
+           fullscreen: Boolean = true,
            vsync: Boolean = true,
            title: String = "Cayuga",
            GLVersionMajor: Int = 3,
@@ -15,7 +15,7 @@ class Game(width: Int,
 
     private val scene: Scene
     init {
-        setCursorVisible(true)
+        setCursorVisible(false)
         scene = Scene(this)
     }
 
