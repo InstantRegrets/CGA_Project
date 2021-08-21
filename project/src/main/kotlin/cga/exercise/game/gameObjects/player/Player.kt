@@ -13,35 +13,40 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import kotlin.math.PI
-import kotlin.math.sin
 
 class Player : Transformable(), GameObject {
     var color = Random.nextColor()
     var pose = Pose.Neutral
     var renderable: Renderable = getPose(color,pose)
     val light = PointLight(color, Vector3f(1f, 0.7f, 1.8f))
-    var movementSpeed: Float = 8f
-    var rotationSpeed: Float = 6f
     var army: ArrayList<Renderable> = arrayListOf()
-
-
     enum class Pose { Right, Left, Neutral}
+
+    init {
+        playerModels.forEach {
+            it.parent = this
+        }
+        bongoLeft.parent = renderableNeutral
+        bongoRight.parent = renderableNeutral
+        translateLocal(Vector3f(9.8f,-4.3f,38f))
+        scaleLocal(Vector3f(0.75f))
+    }
 
     override fun switchPhase(phase: Phase) {
         when(phase){
             Phase.Day -> {
-                renderable.pulseStrength = 0.05f
+                playerModels.forEach{it.pulseStrength = 0.05f}
                 army.clear()
             }
             Phase.Night -> {
-                renderable.pulseStrength = 0.0f
+                playerModels.forEach{it.pulseStrength = 0.0f}
             }
             Phase.Chaos -> {
-                renderable.pulseStrength = 0.3f
+                playerModels.forEach{it.pulseStrength = 0.3f}
                 for(i in -5..5) {
                     for (j in -10..0) {
                         val p = createRenderable(Random.nextColor())
-                        p.parent = this
+                        p.translateGlobal(this.getWorldPosition())
                         p.translateLocal(Vector3f(2f*i.toFloat(), 0f, 2f*j.toFloat()))
                         p.scaleLocal(Vector3f(0.2f))
                         p.pulseStrength = 0.01f
@@ -59,6 +64,8 @@ class Player : Transformable(), GameObject {
 
     override fun draw(shaderProgram: ShaderProgram) {
         renderable.render(shaderProgram)
+        bongoLeft.render(shaderProgram)
+        bongoRight.render(shaderProgram)
         army.forEach { it.render(shaderProgram) }
     }
 
@@ -84,24 +91,25 @@ class Player : Transformable(), GameObject {
             ?: throw Exception("Could not load right Player model")
         private val meshNeutral = ModelLoader.loadModel("assets/models/duck/duckPoseNeutral.obj",0f,PI.toFloat(),0f)?.meshes
             ?: throw Exception("Could not load neutral Player model")
+        val bongoLeft = ModelLoader.loadModel("assets/models/duck/bongo1.obj",0f,0f,0f)
+            ?: throw Exception("Could not load left Bongo model")
+        val bongoRight = ModelLoader.loadModel("assets/models/duck/bongo2.obj",0f,0f,0f)
+            ?: throw Exception("Could not load left Bongo model")
+
         private val renderableLeft = Renderable(meshLeft)
         private val renderableRight = Renderable(meshRight)
         private val renderableNeutral = Renderable(meshNeutral)
-        val renderables = listOf(renderableLeft, renderableRight, renderableNeutral)
+        val playerModels = listOf(renderableLeft, renderableRight, renderableNeutral)
         init {
-            renderables.forEach {
-                it.translateLocal(Vector3f(5f,0f,45f))
-                it.scaleLocal(Vector3f(0.5f))
-            }
+
         }
-        // Custom getter so we create a new Renderable everytime it is called
+        // Custom getter so we don't create a new Renderable everytime it is called
         fun getPose(color: Vector3f, pose: Pose): Renderable {
             val r = when(pose) {
                 Pose.Left-> renderableLeft
                 Pose.Right-> renderableRight
                 Pose.Neutral-> renderableNeutral
             }
-
             r.emitColor = color
             return r
         }

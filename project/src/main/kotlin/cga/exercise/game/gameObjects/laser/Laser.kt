@@ -60,9 +60,9 @@ abstract class Laser : Transformable(), GameObject  {
     fun fire(effect: Event.Effect){
         when(effect){
             Event.Effect.LightOff -> { color.set(0f,0f,0f); fade = false }
-            Event.Effect.LightOnBlue -> { color.set(0f,0f,1f); fade = false }
-            Event.Effect.LightFlashBlue -> { color.set(0f,0f,2f); fade = true }
-            Event.Effect.LightFadeBlue -> { color.set(0f,0f,1f); fade = true }
+            Event.Effect.LightOnBlue -> { color.set(0.482, 0.408, 0.933); fade = false }
+            Event.Effect.LightFlashBlue -> { color.set(0.482, 0.408, 0.933); fade = true }
+            Event.Effect.LightFadeBlue -> { color.set(0.482, 0.408, 0.933); fade = true }
             Event.Effect.LightOnRed -> { color.set(1f,0f,0f); fade = false }
             Event.Effect.LightFlashRed -> { color.set(2f,0f,0f); fade = true }
             Event.Effect.LightFadeRed -> { color.set(1f,0f,0f); fade = true }

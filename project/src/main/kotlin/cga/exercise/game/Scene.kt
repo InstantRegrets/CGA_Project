@@ -22,6 +22,7 @@ import cga.exercise.game.gameObjects.note.NoteKey
 import cga.framework.GLError
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
+import cga.framework.OBJLoader
 import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -34,6 +35,7 @@ import kotlin.collections.ArrayList
  * Created by Fabian on 16.09.2017.
  */
 class Scene(val window: GameWindow) {
+    private var orbActualMesh: Mesh
     val camera: TronCamera
     private val level: Level
     private val player = Player()
@@ -97,7 +99,7 @@ class Scene(val window: GameWindow) {
         //Game Object creation
         sun = Sun(level.song.length)
         orbs.addAll(
-            Orb.createOrbs(10)
+            Orb.createOrbs(10, player)
         )
         gameObjects.addAll(
             listOf(
@@ -117,6 +119,24 @@ class Scene(val window: GameWindow) {
 
         gameObjects.forEach { it.switchPhase(phase) }
         level.song.play()
+
+        //WIP
+        val orbMesh =ModelLoader.loadModel("assets/models/lightSphere.obj",0f,0f,0f)
+        orbActualMesh = orbMesh?.meshes?.first() ?: throw Exception("yeet")
+        val offsets = arrayListOf(
+            Vector3f(-5f,1f,2f),
+            Vector3f(-4f,0f,0f),
+            Vector3f(-3f,0f,0f),
+            Vector3f(-2f,0f,0f),
+            Vector3f(-1f,0f,0f),
+            Vector3f(0f,0f,0f),
+            Vector3f(1f,0f,0f),
+            Vector3f(2f,0f,0f),
+            Vector3f(3f,0f,0f),
+            Vector3f(4f,0f,0f),
+            Vector3f(5f,0f,0f),
+        )
+        orbActualMesh.setupInstancing(offsets)
     }
 
     //RENDERING
@@ -131,6 +151,7 @@ class Scene(val window: GameWindow) {
         SoundListener.setPosition(camera)
         GLError.checkThrow()
         logFps()
+
     }
 
     private fun renderSkybox() {
@@ -216,6 +237,11 @@ class Scene(val window: GameWindow) {
 
         //Draw everything into gBuffer
         gameObjects.forEach { it.draw(geometryPassShader) }
+
+        //geometryPassShader.setUniform("view_matrix", camera.getCalculateViewMatrix())
+        //geometryPassShader.setUniform("projection_matrix", camera.getCalculateProjectionMatrix())
+        //geometryPassShader.setUniform("model_matrix", Matrix4f())
+        //orbActualMesh.renderInstanced(geometryPassShader, 11)
 
         glDepthMask(false)
         GLError.checkThrow("Geometry Pass")
@@ -410,13 +436,13 @@ class Scene(val window: GameWindow) {
     var x: Double = width / 2.0
     var y: Double = height / 2.0
     fun onMouseMove(xPos: Double, yPos: Double) {
-        // if (x == 0.0) {
-        //     x = xPos
-        // } else {
-        //     val diff = (x - xPos) * 0.002
-        //     x = xPos
-        //     camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
-        // }
+         if (x == 0.0) {
+             x = xPos
+         } else {
+             val diff = (x - xPos) * 0.002
+             x = xPos
+             camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
+         }
         // if (y == 0.0) {
         //     y = yPos
         // } else {

@@ -5,8 +5,8 @@ import org.lwjgl.opengl.GL33.*
 
 class Quad{
     //These are just IDs
-    private var vao: Int //the attribute specifications
-    private var vbo: Int //our actual vertices
+    private var vao: Int = glGenVertexArrays() //the attribute specifications
+    private var vbo: Int = glGenBuffers() //our actual vertices
     private val vertexData:FloatArray = floatArrayOf(
         // positions        // texture Coords
         -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
@@ -20,10 +20,6 @@ class Quad{
     )
 
     init {
-        //generating ID's
-        vao = glGenVertexArrays()
-        vbo = glGenBuffers()
-
         //binding Buffers, order is irrelevant, as long as you don't bind the same target
         glBindVertexArray(vao)
         glBindBuffer(GL_ARRAY_BUFFER, vbo)

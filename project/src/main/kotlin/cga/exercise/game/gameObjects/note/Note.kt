@@ -25,13 +25,13 @@ class Note(
 
     init {
         if (data.key == NoteKey.Left) {
-            color = Vector3f(1f ,0f,0f)
-            startPosition = Vector3f(-10f,-2f,-10f )
-            direction = Vector3f(9f,0f,10f)
-        } else {
             color = Vector3f(0f ,0f,1f)
-            startPosition = Vector3f(10f,-2f,-10f)
-            direction = Vector3f(-9f,0f,10f)
+            startPosition = Vector3f(1.55f,0.2f,27f)
+            direction = Vector3f(7f,0f,10f)
+        } else {
+            color = Vector3f(1f ,0f,0f)
+            startPosition = Vector3f(18.15f,0.2f,27f)
+            direction = Vector3f(-7f,0f,10f)
         }
         translateLocal(startPosition)
         renderable.emitColor = color
@@ -71,8 +71,8 @@ class Note(
             val mat = AnimatedMaterial(diff,emit,spec, Vector2f(3.0f))
             // val m =  meshes.map { Mesh(it.vertexData, it.indexData, ModelLoader.defaultOBJAttributes, mat) }.toMutableList()
             val r = Renderable(meshes)
-            r.scaleLocal(Vector3f(0.75f))
-            r.translateLocal(Vector3f(0f, -4f, 0f))
+            r.scaleLocal(Vector3f(0.50f))
+            r.translateLocal(Vector3f(0f, -8f, 0f))
             return r
         }
     }

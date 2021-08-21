@@ -14,14 +14,14 @@ import org.joml.Vector3f
 import org.lwjgl.opengl.GL33.*
 import kotlin.math.*
 
-class Orb:Transformable(), GameObject {
+class Orb(pParent: Transformable?):Transformable(parent = pParent), GameObject {
     companion object OrbFactory{
         val meshes = CustomModel("orb").renderable.meshes
         val encMeshes = CustomModel("orb_enc").renderable.meshes
-        fun createOrbs(n: Int): Collection<GameObject>{
+        fun createOrbs(n: Int, pParent: Transformable?): Collection<GameObject>{
             val result = mutableListOf<GameObject>()
             for (i in 1 until n){
-                result.add(Orb())
+                result.add(Orb(pParent))
             }
             return result
         }
@@ -102,10 +102,10 @@ class Orb:Transformable(), GameObject {
             Phase.Night -> {
                 basespeed = 0.3f
                 jumpSpeed = 0f
-                renderables.forEach { it.pulseStrength = Random.nextFloat(0.1f) }
+                renderables.forEach { it.pulseStrength = Random.nextFloat(0.05f) }
             }
             Phase.Chaos -> {
-                renderables.forEach { it.pulseStrength = Random.nextFloat(0.1f,0.2f) }
+                renderables.forEach { it.pulseStrength = Random.nextFloat(0.05f,0.06f) }
                 basespeed = 1f
                 jumpSpeed = 0.5f
             }

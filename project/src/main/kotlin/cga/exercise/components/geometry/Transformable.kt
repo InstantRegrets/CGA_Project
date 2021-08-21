@@ -69,6 +69,7 @@ open class Transformable(var modelMatrix: Matrix4f = Matrix4f(), var parent: Tra
         modelMatrix.mul(scaleMat)
     }
 
+
     /**
      * Returns position based on aggregated translations.
      * Hint: last column of model matrix
