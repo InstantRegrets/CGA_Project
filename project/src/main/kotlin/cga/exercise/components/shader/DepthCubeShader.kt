@@ -30,8 +30,7 @@ class DepthCubeShader(val cubemap: DepthCubemap) : ShaderProgram(
         setUniform("LightProjectionViewMatrix", pointLight.calcPVMatrixArray(cubemap.aspect,scene.camera.getCalculateViewMatrix()))
         // setUniform("beat", beat)
         setUniform("farPlane", pointLight.farPlane)
-        val pos = Vector4f(pointLight.getWorldPosition(), 1f).mul(scene.camera.getCalculateViewMatrix())
-        setUniform("lightPos", Vector3f(pos.x,pos.y,pos.z))
+        setUniform("lightPos", pointLight.getWorldPosition())
         scene.gameObjects.forEach{ it.draw(this) }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0) //return to default

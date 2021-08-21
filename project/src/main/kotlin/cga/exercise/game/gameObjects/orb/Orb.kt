@@ -18,12 +18,12 @@ class Orb:Transformable(), GameObject {
     companion object OrbFactory{
         val meshes = CustomModel("orb").renderable.meshes
         val encMeshes = CustomModel("orb_enc").renderable.meshes
-        fun createOrbs(n: Int, pParent: Transformable?): Collection<GameObject>{
-            val result = mutableListOf<GameObject>()
-            for (i in 1 until n){
+        fun createOrbs(n: Int, pParent: Transformable?): Collection<Orb>{
+            val result = mutableListOf<Orb>()
+            for (i in 0 until n){
                 val o = Orb()
                 o.parent = pParent
-                result.add(Orb())
+                result.add(o)
             }
             return result
         }
@@ -41,7 +41,7 @@ class Orb:Transformable(), GameObject {
     private val encRendAxis = Vector3f(0f,-1f,0f)
 
 
-    val light = PointLight(color, Vector3f(1f, 0.8f, 0.8f),0f)
+    val light = PointLight(color, Vector3f(1f, 0.1f, 0.1f),0.1f)
     val direction = Random.nextVec3(-2f*PI.toFloat(), 2f* PI.toFloat())
     var basespeed = 0.5f
     var jumpSpeed = 0.0f
@@ -53,7 +53,7 @@ class Orb:Transformable(), GameObject {
         rend2.translateLocal(Vector3f(0f,2f,0f))
         rend3.translateLocal(Vector3f(0f,0f,3f))
         light.parent = this
-        translateLocal(Vector3f(0f,Random.nextFloat(4f,5f),0f)) // todo minimum camera offset
+        translateLocal(Vector3f(0f,Random.nextFloat(8f,16f),0f)) // todo minimum camera offset
     }
 
     override fun draw(shaderProgram: ShaderProgram) {
@@ -87,7 +87,7 @@ class Orb:Transformable(), GameObject {
         rend3.rotateGlobalAxis(8*dt + 4f* basespeed*dt, rend3Axis)
 
         val colorStrength = 0.4f*sin((2f*PI.toFloat()*(beat-0.5f)-0.5f* PI.toFloat()))+0.6f
-        baseColor.mul(colorStrength,color)
+        // baseColor.mul(colorStrength,color)
     }
 
     private fun dir(float: Float): Float {

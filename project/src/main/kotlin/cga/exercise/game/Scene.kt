@@ -39,7 +39,7 @@ class Scene(val window: GameWindow) {
     private val level: Level
     private val player = Player()
     val gameObjects: MutableList<GameObject> = mutableListOf()
-    private val orbs: MutableList<GameObject> = mutableListOf()
+    private val orbs: MutableList<Orb> = mutableListOf()
 
     val sun: Sun
     private val depthMap: DepthMap = DepthMap()
@@ -84,7 +84,8 @@ class Scene(val window: GameWindow) {
 
         // CAMERA
         camera = TronCamera()
-        camera.translateLocal(Vector3f(7f,5f,40f))
+        camera.translateLocal(Vector3f(0f,10f,0f))
+        camera.parent = player
 
         //Sound and level
         SoundContext.setup()
@@ -101,7 +102,7 @@ class Scene(val window: GameWindow) {
         //Game Object creation
         sun = Sun(level.song.length)
         orbs.addAll(
-            Orb.createOrbs(10, player)
+            Orb.createOrbs(2, player)
         )
         gameObjects.addAll(
             listOf(
@@ -112,7 +113,6 @@ class Scene(val window: GameWindow) {
         spotLights.add(sun.light)
         spotLights.add(level.lightShow.sceneLight)
         pointLights.addAll(orbs.map { (it as Orb).light })
-        pointLights.add(player.light)
         gameObjects.addAll(orbs)
 
         //Sphere Mesh for Light Volumes
@@ -413,13 +413,13 @@ class Scene(val window: GameWindow) {
     var x: Double = width / 2.0
     var y: Double = height / 2.0
     fun onMouseMove(xPos: Double, yPos: Double) {
-         if (x == 0.0) {
-             x = xPos
-         } else {
-             val diff = (x - xPos) * 0.002
-             x = xPos
-             camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
-         }
+         // if (x == 0.0) {
+         //     x = xPos
+         // } else {
+         //     val diff = (x - xPos) * 0.002
+         //     x = xPos
+         //     camera.rotateAroundPoint(0f, diff.toFloat(), 0f, Vector3f(0f,0f,0f))
+         // }
         // if (y == 0.0) {
         //     y = yPos
         // } else {

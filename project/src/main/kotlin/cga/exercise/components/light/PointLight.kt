@@ -27,6 +27,7 @@ class PointLight(
         shaderProgram.setUniform("${structName}color", color)
         shaderProgram.setUniform("${structName}attenuation", attenuation)
     }
+    // todo fix calcBoundingSphere
     fun calcBoundingSphere(): Float{
         val constant = attenuation.x
         val linear = attenuation.y
@@ -34,13 +35,13 @@ class PointLight(
         val maxChannel = maxOf(color.x, color.y, color.z)
         val ret = (-linear + sqrt(linear*linear - 4 * exp * (constant - 256/5 * maxChannel * intensity)))/
                 2 * exp
-        return ret*30
+        return ret*300
     }
 
     private val cameraViewMatrix4f = Matrix4f()
     private val viewMatrix = Matrix4f()
     fun calcViewMatrix(side: Vector3f, up: Vector3f): Matrix4f{
-        val position = getWorldPosition4f().mul(cameraViewMatrix4f).toVector3f()
+        val position = getWorldPosition()
         val target = Vector3f(position).add(side)
         viewMatrix.identity()
         viewMatrix.lookAt(position, target, up)
@@ -55,7 +56,7 @@ class PointLight(
     }
 
     fun calcPVMatrixArray(aspect: Float, cameraViewMatrix4f: Matrix4f): Array<Matrix4f> {
-        cameraViewMatrix4f.set(cameraViewMatrix4f)
+        this.cameraViewMatrix4f.set(cameraViewMatrix4f)
         calcProjectionMatrix(aspect)
         val shadowTransform = arrayOf(
             Matrix4f(projectionMatrix).mul(calcViewMatrix(Vector3f(1f,0f,0f),Vector3f(0f,-1f,0f))),

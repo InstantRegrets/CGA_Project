@@ -18,7 +18,6 @@ class Player : Transformable(), GameObject {
     var color = Random.nextColor()
     var pose = Pose.Neutral
     var renderable: Renderable = getPose(color,pose)
-    val light = PointLight(color, Vector3f(1f, 0.7f, 1.8f))
     var army: ArrayList<Renderable> = arrayListOf()
     enum class Pose { Right, Left, Neutral}
 
@@ -59,7 +58,6 @@ class Player : Transformable(), GameObject {
 
     init {
         renderable.parent = this
-        light.parent = this
     }
 
     override fun draw(shaderProgram: ShaderProgram) {
@@ -79,9 +77,7 @@ class Player : Transformable(), GameObject {
         else pose = Pose.Neutral
     }
 
-    override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) {
-         light.bind(shaderProgram, viewMatrix4f)
-    }
+    override fun processLighting(shaderProgram: ShaderProgram, viewMatrix4f: Matrix4f) { }
 
 
     companion object{
