@@ -70,7 +70,6 @@ class TronCamera(
                 transitionPos.set(Vector3f(-2f,4f,6f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 4f
-                shake = 0.3f
             }
             Phase.Night -> {
                 transitionPos.set(Vector3f(2f,4f,6f).sub(this.getPosition()))
@@ -82,7 +81,7 @@ class TronCamera(
                 transitionPos.set(Vector3f(0f,4f,7f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
-                shake = 1.0f
+                shake = 0.3f
             }
         }
 

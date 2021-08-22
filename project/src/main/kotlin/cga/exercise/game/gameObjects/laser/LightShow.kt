@@ -20,6 +20,7 @@ class LightShow: GameObject {
     val sceneLight = SpotLight(
         Vector3f(1f),
         Vector3f(1f, 0f,0f),
+        shadowQuadSize = 120f
     )
 
     init {

@@ -19,8 +19,8 @@ class SoundBuffer(path: File) {
         val info = STBVorbisInfo.malloc()
         val pcm = readVorbis(path.absolutePath, info)
         val c = if (info.channels() == 1) AL_FORMAT_MONO16 else AL_FORMAT_STEREO16
-        if (info.channels() > 1)
-            println("Warning, audio with multiple channels will be played back `as is` without any effects")
+        // if (info.channels() > 1)
+        //     println("Warning, audio with multiple channels will be played back `as is` without any effects")
         alBufferData(bufferId, c, pcm, info.sample_rate())
     }
 

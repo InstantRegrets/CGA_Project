@@ -29,9 +29,18 @@ class Environment : GameObject {
 
     override fun switchPhase(phase: Phase) {
         when(phase){
-            Phase.Day -> { wobbleModel.renderable.vibeStrength = 1f}
-            Phase.Night -> { wobbleModel.renderable.vibeStrength = 0.1f}
-            Phase.Chaos -> { wobbleModel.renderable.vibeStrength = 1f}
+            Phase.Day -> {
+                wobbleModel.renderable.vibeStrength = 0.5f
+                wobbleModel.renderable.pulseStrength = 0.0f
+            }
+            Phase.Night -> {
+                wobbleModel.renderable.vibeStrength = 0.1f
+                wobbleModel.renderable.pulseStrength = 0.0f
+            }
+            Phase.Chaos -> {
+                wobbleModel.renderable.vibeStrength = 1f
+                wobbleModel.renderable.pulseStrength = 0.5f
+            }
         }
     }
 

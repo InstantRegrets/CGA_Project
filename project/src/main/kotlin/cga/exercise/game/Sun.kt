@@ -24,7 +24,7 @@ class Sun(
         outerCone = 0.6f * PI.toFloat(),
         innerCone = 0.4f *PI.toFloat(),
         near_plane = 0f,
-        far_plane = 550f,
+        far_plane = 1200f,
         shadowQuadSize = 320f,
     )
 

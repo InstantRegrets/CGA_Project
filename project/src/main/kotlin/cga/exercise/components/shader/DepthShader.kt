@@ -16,9 +16,6 @@ class DepthShader(val depthMap: DepthMap) : ShaderProgram(
     override val targetPulseStrength: Boolean = true
     override val targetEmitColor: Boolean = false
     override val targetVibeStrength: Boolean = false
-    init {
-        setUniform("depthMap",6)
-    }
 
     fun pass(spotLight: SpotLight, scene: Scene, beat: Float){
         glDisable(GL_BLEND)
