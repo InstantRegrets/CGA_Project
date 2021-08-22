@@ -18,8 +18,6 @@ our spirit animal!
 - [Skybox Texture](https://assetstore.unity.com/packages/vfx/shaders/polyverse-skies-low-poly-skybox-shaders-104017)
 - [Dirt Texture](https://www.vectorstock.com/royalty-free-vector/seamless-pattern-ground-with-stones-brown-soil-vector-37512397)
 
-
-
 # Featureliste
 
 - Soundausgabe
@@ -28,17 +26,25 @@ our spirit animal!
 - Light Volume implementation für Point Lights
 - Lichtshow durch Lasersystem
 - Shadowmapping der spotlights (Sonne und Laser)
-- Point Shadows
-- Instancing
+- Point Shadows der Orbs
+- Instancin
 - Skybox Code
-- Camera Shake
+- Camera Shake und Kamera bewegung der Phasen
 - Mehrere Phasen abhängig von der Musik
 - Geometry shader abhängig von der Musik
-- Animierte Orbs, die um den Spieler fliegen
+- Animierte Orbs, die aus mehreren Spherers bestehen, die um sich selber fliegen, die um den Spieler fliegen
 - Selbst modellierte(s)/colorierte(s):
   - Umgebung
   - Spielermodell
   - Notenmodell
+  - Orbs (naja die Spheren nicht ;))
 
 see [project README](project/README.md)
+
+# Setup
+
+- Level setup under [project/assets/levels/README.md](project/assets/levels/README.md)
+- Graphik (shader) Quality under [project/src/main/kotlin/cga/framework/Quality.kt](project/src/main/kotlin/cga/framework/Quality.kt)
+- run under [project/src/main/kotlin/cga/exercise/main.kt](project/src/main/kotlin/cga/exercise/main.kt)
+
 
