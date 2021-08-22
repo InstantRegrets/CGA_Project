@@ -20,7 +20,7 @@ our spirit animal!
 
 # Featureliste
 
-- Soundausgabe
+- Soundausgabe (musik, hit and miss sound)
 - Einfaches rythmusspiel
 - Deferred Rendering
 - Light Volume implementation für Point Lights
@@ -31,7 +31,7 @@ our spirit animal!
 - Skybox Code
 - Camera Shake und Kamera bewegung der Phasen
 - Mehrere Phasen abhängig von der Musik
-- Geometry shader abhängig von der Musik
+- Geometry shader abhängig von der Musik (pulse + vibe)
 - Animierte Orbs, die aus mehreren Spherers bestehen, die um sich selber fliegen, die um den Spieler fliegen
 - Selbst modellierte(s)/colorierte(s):
   - Umgebung
@@ -39,7 +39,10 @@ our spirit animal!
   - Notenmodell
   - Orbs (naja die Spheren nicht ;))
 
-see [project README](project/README.md)
+**Kleinkram:**
+- FPS-Logger (default off)
+- Console hit Feedback
+- chart loading von Beatsaver Charts
 
 ## Setup
 
