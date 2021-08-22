@@ -5,6 +5,7 @@ import cga.exercise.components.material.AnimatedMaterial
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
+import cga.framework.Colors
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import cga.framework.OBJLoader
@@ -25,11 +26,11 @@ class Note(
 
     init {
         if (data.key == NoteKey.Left) {
-            color = Vector3f(1f ,0f,0f)
+            color = Vector3f(Colors.red)
             startPosition = Vector3f(1.55f,0.2f,27f)
             direction = Vector3f(7.5f,0f,10.5f)
         } else {
-            color = Vector3f(0f ,0f,1f)
+            color = Vector3f(Colors.blue)
             startPosition = Vector3f(18.15f,0.2f,27f)
             direction = Vector3f(-7.5f,0f,10.5f)
         }

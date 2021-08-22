@@ -1,6 +1,6 @@
 package cga.exercise.game
 
-import cga.exercise.components.camera.TronCamera
+import cga.exercise.components.camera.DuckCamera
 import cga.exercise.components.geometry.GeometryBuffer
 import cga.exercise.components.geometry.Mesh
 import cga.exercise.components.geometry.Quad
@@ -33,7 +33,7 @@ import org.lwjgl.opengl.GL33.*
  * Created by Fabian on 16.09.2017.
  */
 class Scene(val window: GameWindow) {
-    val camera: TronCamera
+    val camera: DuckCamera
     private val level: Level
     private val player = Player()
     val gameObjects: MutableList<GameObject> = mutableListOf()
@@ -81,7 +81,7 @@ class Scene(val window: GameWindow) {
         spotLightShader = SpotLightShader()
 
         // CAMERA
-        camera = TronCamera(parent = player, camTarget = player)
+        camera = DuckCamera(parent = player, camTarget = player)
 
 
         //Sound and level

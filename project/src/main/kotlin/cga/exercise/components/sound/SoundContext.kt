@@ -1,11 +1,6 @@
 package cga.exercise.components.sound
 
-import cga.exercise.components.camera.ICamera
-import cga.exercise.components.camera.TronCamera
-import org.joml.Matrix4f
-import org.joml.Vector3f
 import org.lwjgl.openal.AL
-import org.lwjgl.openal.AL11
 import org.lwjgl.openal.AL11.*
 import org.lwjgl.openal.ALC
 import org.lwjgl.openal.ALC11.*

@@ -9,6 +9,7 @@ import cga.exercise.components.shader.GeometryShader
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
+import cga.framework.Colors
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import cga.framework.Random
@@ -119,16 +120,18 @@ class Player : Transformable(), GameObject {
     override fun processInput(window: GameWindow, dt: Float) {
         if (window.getKeyState(GLFW_KEY_D) && window.getKeyState(GLFW_KEY_A) || window.getKeyState(GLFW_KEY_S)) {
             pose = Pose.Wide
-            bongoRight.emitColor.set(0f,0f,1f)
-            bongoLeft.emitColor.set(1f,0f,0f)
+            bongoRight.emitColor.set(Colors.blue)
+            bongoLeft.emitColor.set(Colors.red)
         }
         else if (window.getKeyState(GLFW_KEY_D)) {
             pose = Pose.Right
-            bongoRight.emitColor.set(0f,0f,1f)
+            bongoRight.emitColor.set(Colors.blue)
+            bongoLeft.emitColor.set(0.25f)
         }
         else if(window.getKeyState(GLFW_KEY_A)) {
             pose = Pose.Left
-            bongoLeft.emitColor.set(1f,0f,0f)
+            bongoLeft.emitColor.set(Colors.red)
+            bongoRight.emitColor.set(0.25f)
         }
         else {
             pose = Pose.Neutral

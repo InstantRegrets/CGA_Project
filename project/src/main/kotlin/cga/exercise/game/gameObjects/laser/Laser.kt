@@ -7,6 +7,7 @@ import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
 import cga.exercise.game.gameObjects.note.NoteKey
 import cga.exercise.game.level.Event
+import cga.framework.Colors
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import org.joml.Matrix4f
@@ -60,12 +61,12 @@ abstract class Laser : Transformable(), GameObject  {
     fun fire(effect: Event.Effect){
         when(effect){
             Event.Effect.LightOff -> { color.set(0f,0f,0f); fade = false }
-            Event.Effect.LightOnBlue -> { color.set(0.482, 0.408, 0.933); fade = false }
-            Event.Effect.LightFlashBlue -> { color.set(0.482, 0.408, 0.933); fade = true }
-            Event.Effect.LightFadeBlue -> { color.set(0.482, 0.408, 0.933); fade = true }
-            Event.Effect.LightOnRed -> { color.set(1f,0f,0f); fade = false }
-            Event.Effect.LightFlashRed -> { color.set(2f,0f,0f); fade = true }
-            Event.Effect.LightFadeRed -> { color.set(1f,0f,0f); fade = true }
+            Event.Effect.LightOnBlue -> { color.set(Colors.blue); fade = false }
+            Event.Effect.LightFlashBlue -> { color.set(Colors.blueFlash); fade = true }
+            Event.Effect.LightFadeBlue -> { color.set(Colors.blue); fade = true }
+            Event.Effect.LightOnRed -> { color.set(Colors.red); fade = false }
+            Event.Effect.LightFlashRed -> { color.set(Colors.redFlash); fade = true }
+            Event.Effect.LightFadeRed -> { color.set(Colors.red); fade = true }
         }
     }
 }

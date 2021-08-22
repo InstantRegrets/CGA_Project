@@ -34,7 +34,7 @@ class Sun(
         light.shadowQuadSize = 320f
         model.renderable.pulseStrength = 10f
         translateLocal(Vector3f(50f,400f,0f))
-        scaleLocal(Vector3f(40f))
+        scaleLocal(Vector3f(35f))
         light.rotateLocal(-1.5f * PI.toFloat(),0f,0f)
         rotateAroundPoint(0f,0f,(-0.5* PI).toFloat(), Vector3f())
         rotateAroundPoint(0f,0.4f,0f,Vector3f())
@@ -62,19 +62,16 @@ class Sun(
     override fun switchPhase(phase: Phase) {
         when(phase){
             Phase.Day -> {
-                model.renderable.scaleLocal(Vector3f(0.25f))
                 light.color.set(0.5f,0.25f,0f)
                 model.renderable.emitColor.set(1f,1f,0f)
-                model.renderable.pulseStrength = 40f
+                model.renderable.pulseStrength = 80f
             }
             Phase.Night -> {
-                model.renderable.scaleLocal(Vector3f(2f))
                 light.color.set(0.1f,0.1f,0.1f)
                 model.renderable.emitColor.set(0.3f,0.3f,0.3f)
                 model.renderable.pulseStrength = 0f
             }
             Phase.Chaos -> {
-                model.renderable.scaleLocal(Vector3f(2f))
                 light.color.set(0.8f,0f,0f)
                 model.renderable.emitColor.set(0.8f,0f,0f)
                 model.renderable.pulseStrength = 400f

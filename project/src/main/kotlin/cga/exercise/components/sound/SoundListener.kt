@@ -1,6 +1,6 @@
 package cga.exercise.components.sound
 
-import cga.exercise.components.camera.TronCamera
+import cga.exercise.components.camera.DuckCamera
 import org.joml.Vector3f
 import org.lwjgl.openal.AL10.*
 
@@ -11,7 +11,7 @@ object SoundListener {
         alListener3f(AL_VELOCITY, speed.x, speed.y, speed.z)
     }
 
-    fun setPosition(camera: TronCamera) {
+    fun setPosition(camera: DuckCamera) {
         setPosition(camera.getWorldPosition())
         val at = camera.getWorldZAxis().negate()
         val up = camera.getWorldYAxis()

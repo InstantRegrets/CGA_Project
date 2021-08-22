@@ -7,7 +7,7 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import kotlin.math.*
 
-class TronCamera(
+class DuckCamera(
     private val fieldOfView: Float = 0.5f * PI.toFloat(),
     private val aspectRatio: Float = 16f / 9f,
     private val nearPlane: Float = 0.1f,
@@ -67,12 +67,12 @@ class TronCamera(
     fun switchPhase(phase: Phase, beat: Float){
         when(phase){
             Phase.Day -> {
-                transitionPos.set(Vector3f(-2f,4f,6f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(-2f,4f,7f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 4f
             }
             Phase.Night -> {
-                transitionPos.set(Vector3f(2f,4f,6f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(2f,4f,7f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
 
