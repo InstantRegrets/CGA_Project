@@ -5,14 +5,12 @@ import cga.exercise.components.geometry.Transformable
 import cga.exercise.components.shader.ShaderProgram
 import cga.exercise.game.gameObjects.GameObject
 import cga.exercise.game.gameObjects.Phase
-import cga.exercise.game.gameObjects.note.NoteKey
 import cga.exercise.game.level.Event
 import cga.framework.Colors
 import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import kotlin.random.Random
 
 abstract class Laser : Transformable(), GameObject  {
     val color: Vector3f = Vector3f(0f)

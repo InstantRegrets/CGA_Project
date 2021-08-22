@@ -2,8 +2,6 @@ package cga.exercise.game.gameObjects.player
 
 import cga.exercise.components.geometry.Renderable
 import cga.exercise.components.geometry.Transformable
-import cga.exercise.components.light.PointLight
-import cga.exercise.components.shader.DepthCubeShader
 import cga.exercise.components.shader.DepthShader
 import cga.exercise.components.shader.GeometryShader
 import cga.exercise.components.shader.ShaderProgram
@@ -14,7 +12,6 @@ import cga.framework.GameWindow
 import cga.framework.ModelLoader
 import cga.framework.Random
 import org.joml.Matrix4f
-import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import kotlin.math.PI
