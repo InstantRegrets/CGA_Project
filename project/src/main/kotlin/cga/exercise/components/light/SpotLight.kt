@@ -19,7 +19,7 @@ class SpotLight(
     val innerCone: Float = (0.2* PI).toFloat(),
     var near_plane: Float = 250f,
     var far_plane: Float = 450f,
-    val shadowQuadSize: Float = 80f, // Inner Cone in radians
+    var shadowQuadSize: Float = 80f, // Inner Cone in radians
 ) : Light() {
 
     override fun bind(shaderProgram: ShaderProgram, viewMatrix: Matrix4f) {

@@ -14,26 +14,24 @@ import org.joml.Vector3f
 import kotlin.math.PI
 
 class Sun(
-    private val songLength: Float,
-    private val near_plane: Float = 350f,
-    private val far_plane: Float = 450f
+    private val songLength: Float
 ): GameObject, Transformable() {
 
-    private val shadowQuadSize = 20f
-
-    private var lightView = Matrix4f()
-    private var projectionMatrix = Matrix4f()
     val model = CustomModel("orb")
     val light = SpotLight(
         color = Vector3f(1f, 1f, 1f),
         attenuation = Vector3f(1f, 0f, 0f),
         outerCone = 0.6f * PI.toFloat(),
         innerCone = 0.4f *PI.toFloat(),
+        near_plane = 0f,
+        far_plane = 550f,
+        shadowQuadSize = 320f,
     )
 
     init {
         model.renderable.parent = this
         light.parent = this
+        light.shadowQuadSize = 320f
         model.renderable.pulseStrength = 10f
         translateLocal(Vector3f(50f,400f,0f))
         scaleLocal(Vector3f(40f))

@@ -81,9 +81,8 @@ class Scene(val window: GameWindow) {
         spotLightShader = SpotLightShader()
 
         // CAMERA
-        camera = TronCamera(camTarget = player)
-        camera.translateLocal(Vector3f(0f,10f,0f))
-        camera.parent = player
+        camera = TronCamera(parent = player, camTarget = player)
+
 
         //Sound and level
         SoundContext.setup()
@@ -138,7 +137,7 @@ class Scene(val window: GameWindow) {
         glDepthFunc(GL_LEQUAL) //prevent z-fighting
         skyboxShader.use()
         //We eliminate the translation part of the matrix
-        val viewMatrix = Matrix4f(Matrix3f(camera.getCalculateViewMatrix()))
+        val viewMatrix = Matrix4f(Matrix3f(camera.viewMatrix))
         //upload everything
         skyboxShader.setUniform("view_matrix", viewMatrix)
         skyboxShader.setUniform("projection_matrix", camera.getCalculateProjectionMatrix())
@@ -169,7 +168,7 @@ class Scene(val window: GameWindow) {
 
         fpsLogger.logSpotLightPass()
 
-        val viewLocal = camera.getCalculateViewMatrix()
+        val viewLocal = camera.viewMatrix
         val projectionLocal = camera.getCalculateProjectionMatrix()
 
         glEnable(GL_STENCIL_TEST)
@@ -200,11 +199,11 @@ class Scene(val window: GameWindow) {
 
         spotLightShader.use()
         gBuffer.bindForLightPass()
-        spotLightShader.setUniform("CameraViewMatrix", camera.getCalculateViewMatrix())
+        spotLightShader.setUniform("CameraViewMatrix", camera.viewMatrix)
         spotLightShader.setUniform("LightProjectionViewMatrix", spotLight.calcPVMatrix())
         glActiveTexture(GL_TEXTURE6)
         glBindTexture(GL_TEXTURE_2D, depthMap.texture)
-        spotLight.bind(spotLightShader, camera.getCalculateViewMatrix())
+        spotLight.bind(spotLightShader, camera.viewMatrix)
         quad.draw(spotLightShader)
         glDisable(GL_BLEND)
     }

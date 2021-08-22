@@ -22,16 +22,17 @@ class TronCamera(
     private var transitionStartTime = 0f
     private val transitionPos = Vector3f(0f)
     init {
-        translateLocal(Vector3f(0f, -4f, 8f)) // since the ground is a bit below 0
+        translateLocal(Vector3f(0f, 50f, -350f)) // since the ground is a bit below 0
+        transitionPos.set(-2f,4f,8f).sub(this.getPosition())
     }
 
     override fun getCalculateViewMatrix(): Matrix4f {
         val up = getWorldYAxis()
         val cameraPosition = getWorldPosition()
-        val cameraTarget = Vector3f(0f,0f,0f)
-        cameraPosition.sub(camTarget.getWorldPosition(), cameraTarget)
-        cameraTarget.normalize()
-        cameraTarget.add(Random.nextVec3(-0.4f,0.4f).mul(shake))
+        val cameraTarget = camTarget.getWorldPosition()
+        // cameraTarget.normalize()
+        cameraTarget.add(0f,4.0f,0f)
+        cameraTarget.add(Random.nextVec3(-0.1f,0.1f).mul(shake))
         viewMatrix = Matrix4f().lookAt(cameraPosition, cameraTarget, up)
 
         return viewMatrix
@@ -66,19 +67,19 @@ class TronCamera(
     fun switchPhase(phase: Phase, beat: Float){
         when(phase){
             Phase.Day -> {
-                transitionPos.set(Vector3f(-2f,5f,7f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(-2f,4f,6f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 4f
                 shake = 0.3f
             }
             Phase.Night -> {
-                transitionPos.set(Vector3f(2f,5f,7f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(2f,4f,6f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
 
             }
             Phase.Chaos -> {
-                transitionPos.set(Vector3f(0f,5f,8f).sub(this.getPosition()))
+                transitionPos.set(Vector3f(0f,4f,7f).sub(this.getPosition()))
                 transitionStartTime = beat
                 transitionDuration = 8f
                 shake = 1.0f
