@@ -20,33 +20,36 @@ our spirit animal!
 
 # Featureliste
 
-- Soundausgabe (musik, hit and miss sound)
-- Einfaches rythmusspiel
-- Deferred Rendering
-- Light Volume implementation für Point Lights
-- Lichtshow durch Lasersystem
-- Shadowmapping der spotlights (Sonne und Laser)
-- Point Shadows der Orbs
-- Instancin
-- Skybox Code
-- Camera Shake und Kamera bewegung der Phasen
-- Mehrere Phasen abhängig von der Musik
-- Geometry shader abhängig von der Musik (pulse + vibe)
-- Animierte Orbs, die aus mehreren Spherers bestehen, die um sich selber fliegen, die um den Spieler fliegen
+Mini Disclaimer: Auch wenn nur ein name an einem Feature steht, wurde grundsätzlich zusammen Entwickelt (Ideen, Debugging, Unterstützung) :)
+
+- Soundausgabe (musik, hit and miss sound) [Bastian]
+- Einfaches rythmusspiel [Alle]
+- Deferred Rendering [Jannik]
+- Light Volume implementation für Point Lights [Jannik]
+- Lichtshow durch Lasersystem [Simon]
+- Shadowmapping der spotlights (Sonne und Laser) [Bastian]
+- Point Shadows der Orbs [Bastian]
+- Instancing [Jannik]
+- Skybox Code [Simon + Jannik]
+- Camera Shake und Kamerafahrten [Simon]
+- Geometry shader abhängig von der Musik (pulse + vibe) [Bastian]
+- Animierte Orbs, die aus mehreren Sphären bestehen, die um sich selber fliegen, die um den Spieler fliegen [Alle]
 - Selbst modellierte(s)/colorierte(s):
-  - Umgebung
-  - Spielermodell
-  - Notenmodell
-  - Orbs (naja die Spheren nicht ;))
+  - Umgebung [Jannik]
+  - Spielermodell [Simon]
+  - Notenmodell [Simon]
+  - Orbs (naja die Spheren nicht ;)) [Bastian]
 
 **Kleinkram:**
+
 - FPS-Logger (default off)
 - Console hit Feedback
 - chart loading von Beatsaver Charts
+- Mehrere Phasen abhängig von der Musik 
 
 ## Setup
 
-- Level setup under [project/assets/levels/README.md](project/assets/levels/README.md)
+- Level setup under [project/assets/levels](project/assets/levels)
 - Graphik (shader) Quality under [project/src/main/kotlin/cga/framework/Quality.kt](project/src/main/kotlin/cga/framework/Quality.kt)
 - run under [project/src/main/kotlin/cga/exercise/main.kt](project/src/main/kotlin/cga/exercise/main.kt)
 
