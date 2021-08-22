@@ -127,6 +127,7 @@ class Scene(val window: GameWindow) {
     fun render(dt: Float, t: Float) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         deferredRender(dt, t)
+        if (shaderPassIndex > 0)
         renderSkybox()
         GLError.checkThrow()
         fpsLogger.logFps()
@@ -156,13 +157,15 @@ class Scene(val window: GameWindow) {
         fpsLogger.resetTimer()
         geometryPass(dt, beat)
         fpsLogger.logGeometryPass();
+        if (shaderPassIndex > 1)
         ambientPass()
         fpsLogger.logAmbientPass()
 
-        spotLights.forEach {
-            depthShader.pass(it, this, beat)
-            spotLightPass(it) // todo second pass for mountain lights
-        }
+        if (shaderPassIndex > 2)
+            spotLights.forEach {
+                depthShader.pass(it, this, beat)
+                spotLightPass(it) // todo second pass for mountain lights
+            }
 
         fpsLogger.logSpotLightPass()
 
@@ -170,11 +173,12 @@ class Scene(val window: GameWindow) {
         val projectionLocal = camera.getCalculateProjectionMatrix()
 
         glEnable(GL_STENCIL_TEST)
-        pointLights.forEach {
-            stencilPass(it, viewLocal, projectionLocal)
-            depthCubeShader.pass(it,this,beat)
-            pointLightPass(it, viewLocal, projectionLocal)
-        }
+        if (shaderPassIndex > 3)
+            pointLights.forEach {
+                stencilPass(it, viewLocal, projectionLocal)
+                depthCubeShader.pass(it,this,beat)
+                pointLightPass(it, viewLocal, projectionLocal)
+            }
 
         fpsLogger.logPointLightPass()
         glDisable(GL_STENCIL_TEST)
@@ -382,7 +386,14 @@ class Scene(val window: GameWindow) {
         camera.switchPhase(phase,beat) //todo
     }
 
+    //
+    var shaderPassIndex = 4;
     fun onKey(key: Int, scancode: Int, action: Int, mode: Int) {
+        if (key == GLFW_KEY_L && action == 1) {
+            shaderPassIndex++
+            shaderPassIndex %= 5
+            println(shaderPassIndex)
+        }
         if (key == GLFW_KEY_A && action == 1) {
             level.onKey(HitKey.Left)
         }

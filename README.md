@@ -41,10 +41,21 @@ our spirit animal!
 
 see [project README](project/README.md)
 
-# Setup
+## Setup
 
 - Level setup under [project/assets/levels/README.md](project/assets/levels/README.md)
 - Graphik (shader) Quality under [project/src/main/kotlin/cga/framework/Quality.kt](project/src/main/kotlin/cga/framework/Quality.kt)
 - run under [project/src/main/kotlin/cga/exercise/main.kt](project/src/main/kotlin/cga/exercise/main.kt)
 
+## Controls
+
+- **a** - Left Hit
+- **s** - Both Hit
+- **d** - Right Hit
+- **l** - switch through render targets
+    - skybox
+    - ambient + emit
+    - spotlights
+    - pointlights
+- **esc** - exit game
 
