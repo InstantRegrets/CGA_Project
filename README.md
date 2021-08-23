@@ -4,21 +4,21 @@
 
 our spirit animal!
 
-# Teammitglieder
+## Teammitglieder
 - Simon Wöhler
 - Bastian Abt
 - Jannik Alexander
 
 
 
-# Disclaimer: verwendete externe Inhalte
+## Disclaimer: verwendete externe Inhalte
 
 - [Duck sound](https://freesound.org/people/dobroide/sounds/185134/)
 - [Bongo sound](https://freesound.org/people/stomachache/sounds/29803/)
 - [Skybox Texture](https://assetstore.unity.com/packages/vfx/shaders/polyverse-skies-low-poly-skybox-shaders-104017)
 - [Dirt Texture](https://www.vectorstock.com/royalty-free-vector/seamless-pattern-ground-with-stones-brown-soil-vector-37512397)
 
-# Featureliste
+## Featureliste
 
 Mini Disclaimer: Auch wenn nur ein name an einem Feature steht, wurde grundsätzlich zusammen Entwickelt (Ideen, Debugging, Unterstützung) :)
 
@@ -46,6 +46,14 @@ Mini Disclaimer: Auch wenn nur ein name an einem Feature steht, wurde grundsätz
 - Console hit Feedback
 - chart loading von Beatsaver Charts
 - Mehrere Phasen abhängig von der Musik 
+
+**gestrichene Features:**
+- ~~parametisierte Objekte~~
+- ~~Toonshader + Fogshader~~
+- ~~SSAO~~
+- ~~Orbit + Flythrough Camera~~
+- ~~Texture Matrizen~~ (animierte Texturen sind implementiert, werden aber nicht benutzt)
+
 
 ## Setup
 
