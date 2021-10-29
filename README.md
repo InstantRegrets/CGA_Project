@@ -18,6 +18,16 @@ our spirit animal!
 - [Skybox Texture](https://assetstore.unity.com/packages/vfx/shaders/polyverse-skies-low-poly-skybox-shaders-104017)
 - [Dirt Texture](https://www.vectorstock.com/royalty-free-vector/seamless-pattern-ground-with-stones-brown-soil-vector-37512397)
 
+## Video
+
+Aufgrund von Upload limits musste das Video auf Youtube hochgeladen werden.
+
+Cayuga_Featurevideo
+
+Da das Erklärvideo leider ein bisschen in der Bitrate eingebüßt hat, wir aber keine Zeit mehr hatten das komplett neu zu machen, haben wir noch einmal ein rohes Video hochgeladen, ohne Text o.ä.:
+
+Cayuga_Gameplay
+
 ## Featureliste
 
 Mini Disclaimer: Auch wenn nur ein name an einem Feature steht, wurde grundsätzlich zusammen Entwickelt (Ideen, Debugging, Unterstützung) :)
